@@ -1,0 +1,71 @@
+MEZYAD — GROUPS 1, 2 AND 3
+
+Extract the entire ZIP into a NEW folder outside your existing repository.
+This is a standalone frontend package. Do not overwrite your team project.
+
+QUICK PREVIEW
+Open PREVIEW.html in Chrome or Edge.
+Keep the public folder beside it. Choose Login, then the preview account button.
+Preview changes stay in memory and reset when you refresh the browser.
+The preview starts with approved, pending and rejected example listings.
+No real account, listing, auction or bank operation is created in preview mode.
+
+RUN REACT IN VS CODE
+Open this extracted folder in VS Code, then run:
+  npm ci
+  npm run dev
+Open the local URL printed by Vite.
+
+GROUP 1
+Home: src/pages/Home.jsx
+Public auctions: src/pages/Browse.jsx
+How it works: src/pages/Guide.jsx
+Help: src/pages/Help.jsx
+
+GROUP 2
+Login: src/pages/Login.jsx
+Register: src/pages/Register.jsx
+Profile: src/pages/Profile.jsx
+Activity: src/pages/Activity.jsx
+
+GROUP 3
+My listings: src/pages/MyListings.jsx
+Create listing: src/pages/CreateListing.jsx
+Edit rejected listing: src/pages/EditListing.jsx
+Create public/private auction: src/pages/CreateAuction.jsx
+
+SHARED FILES
+src/ListingEditor.jsx: category, details, images and confirmation steps.
+src/workspace.js: account and listing state, preview and API operations.
+src/api.js: request handling, API messages and field validation.
+src/account-components.jsx: account layouts and shared controls.
+src/App.jsx: routes, navigation and public catalog.
+src/components.jsx: cards, mascot, dialogs and icons.
+src/styles.css: responsive design and motion.
+
+OPTIONAL API MODE
+Start your existing backend on port 3000. Run this package with Vite.
+Use the top-bar API button. Vite proxies /api and /uploads to 127.0.0.1:3000.
+You can configure VITE_API_URL using .env.example.
+API mode uses real accounts and writes real listings/auctions when you submit.
+API failures are shown explicitly; preview data is not substituted automatically.
+This package does not create an admin, approve listings, or change your schema.
+Your database must already have the team's required migrations applied.
+The API integration still needs testing against your actual local backend.
+
+LIMITS
+Profile editing is interactive in preview only. In API mode it is disabled
+because a supported profile update endpoint was not found in the reviewed code.
+Password reset/change, bidding, private access entry, bank integration and admin
+screens are outside these two groups. No fake bank success is implemented.
+Auction details are read-only; an auction's private code appears after creation.
+Preview records are illustrative, not live listings for sale.
+
+CHECKED
+Production build; preview login and registration; profile preview edits;
+listing states and rejected listing resubmission; private auction confirmation;
+input boundaries and API request/error handling with controlled local responses.
+These checks are not a claim that all live backend integration tests passed.
+
+No GitHub, Notion, or existing database changes were made.
+Images and fonts are local; font license files are included.

@@ -1,0 +1,178 @@
+import React, { useState } from "react";
+import { AuthLayout, PasswordField } from "../account-components";
+import { Icon } from "../components";
+import { request, validEmail, validPassword } from "../api";
+import { previewUser } from "../workspace";
+
+// تم التعديل من عبير: نطابق شروط التسجيل مع الباك ونتاكد من تطابق الباسورد قبل الارسال.
+export default function Register({ workspace }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+  const [uncertain, setUncertain] = useState(false);
+  async function submit(event) {
+    event.preventDefault();
+    if (busy || done || uncertain) return;
+    if (!name.trim() || name.trim().length > 160 || !validEmail(email)) {
+      setError("اكتب اسمك وبريد صحيح.");
+      return;
+    }
+    if (!workspace.demo && !validPassword(password)) {
+      setError("كلمة المرور 8 أحرف على الأقل، وبحجم ما يتجاوز 72 بايت.");
+      return;
+    }
+    if (!workspace.demo && password !== confirm) {
+      setError("تأكيد كلمة المرور مو مطابق.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      if (workspace.demo)
+        workspace.enterPreview({
+          ...previewUser,
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+        });
+      else {
+        const result = await request("/auth/register", {
+          method: "POST",
+          body: {
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            password,
+          },
+        });
+        if (!result?.id) {
+          const err = new Error(
+            "ما تأكدنا من إنشاء الحساب. جرّب تسجيل الدخول قبل إعادة التسجيل.",
+          );
+          err.uncertain = true;
+          throw err;
+        }
+      }
+      setPassword("");
+      setConfirm("");
+      setDone(true);
+    } catch (err) {
+      setError(err.message);
+      setUncertain(Boolean(err.uncertain));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <AuthLayout register>
+      <p className="eyebrow">يا هلا بالبدايات</p>
+      <h1>
+        مكانك <em>محفوظ.</em>
+      </h1>
+      <p className="form-intro">حساب واحد يجمع أصولك ومشاركاتك.</p>
+      {done ? (
+        <div className="success-box">
+          <div className="success-seal">
+            <Icon name="check" size={32} />
+          </div>
+          <h2>{workspace.demo ? "حياك في المعاينة!" : "تم إنشاء حسابك!"}</h2>
+          <p>
+            {workspace.demo
+              ? "هذا حساب داخل المعاينة فقط، وما انحفظ في الباك."
+              : "تقدر الآن تسجل دخولك بنفس البريد وكلمة المرور."}
+          </p>
+          <a
+            className="button dark full"
+            href={
+              workspace.demo
+                ? "#/activity"
+                : "#/login?email=" + encodeURIComponent(email)
+            }
+          >
+            {" "}
+            {workspace.demo ? "ادخل مجلسك" : "تسجيل الدخول"} <Icon />
+          </a>
+        </div>
+      ) : (
+        <>
+          {workspace.demo && (
+            <p className="inline-notice">
+              تجربة شكل التسجيل فقط. استخدم اسم وبريد توضيحي؛ ما نطلب كلمة مرور
+              في المعاينة.
+            </p>
+          )}
+          <form className="form-stack" onSubmit={submit}>
+            <fieldset disabled={busy || uncertain}>
+              <label className="field">
+                <span>الاسم الكامل</span>
+                <input
+                  name="name"
+                  autoComplete="name"
+                  required
+                  maxLength={160}
+                  placeholder="اسمك اللي نعرفك فيه"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </label>
+              <label className="field">
+                <span>البريد الإلكتروني</span>
+                <input
+                  name="email"
+                  type="email"
+                  dir="ltr"
+                  autoComplete="email"
+                  required
+                  maxLength={254}
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+              {!workspace.demo && (
+                <>
+                  <PasswordField
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <p className="field-hint">
+                    8 أحرف على الأقل. استخدم كلمة مرور خاصة بحسابك.
+                  </p>
+                  <PasswordField
+                    name="confirmPassword"
+                    label="تأكيد كلمة المرور"
+                    autoComplete="new-password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                  />
+                </>
+              )}
+              <button className="button dark full" type="submit">
+                {busy
+                  ? "جاري إنشاء الحساب…"
+                  : workspace.demo
+                    ? "تجربة إنشاء الحساب"
+                    : "إنشاء حساب"}{" "}
+                <Icon />
+              </button>
+            </fieldset>
+            {error && (
+              <p role="alert" className="form-error">
+                {error}
+              </p>
+            )}
+          </form>
+          <p className="auth-switch">
+            عندك حساب؟{" "}
+            <a href={"#/login?email=" + encodeURIComponent(email)}>
+              سجّل دخولك
+            </a>
+          </p>
+        </>
+      )}
+    </AuthLayout>
+  );
+}
