@@ -119,11 +119,6 @@ export default function Login({ workspace, params }) {
           </details>
         </>
       )}
-      <p className="form-footnote">
-        <Icon name="lock" size={15} /> خلّ حسابك لك. لا تشارك كلمة المرور مع
-        أحد.
-      </p>
-      {!workspace.user && <EmailAccess demo={workspace.demo} />}
     </AuthLayout>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export function Icon({ name = "arrow", size = 20, ...props }) {
   const paths = {
@@ -202,6 +202,10 @@ export const statusLabels = {
 };
 
 export function AuctionCard({ auction, onOpen }) {
+  // تم التعديل من عبير: نتنقل بين صور الاصل على البطاقه بدون فتح التفاصيل.
+  const photos = [...new Set([auction.image_url, ...(auction.images || []).map(p => typeof p === "string" ? p : p.image_url)].filter(Boolean))];
+  const [photo, setPhoto] = useState(0);
+
   return (
     <article className="auction-card">
       <button
@@ -215,7 +219,7 @@ export function AuctionCard({ auction, onOpen }) {
         </span>
         {auction.image_url ? (
           <img
-            src={auction.image_url}
+            src={photos[photo % photos.length]}
             alt={auction.title}
             loading="lazy"
             onError={(e) => {
@@ -231,6 +235,7 @@ export function AuctionCard({ auction, onOpen }) {
           <Icon />
         </span>
       </button>
+      {photos.length > 1 && <div className="card-gallery" aria-label="صور المزاد">{photos.map((p,i)=><button key={p} aria-label={"الصوره " + (i+1)} aria-pressed={photo===i} onClick={()=>setPhoto(i)} />)}</div>}
       <div className="card-category">{auction.categoryLabel}</div>
       <h3>
         <button onClick={() => onOpen(auction)}>{auction.title}</button>
@@ -252,6 +257,7 @@ export function AuctionCard({ auction, onOpen }) {
         </span>
         <span>{money(auction.bid_count)} عروض</span>
       </div>
+      <button className="button outline card-details" onClick={()=>onOpen(auction)}>التفاصيل <Icon /></button>
     </article>
   );
 }
