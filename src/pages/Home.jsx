@@ -125,6 +125,21 @@ export default function Home({
       </section>
 
       <section className="category-section">
+        {/* تم التعديل من عبير: صوره الرياض بقصه منحنيه مع عنوان بخط عربي مستقل. */}
+        <figure className="category-portrait">
+          <img
+            src="/images/riyadh-architecture.webp"
+            alt="صورة فوتوغرافية لعمارة الرياض ونخلة، بعدسة يوسف بوزوينة"
+            loading="lazy"
+          />
+          <figcaption>
+            <span>الرياض</span>
+            <small>أصالة نعيشها. وقيمة نختارها.</small>
+          </figcaption>
+          <span className="portrait-orbit" aria-hidden="true">
+            ✦
+          </span>
+        </figure>
         <div className="container category-layout">
           <div>
             <p className="eyebrow">لكل قيمة مكان</p>
