@@ -23,7 +23,7 @@ export default function AuctionResult({ market, id }) {
       market={market}
       title="وكل مجلس، له ختام."
       eyebrow="نتيجة المزاد"
-      description="النتيجة المعتمدة تظهر بعد إغلاق المزاد عند الخادم."
+      description="تابع نتيجة مشاركتك بعد إغلاق المزاد."
     >
       <AuctionState state={state}>
         {a && (
@@ -33,7 +33,10 @@ export default function AuctionResult({ market, id }) {
               className={"result-paper " + (r?.isWinner ? "is-winner" : "")}
             >
               <div className="result-illustration">
-                <Auctioneer />
+                <Auctioneer
+                  character="collector"
+                  motion={r?.isWinner ? "celebrate" : "inspect"}
+                />
               </div>
               <p className="eyebrow">
                 {closed ? "THE FINAL CALL" : "THE AUCTION CONTINUES"}
@@ -64,8 +67,8 @@ export default function AuctionResult({ market, id }) {
                 <p>سجّل دخولك عشان تعرف نتيجة مشاركتك.</p>
               )}
               <p className="result-footnote">
-                هذي نتيجة المزاد فقط. التسوية والدفع ونقل الملكية خارج نطاق
-                النسخة الحالية.
+                هذي نتيجة المنافسة. الدفع ونقل الملكية ما يتمّون من خلال الموقع
+                حاليًا.
               </p>
               <div className="form-actions">
                 <a

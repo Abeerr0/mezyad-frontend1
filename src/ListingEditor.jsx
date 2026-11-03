@@ -130,7 +130,7 @@ export default function ListingEditor({ workspace, existing }) {
         <h2>{existing ? "تمت إعادة الإرسال." : "إعلانك جاهز للمراجعة."}</h2>
         <p>
           {workspace.demo
-            ? "حفظناه داخل المعاينة فقط، بحالة قيد المراجعة."
+            ? "إعلان التجربة جاهز. حالته الآن قيد المراجعة."
             : "حُفظ إعلانك وصوره بحالة قيد المراجعة. تقدر تتابع القرار من إعلاناتك."}
         </p>
         <p>الخطوة الجاية: بعد الاعتماد تقدر تجهّز المزاد.</p>
@@ -468,7 +468,7 @@ export default function ListingEditor({ workspace, existing }) {
       </section>
       <aside className="editor-aside">
         <div className="editor-tip">
-          <Auctioneer small />
+          <Auctioneer small character="auctioneer" motion="inspect" />
           <h3>
             {
               [

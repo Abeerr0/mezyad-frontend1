@@ -54,7 +54,7 @@ export default function MyListings({ workspace, params }) {
         {params.get("saved") === "1" && (
           <p className="inline-notice" role="status">
             تمت إعادة إرسال إعلانك للمراجعة
-            {workspace.demo ? " داخل المعاينة فقط" : ""}.
+            {workspace.demo ? " في نسخة التجربة" : ""}.
           </p>
         )}
         <div className="listing-toolbar">

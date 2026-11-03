@@ -23,14 +23,7 @@ import EditListing from "./pages/EditListing";
 import CreateAuction from "./pages/CreateAuction";
 import { useWorkspace } from "./workspace";
 import { API, imageUrl } from "./api";
-import {
-  Auctioneer,
-  Icon,
-  Modal,
-  dateText,
-  money,
-  statusLabels,
-} from "./components";
+import { Icon } from "./components";
 import { categoryLabels, demoAuctions, demoCategories } from "./data";
 
 const pageTitles = {
@@ -64,14 +57,8 @@ function readRoute() {
 // تم التعديل من عبير: نحفظ مسار الصفحه بالفاصل # عشان الروابط والرجوع تشتغل بدون مكتبه اضافيه.
 export default function App() {
   const [route, setRoute] = useState(readRoute);
-  const [demo, setDemo] = useState(() => {
-    if (location.protocol === "file:") return true;
-    try {
-      return sessionStorage.getItem("mezyad-group-one-mode") !== "api";
-    } catch {
-      return true;
-    }
-  });
+  // تم التعديل من عبير: الموقع يفتح ببياناته الحقيقيه؛ ملف PREVIEW وحده مخصص للتجربه.
+  const demo = location.pathname.endsWith("/PREVIEW.html");
   const workspace = useWorkspace(demo);
   const market = useMarket(workspace);
   const [catalog, setCatalog] = useState({ auctions: [], categories: [] });
@@ -79,11 +66,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
   const [menu, setMenu] = useState(false);
-  const [modal, setModal] = useState(null);
-  const [detail, setDetail] = useState(null);
-  const [detailError, setDetailError] = useState("");
-  const [detailBusy, setDetailBusy] = useState(false);
-  const detailRequest = useRef(null);
   const mainRef = useRef(null);
   const category =
     route.page === "auctions" ? route.params.get("category") || "" : "";
@@ -94,7 +76,6 @@ export default function App() {
     const onRoute = () => {
       setRoute(readRoute());
       setMenu(false);
-      setModal(null);
     };
     window.addEventListener("hashchange", onRoute);
     return () => window.removeEventListener("hashchange", onRoute);
@@ -104,23 +85,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "instant" });
     mainRef.current?.focus({ preventScroll: true });
   }, [route.page]);
-  useEffect(() => () => detailRequest.current?.abort(), []);
-
-  function changeMode(next) {
-    if (!next && location.protocol === "file:") {
-      setModal({ type: "api", title: "ربط الباك يحتاج تشغيل Vite" });
-      return;
-    }
-    setDemo(next);
-    setModal(null);
-    try {
-      sessionStorage.setItem("mezyad-group-one-mode", next ? "demo" : "api");
-    } catch {
-      /* تم التعديل من عبير: لو التخزين مقفول نكمل وضع المعاينه بنفس الجلسه. */
-    }
-    if (location.hash.includes("?")) location.hash = "/" + route.page;
-  }
-
   // تم التعديل من عبير: وضع API يقرا بيانات الباك فقط ولا يستبدل الخطا ببيانات تجريبيه.
   useEffect(() => {
     if (!["home", "auctions"].includes(route.page)) return;
@@ -183,9 +147,7 @@ export default function App() {
       } catch (err) {
         if (active && err.name !== "AbortError") {
           setCatalog({ auctions: [], categories: [] });
-          setError(
-            "تأكد أن الباك يعمل على المنفذ 3000 وأن قاعدة البيانات متصلة. ما نعرض بيانات تجريبية بدل بياناته.",
-          );
+          setError("تعذّر تحميل المزادات الآن. حاول مرة ثانية بعد شوي.");
         }
       } finally {
         if (active) setLoading(false);
@@ -202,10 +164,6 @@ export default function App() {
   function openAuction(auction) {
     location.hash = "/auction?id=" + encodeURIComponent(auction.id);
   }
-  function closeModal() {
-    detailRequest.current?.abort();
-    setModal(null);
-  }
   function onFeature(type) {
     if (type === "private") {
       location.hash = "/private-access";
@@ -221,16 +179,8 @@ export default function App() {
       location.hash = workspace.user ? "/activity" : "/login";
       return;
     }
-    setModal({
-      type,
-      title:
-        type === "private"
-          ? "دخول المزاد الخاص"
-          : type === "sell"
-            ? "ابدأ حكاية أصلك"
-            : "حسابك في مزياد",
-    });
   }
+
   // تم التعديل من عبير: نخلي سعر المعاينه ومشاركات المستخدم متوافقه بين الصفحات القديمه والجديده.
   const accountWorkspace = demo
     ? {
@@ -254,7 +204,6 @@ export default function App() {
     loading,
     error,
     retry: () => setRefresh((n) => n + 1),
-    onDemo: () => changeMode(true),
     onOpen: openAuction,
     onFeature,
   };
@@ -271,18 +220,18 @@ export default function App() {
       >
         تخطي إلى المحتوى
       </a>
-      <div className={"preview-bar " + (!demo ? "api-mode" : "")}>
+      {/* تم التعديل من عبير: نعرض رساله البراند، والتنبيه المختصر يظهر بملف التجربه فقط. */}
+      <div className="preview-bar brand-bar">
         <span>
-          <i />
-          {demo
-            ? "معاينة التصميم · بيانات توضيحية غير معروضة للبيع"
-            : "وضع API · بيانات الباك المحلي"}
-          <small>المجموعات 01 — 05</small>
+          <i /> للقيمة أهلها، وللمنافسة مزياد.
         </span>
-        <button onClick={() => changeMode(!demo)}>
-          {demo ? "ربط بيانات الباك" : "الرجوع للمعاينة"}
-          <Icon name="refresh" size={13} />
-        </button>
+        {demo ? (
+          <small>نسخة تجربة — العمليات هنا ما تنفّذ شراء أو بيع</small>
+        ) : (
+          <a href="#/guide">
+            خطوتك الأولى للمزاد <Icon size={13} />
+          </a>
+        )}
       </div>
       <header className="site-header">
         <div className="container header-inner">
@@ -431,102 +380,15 @@ export default function App() {
             </div>
           </div>
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} مزياد · مشروع MVP تعليمي</span>
+            <span>© {new Date().getFullYear()} مزياد. جميع الحقوق محفوظة.</span>
             <span>
               <i />
               المملكة العربية السعودية
             </span>
-            <span>لا تحويلات مالية حقيقية</span>
+            <span>للقيمة أهلها.</span>
           </div>
         </div>
       </footer>
-      {modal && (
-        <Modal title={modal.title} onClose={closeModal}>
-          {modal.type === "auction" ? (
-            <>
-              <p className="modal-eyebrow">
-                {demo
-                  ? "معاينة أصل توضيحي — ليست مزايدة فعلية"
-                  : "تفاصيل من الباك المحلي"}
-              </p>
-              {detailBusy ? (
-                <p role="status">جاري جلب التفاصيل…</p>
-              ) : detailError ? (
-                <p role="alert">{detailError}</p>
-              ) : (
-                <>
-                  {/* تم التعديل من عبير: نعرض صوره الاصل اذا موجوده بدون نحط صوره اصل ثاني بدالها. */}
-                  {detail.image_url ? (
-                    <img
-                      className="detail-photo"
-                      src={detail.image_url}
-                      alt={detail.title}
-                    />
-                  ) : (
-                    <p className="detail-photo">
-                      لا توجد صورة متاحة لهذا الأصل.
-                    </p>
-                  )}
-                  <div className="detail-price">
-                    <span>{statusLabels[detail.status]}</span>
-                    <strong>{money(detail.current_price)} ر.س</strong>
-                  </div>
-                  <p>{detail.description || "لا يوجد وصف إضافي متاح."}</p>
-                  <dl className="detail-facts">
-                    <div>
-                      <dt>أقل زيادة</dt>
-                      <dd>{money(detail.minimum_increment)} ر.س</dd>
-                    </div>
-                    <div>
-                      <dt>البداية — بتوقيت الرياض</dt>
-                      <dd>
-                        {detail.start_time
-                          ? dateText(detail.start_time)
-                          : "غير متاحة"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>النهاية — بتوقيت الرياض</dt>
-                      <dd>
-                        {detail.end_time
-                          ? dateText(detail.end_time)
-                          : "غير متاحة"}
-                      </dd>
-                    </div>
-                  </dl>
-                  <p className="scope-note">
-                    واجهة تقديم العروض والالتزام تُستكمل ضمن مجموعة المشاركة،
-                    ولا يتم إرسال أي عرض من هنا.
-                  </p>
-                  <a
-                    className="button dark"
-                    href="#/guide"
-                    onClick={closeModal}
-                  >
-                    فهم خطوات المشاركة <Icon />
-                  </a>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <Auctioneer small />
-              <p>
-                {modal.type === "api"
-                  ? "افتح المجلد في VS Code وشغّل npm ci ثم npm run dev، وبعدها افتح رابط localhost واضغط ربط بيانات الباك."
-                  : "صفحة الدخول برمز خاص وتقديم العروض والالتزام ضمن مجموعة المشاركة القادمة. إعداد المزاد الخاص للبائع متاح الآن من إعلاناتي."}
-              </p>
-              <p className="scope-note">
-                في المعاينة، كل التجارب داخل الصفحة فقط. وضع API يتصل بالباك عند
-                اختياره.
-              </p>
-              <a className="button dark" href="#/guide" onClick={closeModal}>
-                تعرّف على الخطوات <Icon />
-              </a>
-            </>
-          )}
-        </Modal>
-      )}
     </>
   );
 }

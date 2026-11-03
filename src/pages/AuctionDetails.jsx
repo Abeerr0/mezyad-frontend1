@@ -133,8 +133,8 @@ export default function AuctionDetails({ market, id }) {
                   سجل العروض
                 </a>
                 <p className="field-hint">
-                  السعر يتحدث كل 4 ثواني. القبول النهائي حسب وقت الخادم والشروط
-                  وقت الإرسال.
+                  السعر يتحدّث تلقائيًا. يتأكد قبول عرضك بعد إرساله وفق آخر سعر
+                  ووقت المزاد.
                 </p>
                 {state.updated && (
                   <small>

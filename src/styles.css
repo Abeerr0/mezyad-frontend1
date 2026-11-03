@@ -723,13 +723,6 @@ em {
 .journey-art .auctioneer {
   transform: rotate(-3deg);
 }
-.gavel-hand {
-  transform-origin: 195px 180px;
-  animation: gavel-wave 5s ease-in-out infinite;
-}
-.sparkle {
-  animation: breathe 3s ease-in-out infinite;
-}
 .art-star {
   position: absolute;
   top: 25px;
@@ -3657,4 +3650,130 @@ button:disabled {
   padding-block: 0;
   flex-wrap: wrap;
   gap: 5px;
+}
+
+/* تم التعديل من عبير: نخلي حركات الشخصيات مرتبطه بالمزاد وتوقف حسب تفضيل المستخدم. */
+.brand-bar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+}
+.brand-bar small {
+  font-size: 11px;
+}
+.mascot-arm {
+  transform-origin: 195px 180px;
+}
+.mascot-head {
+  transform-origin: 150px 155px;
+}
+.mascot-eyes {
+  transform-origin: 150px 105px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mascot-gavel .mascot-arm {
+    animation: mascot-call 6s ease-in-out infinite;
+  }
+  .mascot-bid .mascot-arm {
+    animation: mascot-raise 7s ease-in-out infinite;
+  }
+  .mascot-inspect .mascot-arm {
+    animation: mascot-look 8s ease-in-out infinite;
+  }
+  .mascot-inspect .mascot-head {
+    animation: mascot-tilt 8s ease-in-out infinite;
+  }
+  .mascot-celebrate .mascot-body {
+    animation: mascot-hop 5s ease-in-out infinite;
+  }
+  .mascot-celebrate .mascot-flourish {
+    animation: breathe 3s ease-in-out infinite;
+  }
+  .mascot-eyes {
+    animation: mascot-blink 9s linear infinite;
+  }
+}
+@keyframes mascot-call {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0);
+  }
+  65% {
+    transform: rotate(-20deg);
+  }
+  72% {
+    transform: rotate(25deg);
+  }
+  78% {
+    transform: rotate(15deg);
+  }
+}
+@keyframes mascot-raise {
+  0%,
+  35%,
+  100% {
+    transform: translateY(0);
+  }
+  45%,
+  65% {
+    transform: translateY(-17px) rotate(-5deg);
+  }
+}
+@keyframes mascot-look {
+  0%,
+  30%,
+  100% {
+    transform: rotate(0);
+  }
+  45%,
+  65% {
+    transform: rotate(-24deg);
+  }
+}
+@keyframes mascot-tilt {
+  0%,
+  30%,
+  100% {
+    transform: rotate(0);
+  }
+  45%,
+  65% {
+    transform: rotate(6deg);
+  }
+}
+@keyframes mascot-hop {
+  0%,
+  45%,
+  75%,
+  100% {
+    transform: translateY(0);
+  }
+  55%,
+  67% {
+    transform: translateY(-9px);
+  }
+  61% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes mascot-blink {
+  0%,
+  42%,
+  46%,
+  100% {
+    transform: scaleY(1);
+  }
+  44% {
+    transform: scaleY(0.15);
+  }
+}
+@media (max-width: 600px) {
+  .brand-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    text-align: center;
+  }
 }

@@ -1,4 +1,4 @@
-MEZYAD — GROUPS 1, 2 AND 3
+MEZYAD — GROUPS 1 TO 5
 
 Extract the entire ZIP into a NEW folder outside your existing repository.
 This is a standalone frontend package. Do not overwrite your team project.
@@ -43,9 +43,10 @@ src/App.jsx: routes, navigation and public catalog.
 src/components.jsx: cards, mascot, dialogs and icons.
 src/styles.css: responsive design and motion.
 
-OPTIONAL API MODE
+LIVE SITE
 Start your existing backend on port 3000. Run this package with Vite.
-Use the top-bar API button. Vite proxies /api and /uploads to 127.0.0.1:3000.
+The main app uses the API by default. Vite proxies /api and /uploads to 127.0.0.1:3000.
+There is no public preview switch. PREVIEW.html is the separate demo entry.
 You can configure VITE_API_URL using .env.example.
 API mode uses real accounts and writes real listings/auctions when you submit.
 API failures are shown explicitly; preview data is not substituted automatically.
@@ -56,9 +57,9 @@ The API integration still needs testing against your actual local backend.
 LIMITS
 Profile editing is interactive in preview only. In API mode it is disabled
 because a supported profile update endpoint was not found in the reviewed code.
-Password reset/change, bidding, private access entry, bank integration and admin
-screens are outside these two groups. No fake bank success is implemented.
-Auction details are read-only; an auction's private code appears after creation.
+Password reset/change and admin screens are not included.
+Bidding requires confirmed bank commitment in live mode. The backend bank
+service must be available; no synthetic bank success is implemented.
 Preview records are illustrative, not live listings for sale.
 
 CHECKED
@@ -67,5 +68,5 @@ listing states and rejected listing resubmission; private auction confirmation;
 input boundaries and API request/error handling with controlled local responses.
 These checks are not a claim that all live backend integration tests passed.
 
-No GitHub, Notion, or existing database changes were made.
+This frontend package does not modify the database schema.
 Images and fonts are local; font license files are included.

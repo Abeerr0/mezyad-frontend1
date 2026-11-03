@@ -48,7 +48,7 @@ export async function request(
     if (cause.name === "AbortError") throw cause;
     const error = new Error(
       method === "GET"
-        ? "تعذر الاتصال. تأكد من تشغيل الباك وحاول مرة ثانية."
+        ? "تعذّر الاتصال. تحقق من اتصالك وحاول مرة ثانية."
         : "انقطع الاتصال وما تأكدنا من حفظ الطلب. تحقق من حسابك قبل إعادة الإرسال.",
     );
     error.uncertain = method !== "GET";
@@ -58,7 +58,7 @@ export async function request(
     const error = new Error(
       messages[result.error?.code] ||
         (response.status >= 500
-          ? "الخادم ما قدر يكمل الطلب. تحقق من بياناتك قبل المحاولة مرة ثانية."
+          ? "ما اكتمل طلبك. تحقق من حالته قبل المحاولة مرة ثانية."
           : "ما اكتمل الطلب. راجع البيانات وحاول مرة ثانية."),
     );
     error.code = result.error?.code;

@@ -112,7 +112,7 @@ export default function Help({ topic = "" }) {
             كيف تشتغل مزياد <Icon />
           </a>
         </div>
-        <Auctioneer small />
+        <Auctioneer small character="collector" motion="inspect" />
       </section>
     </div>
   );

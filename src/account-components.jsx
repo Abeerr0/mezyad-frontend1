@@ -33,7 +33,7 @@ export function AccountLayout({
   if (!workspace.user)
     return (
       <section className="container access-gate">
-        <Auctioneer small />
+        <Auctioneer small character="collector" motion="inspect" />
         <p className="eyebrow">مجلسك له مكان</p>
         <h1>سجّل دخولك، وكمّل.</h1>
         <p>
@@ -58,7 +58,7 @@ export function AccountLayout({
           <span>{workspace.user.name?.slice(0, 1) || "م"}</span>
           <div>
             <strong>{workspace.user.name}</strong>
-            <small>{workspace.demo ? "حساب معاينة" : "حساب مزياد"}</small>
+            <small>{workspace.demo ? "حساب تجربة" : "عضو مزياد"}</small>
           </div>
         </div>
         <nav aria-label="صفحات حسابي">
@@ -84,7 +84,7 @@ export function AccountLayout({
           <Icon name="plus" /> اعرض أصلك
         </a>
         <div className="sidebar-tip">
-          <Auctioneer small />
+          <Auctioneer small character="collector" motion="inspect" />
           <p>
             كل أصل له حكاية.
             <br />
@@ -114,15 +114,6 @@ export function AccountLayout({
           <h1>{title}</h1>
           <p>{description}</p>
         </header>
-        {workspace.demo && (
-          <div className="demo-note">
-            <Icon name="image" size={17} />
-            <span>
-              معاينة تفاعلية: تغييراتك تبقى داخل هالصفحة وتُعاد عند تحديث
-              المتصفح. ما تنرسل لقاعدة البيانات.
-            </span>
-          </div>
-        )}
         {children}
       </section>
     </div>
@@ -218,7 +209,7 @@ export function AuthLayout({ register, children }) {
         </div>
         <div className="auth-art-bottom">
           <span>مزياد · للقيمة عنوان</span>
-          <span>01 — 05</span>
+          <span>للقيمة أهلها.</span>
         </div>
       </aside>
       <div className="auth-form-panel">

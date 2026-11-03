@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon, dateText } from "../components";
-import { auctionLink, useAuction } from "../market";
+import { commitmentLabel, auctionLink, useAuction } from "../market";
 import {
   AuctionLayout,
   AuctionState,
@@ -15,9 +15,9 @@ export default function BankStatus({ market, id }) {
   return (
     <AuctionLayout
       market={market}
-      title="خلّ التأكيد من مصدره."
+      title="وين وصل التزامك؟"
       eyebrow="متابعة الالتزام"
-      description="هنا تظهر الحالة المسجلة عند الخادم، مو مجرد رجوع من صفحة البنك."
+      description="تابع حالة التزامك، واعرف متى تقدر تدخل المنافسة."
     >
       <SignInGate market={market}>
         <AuctionState state={state}>
@@ -29,9 +29,7 @@ export default function BankStatus({ market, id }) {
                 size={48}
               />
             </div>
-            <p className="eyebrow">
-              {market.demo ? "وضع المعاينة" : "آخر حالة من الباك"}
-            </p>
+            <p className="eyebrow">حالة الالتزام</p>
             <h2>
               {bank?.status === "SUCCESS"
                 ? "وصل تأكيد الالتزام."
@@ -41,15 +39,15 @@ export default function BankStatus({ market, id }) {
             </h2>
             <p>
               {market.demo
-                ? "ما ننشئ نجاح بنكي تجريبي. تقدر ترجع للمزاد وتجرب الواجهة بدون اتصال بالبنك."
-                : "إذا ما اكتمل الربط البنكي، بتبقى المزايدة الفعلية متوقفة هنا حتى يظهر التزام ناجح."}
+                ? "طلب الالتزام غير متاح في نسخة التجربة."
+                : "بعد تأكيد الالتزام، تقدر تنتقل للمزاد وتقدّم عرضك."}
             </p>
             {bank && (
               <dl className="spec-list">
                 <div>
                   <dt>الحالة</dt>
                   <dd>
-                    <bdi>{bank.status}</bdi>
+                    <bdi>{commitmentLabel(bank.status)}</bdi>
                   </dd>
                 </div>
                 <div>

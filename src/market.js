@@ -25,12 +25,23 @@ export const statusLabels = {
   SCHEDULED: "قريب يبدأ",
   CLOSED: "انتهى المزاد",
 };
+// تم التعديل من عبير: نعرض حاله الالتزام بكلام واضح بدل رموز النظام.
+export function commitmentLabel(status) {
+  const labels = {
+    SUCCESS: "تم التأكيد",
+    PENDING: "بانتظار التأكيد",
+    FAILED: "ما اكتمل الطلب",
+    CANCELLED: "تم الإلغاء",
+    EXPIRED: "انتهت الصلاحية",
+  };
+  return labels[status] || "تحتاج متابعة";
+}
 const messages = {
   INVALID_CODE: "رمز الدخول مو صحيح. تأكد منه وحاول من جديد.",
   OWNER: "هذا مزادك. تقدر تتابعه، لكن ما تقدر تشارك فيه كمزايد.",
   COMMITMENT_REQUIRED: "تحتاج التزام بنكي موثق قبل تقديم العرض.",
   BANK_SANDBOX_UNAVAILABLE:
-    "خدمة البنك التجريبية غير متاحة حاليًا. ما تم اعتماد أي التزام.",
+    "خدمة الالتزام البنكي غير متاحة الآن. ما تم تأكيد التزامك؛ حاول لاحقًا.",
   BID_TOO_LOW: "وصل عرض أعلى أو المبلغ أقل من المطلوب. راجع آخر سعر.",
   AUCTION_NOT_ACTIVE: "المزاد مو مفتوح للمزايدة الآن. راجع موعده وحالته.",
   DUPLICATE_REQUEST: "هذا الطلب تمت معالجته. تحقق من عروضك قبل تقديم عرض جديد.",
@@ -51,7 +62,7 @@ export async function marketRequest(path, options = {}) {
     if (options.signal?.aborted) throw error;
     if (error.name === "AbortError") {
       const timeout = new Error(
-        "تأخر رد الخادم. تحقق من اتصالك ومن حالة الطلب قبل تكراره.",
+        "تأخر الرد. تحقق من اتصالك ومن حالة طلبك قبل تكراره.",
       );
       timeout.uncertain = options.method === "POST";
       throw timeout;

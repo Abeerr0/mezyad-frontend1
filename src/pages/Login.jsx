@@ -57,9 +57,10 @@ export default function Login({ workspace, params }) {
         <>
           {workspace.demo && (
             <div className="auth-demo">
-              <span className="pill">وضع المعاينة</span>
+              <span className="pill">تجربة الموقع</span>
               <p>
-                شوف رحلة المستخدم بحساب جاهز، بدون بريد أو كلمة مرور حقيقية.
+                اكتشف خطوات البيع والمزايدة بحساب تجربة. عملياتك هنا ما تنحفظ
+                بحساب فعلي.
               </p>
               <button
                 className="button dark"
@@ -68,7 +69,7 @@ export default function Login({ workspace, params }) {
                   location.hash = destination;
                 }}
               >
-                جرّب حساب المعاينة <Icon />
+                ابدأ التجربة <Icon />
               </button>
             </div>
           )}
@@ -109,14 +110,15 @@ export default function Login({ workspace, params }) {
           <details className="auth-help">
             <summary>نسيت كلمة المرور؟</summary>
             <p>
-              استعادة كلمة المرور مو متاحة في النسخة الحالية. ما نرسل رابط
-              استعادة وهمي. تقدر ترجع لحسابك إذا تذكرت كلمة المرور.
+              استعادة كلمة المرور غير متاحة حاليًا. إذا كانت محفوظة عندك، تقدر
+              تلقاها في مدير كلمات المرور بمتصفحك.
             </p>
           </details>
         </>
       )}
       <p className="form-footnote">
-        <Icon name="lock" size={15} /> بيانات الدخول ما تُحفظ في ملفات المشروع.
+        <Icon name="lock" size={15} /> خلّ حسابك لك. لا تشارك كلمة المرور مع
+        أحد.
       </p>
     </AuthLayout>
   );

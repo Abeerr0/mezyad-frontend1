@@ -22,7 +22,9 @@ export default function Register({ workspace }) {
       return;
     }
     if (!workspace.demo && !validPassword(password)) {
-      setError("كلمة المرور 8 أحرف على الأقل، وبحجم ما يتجاوز 72 بايت.");
+      setError(
+        "استخدم 8 أحرف على الأقل. إذا كانت كلمة المرور طويلة جدًا، اختصرها وحاول من جديد.",
+      );
       return;
     }
     if (!workspace.demo && password !== confirm) {
@@ -77,10 +79,10 @@ export default function Register({ workspace }) {
           <div className="success-seal">
             <Icon name="check" size={32} />
           </div>
-          <h2>{workspace.demo ? "حياك في المعاينة!" : "تم إنشاء حسابك!"}</h2>
+          <h2>{workspace.demo ? "حياك في التجربة!" : "تم إنشاء حسابك!"}</h2>
           <p>
             {workspace.demo
-              ? "هذا حساب داخل المعاينة فقط، وما انحفظ في الباك."
+              ? "حساب التجربة جاهز. تقدر تكتشف الخطوات بدون تنفيذ عمليات فعلية."
               : "تقدر الآن تسجل دخولك بنفس البريد وكلمة المرور."}
           </p>
           <a
@@ -99,8 +101,7 @@ export default function Register({ workspace }) {
         <>
           {workspace.demo && (
             <p className="inline-notice">
-              تجربة شكل التسجيل فقط. استخدم اسم وبريد توضيحي؛ ما نطلب كلمة مرور
-              في المعاينة.
+              أنت في نسخة التجربة. استخدم بيانات تجريبية، وبدون كلمة مرور.
             </p>
           )}
           <form className="form-stack" onSubmit={submit}>

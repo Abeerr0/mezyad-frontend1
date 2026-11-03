@@ -14,7 +14,7 @@ const startingItems = [
     seller_id: "preview-user",
     title: "بورش كاريرا GT — 2005",
     description:
-      "سيارة نادرة بحالة ممتازة، مع تفاصيل أصلية موثقة. إعلان توضيحي لتجربة إعداد المزاد بعد الاعتماد.",
+      "سيارة نادرة بتفاصيل كلاسيكية. راجع الصور والمواصفات قبل تحديد عرضك.",
     category_id: "cars",
     categoryFields: { "سنة الصنع": "2005", اللون: "فضي", الممشى: "18,000 كم" },
     images: ["/images/porsche-carrera-gt.jpg"],
@@ -37,8 +37,7 @@ const startingItems = [
     id: "own-rejected",
     seller_id: "preview-user",
     title: "لوحة مميزة — ن ج د 1",
-    description:
-      "لوحة مميزة برقم منفرد. بيانات توضيحية لتجربة التعديل وإعادة الإرسال.",
+    description: "لوحة مميزة برقم منفرد وحروف تلفت النظر.",
     category_id: "plates",
     categoryFields: { الحروف: "ن ج د", الرقم: "1" },
     images: ["/images/plate-njd1.jpg"],
@@ -132,7 +131,9 @@ export function useWorkspace(demo) {
     ])
       .then(([nextItems, nextAuctions, nextCategories]) => {
         if (![nextItems, nextAuctions, nextCategories].every(Array.isArray))
-          throw new Error("وصلت بيانات غير متوقعة من الخادم.");
+          throw new Error(
+            "تعذّر تحميل بيانات حسابك. حاول تسجيل الدخول مرة ثانية.",
+          );
         if (!controller.signal.aborted) {
           setItems(nextItems);
           setAuctions(nextAuctions);

@@ -70,7 +70,7 @@ export default function PrivateAccess({ market }) {
             </label>
             {market.demo && (
               <p className="inline-notice">
-                رمز المعاينة: <bdi>MEZYAD-PREVIEW</bdi>
+                رمز التجربة: <bdi>MEZYAD-PREVIEW</bdi>
               </p>
             )}
             {error && (

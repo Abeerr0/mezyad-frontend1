@@ -8,7 +8,6 @@ export default function Browse({
   loading,
   error,
   retry,
-  onDemo,
   onOpen,
   category,
   status,
@@ -159,12 +158,7 @@ export default function Browse({
             <span>السعر بالريال السعودي</span>
           </div>
           {loading || error ? (
-            <StatePanel
-              loading={loading}
-              error={error}
-              onRetry={retry}
-              onDemo={onDemo}
-            />
+            <StatePanel loading={loading} error={error} onRetry={retry} />
           ) : visible.length ? (
             <div className="auction-grid browse-grid">
               {visible.map((a) => (

@@ -8,7 +8,6 @@ export default function Home({
   loading,
   error,
   retry,
-  onDemo,
   onOpen,
   onFeature,
 }) {
@@ -48,7 +47,7 @@ export default function Home({
               </button>
             </div>
             <div className="hero-note">
-              <span>01 / 04</span>
+              <span>MEZYAD</span>
               <span>للأصول التي لا تتكرر</span>
             </div>
           </div>
@@ -83,7 +82,7 @@ export default function Home({
           </span>
           <span>
             <Icon name="gavel" />
-            عروض يتحقق منها السيرفر
+            كل عرض، بشروط واضحة
           </span>
           <a href="#/guide">
             تعرّف على الرحلة <Icon size={16} />
@@ -104,12 +103,7 @@ export default function Home({
           </a>
         </div>
         {loading || error ? (
-          <StatePanel
-            loading={loading}
-            error={error}
-            onRetry={retry}
-            onDemo={onDemo}
-          />
+          <StatePanel loading={loading} error={error} onRetry={retry} />
         ) : featured.length ? (
           <div className="auction-grid">
             {featured.map((a) => (
@@ -164,7 +158,7 @@ export default function Home({
         <div className="journey-art">
           <div className="art-ring" />
           <span className="art-star">✦</span>
-          <Auctioneer />
+          <Auctioneer character="auctioneer" motion="gavel" />
           <span className="art-stamp">حياك في المَجلس</span>
         </div>
         <div className="journey-copy">

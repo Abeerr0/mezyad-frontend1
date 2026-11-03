@@ -20,7 +20,7 @@ export default function Profile({ workspace }) {
     workspace.updatePreviewProfile(name.trim(), email.trim().toLowerCase());
     setEditing(false);
     setError("");
-    setMessage("تم تحديث بيانات المعاينة فقط.");
+    setMessage("تم تحديث بيانات حساب التجربة.");
   }
   return (
     <AccountLayout
@@ -41,7 +41,7 @@ export default function Profile({ workspace }) {
               <p dir="ltr">{workspace.user.email}</p>
             </div>
             <span className="pill">
-              {workspace.demo ? "معاينة" : "حساب مسجل"}
+              {workspace.demo ? "حساب تجربة" : "عضو مزياد"}
             </span>
           </div>
           <section className="paper-card">
@@ -122,8 +122,7 @@ export default function Profile({ workspace }) {
             </form>
             {!workspace.demo && (
               <p className="inline-notice">
-                بياناتك معروضة من جلسة الدخول. تحديث الاسم والبريد يحتاج مسار في
-                الباك، وهو غير موجود حاليًا؛ لذلك الحفظ غير مفعّل.
+                تعديل بيانات الحساب غير متاح حاليًا. تقدر تشوف اسمك وبريدك هنا.
               </p>
             )}
           </section>
@@ -132,8 +131,8 @@ export default function Profile({ workspace }) {
             <div>
               <h2>أمان حسابك</h2>
               <p>
-                كلمة المرور ما تنعرض هنا. تغييرها واستعادتها مو متاحين في الباك
-                الحالي.
+                احتفظ بكلمة مرورك لنفسك. تغيير كلمة المرور واستعادتها غير متاحين
+                حاليًا.
               </p>
               <a className="text-link" href="#/help">
                 روح للمساعدة <Icon size={16} />

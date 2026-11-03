@@ -136,7 +136,7 @@ export default function Bidding({ market, id }) {
       market={market}
       title="ارفع عرضك، عن قناعة."
       eyebrow="خطوة محسوبة"
-      description="راجع المبلغ والسعر الحالي قبل التأكيد. القرار لك، والتحقق عند الخادم."
+      description="خذ قرارك على بيّنة. راجع آخر سعر ومبلغ عرضك قبل التأكيد."
     >
       <SignInGate market={market}>
         <AuctionState state={state}>
@@ -167,7 +167,7 @@ export default function Bidding({ market, id }) {
                   </div>
                   {market.demo && (
                     <p className="demo-bid-note">
-                      عرض معاينة فقط — بدون التزام بنكي أو مزايدة حقيقية.
+                      عرض تجريبي — ما يدخل في مزاد فعلي.
                     </p>
                   )}
                   {owner ? (
@@ -265,7 +265,7 @@ export default function Bidding({ market, id }) {
                             بتقدم عرض بقيمة <strong>{money(amount)} ر.س</strong>{" "}
                             على «{a.title}».
                           </p>
-                          <p>العرض المقبول ما ينلغى من هالواجهة.</p>
+                          <p>تأكد من مبلغك؛ ما تقدر تلغي العرض بعد قبوله.</p>
                           <div className="form-actions">
                             <button
                               type="button"
@@ -306,12 +306,12 @@ export default function Bidding({ market, id }) {
                       <Icon name="check" />
                       <h3>
                         {market.demo
-                          ? "انحفظ عرض المعاينة."
+                          ? "تم قبول عرضك في التجربة."
                           : "وصل تأكيد قبول عرضك."}
                       </h3>
                       <p>
-                        {money(success.amount)} ر.س — قبول العرض ما يعني فوز
-                        نهائي.
+                        {money(success.amount)} ر.س — تابع المنافسة، والنتيجة
+                        تظهر بعد إغلاق المزاد.
                       </p>
                       <a href={auctionLink("my-auctions", id)}>تابع مزاداتك</a>
                     </div>

@@ -46,7 +46,10 @@ export default function Guide({ onFeature }) {
           </div>
           <div className="guide-art">
             <div className="art-ring" />
-            <Auctioneer />
+            <Auctioneer
+              character={role === "bidder" ? "collector" : "auctioneer"}
+              motion={role === "bidder" ? "bid" : "inspect"}
+            />
             <span className="speech-bubble">كل خطوة، ولها حكاية.</span>
           </div>
         </section>
@@ -104,11 +107,11 @@ export default function Guide({ onFeature }) {
         <section className="guide-bank">
           <Icon name="shield" size={34} />
           <div>
-            <h2>خلّينا نكون واضحين</h2>
+            <h2>خطوة تسبق المنافسة</h2>
             <p>
-              الالتزام البنكي شرط في الفلو المعتمد، وليس تحويلًا ماليًا. الربط
-              الرسمي في بيئة Sandbox ما زال بانتظار التفعيل. ما نعرض نجاحًا
-              وهميًا، وتجربة المزايدة الكاملة تعتمد على جاهزية الربط.
+              قبل ما تقدّم عرضك، أكمل الالتزام البنكي الخاص بالمزاد. تقدر تتابع
+              حالته من حسابك، وتبدأ المزايدة بعد تأكيده. الالتزام ما يعني دفع
+              قيمة الأصل.
             </p>
             <a href="#/help?topic=bank" className="text-link">
               اقرأ عن الالتزام <Icon size={18} />

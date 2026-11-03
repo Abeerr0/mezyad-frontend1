@@ -94,9 +94,7 @@ export default function CreateAuction({ workspace, params }) {
               <Icon name="gavel" size={34} />
             </div>
             <p className="eyebrow">جاهزين للمنافسة</p>
-            <h2>
-              {workspace.demo ? "تم إنشاء مزاد المعاينة." : "تم إنشاء مزادك."}
-            </h2>
+            <h2>{workspace.demo ? "مزاد التجربة جاهز." : "تم إنشاء مزادك."}</h2>
             <p>{item?.title}</p>
             <p>
               {result.visibility === "PRIVATE"
@@ -105,8 +103,8 @@ export default function CreateAuction({ workspace, params }) {
             </p>
             <p className="field-hint">
               {workspace.demo
-                ? "هذا مثال داخل الصفحة فقط، ولا يُنشر في التصفح العام أو الباك."
-                : "موعد البداية والنهاية يحددان الحالة الفعلية عند الخادم."}
+                ? "هذا مزاد تجريبي، وما يُنشر للمستخدمين."
+                : "يبدأ مزادك وينتهي تلقائيًا في المواعيد اللي حددتها."}
             </p>
             {result.visibility === "PRIVATE" &&
               (result.accessCode ? (
@@ -329,8 +327,8 @@ export default function CreateAuction({ workspace, params }) {
                     </div>
                   </dl>
                   <p className="inline-notice">
-                    بعد التأكيد، ما فيه تعديل لشروط المزاد من هالواجهة. تأكد من
-                    السعر والوقت.
+                    راجع السعر والمواعيد قبل التأكيد؛ شروط المزاد ما تتعدل بعد
+                    إنشائه.
                   </p>
                 </section>
               )}

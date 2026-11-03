@@ -43,7 +43,7 @@ export default function Activity({ workspace, onOpen }) {
               اعرض أصلك <Icon name="plus" />
             </a>
           </div>
-          <Auctioneer />
+          <Auctioneer character="collector" motion="bid" />
         </div>
         <div className="stat-grid">
           {stats.map(([label, value, icon]) => (
@@ -133,8 +133,7 @@ export default function Activity({ workspace, onOpen }) {
             </div>
           )}
           <p className="field-hint">
-            هذي قائمة المزادات اللي أنشأتها أو شاركت فيها، مو سجل فوز أو إثبات
-            نتيجة.
+            افتح أي مزاد لمتابعة تفاصيله، وراجع النتيجة بعد الإغلاق.
           </p>
         </section>
         <section className="paper-card">

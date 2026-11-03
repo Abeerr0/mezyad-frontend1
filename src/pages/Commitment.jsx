@@ -1,6 +1,11 @@
 import React, { useRef, useState } from "react";
 import { Icon } from "../components";
-import { auctionLink, useAuction, displayStatus } from "../market";
+import {
+  commitmentLabel,
+  auctionLink,
+  useAuction,
+  displayStatus,
+} from "../market";
 import {
   AuctionLayout,
   AuctionState,
@@ -25,7 +30,7 @@ export default function Commitment({ market, id }) {
     try {
       await market.commit(id);
       state.reload();
-      setMessage("تم إرسال الطلب. راجع الحالة المسجلة عند الخادم.");
+      setMessage("تم إرسال طلبك. تابع حالة الالتزام هنا.");
     } catch (err) {
       setMessage(err.message);
     } finally {
@@ -53,22 +58,22 @@ export default function Commitment({ market, id }) {
                   </div>
                   <h2>{approved ? "التزامك موثّق." : "نبدأ من التحقق."}</h2>
                   <p>
-                    الالتزام يخص حسابك وهذا المزاد. ما نعتبره ناجح إلا لما يرجع
-                    تأكيد موثوق من الخادم.
+                    التزامك يخص هذا المزاد. بعد تأكيده تقدر تقدّم عرضك وتدخل
+                    المنافسة.
                   </p>
                   <ol className="bank-steps">
                     <li>
                       <b>01</b>
                       <div>
                         <h3>اطلب الالتزام</h3>
-                        <p>يرسل الموقع طلبك إلى خدمة البنك المربوطة بالباك.</p>
+                        <p>ابدأ طلب الالتزام الخاص بهذا المزاد.</p>
                       </div>
                     </li>
                     <li>
                       <b>02</b>
                       <div>
                         <h3>انتظر التحقق</h3>
-                        <p>التوفر والقبول حسب بيئة البنك الرسمية.</p>
+                        <p>تابع حالة طلبك إلى أن يصلك التأكيد.</p>
                       </div>
                     </li>
                     <li>
@@ -91,12 +96,13 @@ export default function Commitment({ market, id }) {
                   </h2>
                   {state.commitment && (
                     <p>
-                      الحالة عند الخادم: <bdi>{state.commitment.status}</bdi>
+                      حالة التزامك:{" "}
+                      <bdi>{commitmentLabel(state.commitment.status)}</bdi>
                     </p>
                   )}
                   {market.demo && (
                     <p className="inline-notice">
-                      المعاينة ما تنشئ التزام ولا تقلد نجاح بنك رسمي.
+                      طلب الالتزام غير متاح في نسخة التجربة.
                     </p>
                   )}
                   {a.seller_id === market.userId ? (
@@ -132,7 +138,7 @@ export default function Commitment({ market, id }) {
                     تحقق من حالة البنك
                   </a>
                   <p className="field-hint">
-                    ما فيه تحويل مالي أو تسوية بيع في هالنسخة.
+                    طلب الالتزام ما يعني دفع قيمة الأصل.
                   </p>
                 </aside>
               </div>

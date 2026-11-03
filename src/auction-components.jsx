@@ -24,15 +24,9 @@ export function AuctionLayout({
           <p>{description}</p>
         </div>
         <div className="auction-heading-mark">
-          <Auctioneer small />
+          <Auctioneer small character="auctioneer" motion="bid" />
         </div>
       </header>
-      {market.demo && (
-        <p className="inline-notice">
-          معاينة تفاعلية فقط. العروض هنا توضيحية، وما تنحفظ في الباك أو تثبت
-          موافقة بنك.
-        </p>
-      )}
       {children}
     </section>
   );
