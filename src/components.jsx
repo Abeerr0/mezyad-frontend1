@@ -45,8 +45,15 @@ export function Auctioneer({
   character = "auctioneer",
   motion = "gavel",
 }) {
-  const woman = character === "collector";
-  const outfit = woman ? "#34392e" : "#f8f3e6";
+  const woman = ["collector", "curator"].includes(character);
+  const outfit =
+    character === "curator"
+      ? "#806344"
+      : character === "expert"
+        ? "#d5c4a4"
+        : woman
+          ? "#34392e"
+          : "#f8f3e6";
   return (
     <svg
       className={`auctioneer mascot-${motion} ${small ? "small" : ""}`}
@@ -79,6 +86,7 @@ export function Auctioneer({
         <path d="m62 184-6-12c-5-10-21-3-16 8l9 17" fill="#ca926c" />
         <path d="M117 273h24m19 0h30" strokeWidth="8" />
         <g className="mascot-head">
+          {/* تم التعديل من عبير: الخبير بنظاره والمنسقه ببروش نجمه عشان تتميز كل شخصيه. */}
           {woman && (
             <path
               d="M99 91c0-73 103-73 103 0l9 85-26-12h-69l-26 12Z"
@@ -111,6 +119,19 @@ export function Auctioneer({
               />
               <path d="M126 128c9-5 14-5 23-1 8-4 14-4 23 1" strokeWidth="4" />
             </>
+          )}
+          {character === "expert" && (
+            <g>
+              <circle cx="131" cy="106" r="12" />
+              <circle cx="166" cy="106" r="12" />
+              <path d="M143 106h11" />
+            </g>
+          )}
+          {character === "curator" && (
+            <path
+              d="m187 151 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z"
+              fill="#b18a4b"
+            />
           )}
           <g className="mascot-eyes">
             <path d="M128 105h5m32 0h5" strokeWidth="5" />
@@ -203,11 +224,35 @@ export const statusLabels = {
 
 export function AuctionCard({ auction, onOpen }) {
   // تم التعديل من عبير: نتنقل بين صور الاصل على البطاقه بدون فتح التفاصيل.
-  const photos = [...new Set([auction.image_url, ...(auction.images || []).map(p => typeof p === "string" ? p : p.image_url)].filter(Boolean))];
+  const photos = [
+    ...new Set(
+      [
+        auction.image_url,
+        ...(auction.images || []).map((p) =>
+          typeof p === "string" ? p : p.image_url,
+        ),
+      ].filter(Boolean),
+    ),
+  ];
   const [photo, setPhoto] = useState(0);
+  const [hovering, setHovering] = useState(false);
+  useEffect(() => {
+    if (
+      !hovering ||
+      photos.length < 2 ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const t = setInterval(() => setPhoto((n) => (n + 1) % photos.length), 2200);
+    return () => clearInterval(t);
+  }, [hovering, photos.length]);
 
   return (
-    <article className="auction-card">
+    <article
+      className="auction-card"
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
       <button
         className="card-photo"
         onClick={() => onOpen(auction)}
@@ -235,7 +280,18 @@ export function AuctionCard({ auction, onOpen }) {
           <Icon />
         </span>
       </button>
-      {photos.length > 1 && <div className="card-gallery" aria-label="صور المزاد">{photos.map((p,i)=><button key={p} aria-label={"الصوره " + (i+1)} aria-pressed={photo===i} onClick={()=>setPhoto(i)} />)}</div>}
+      {photos.length > 1 && (
+        <div className="card-gallery" aria-label="صور المزاد">
+          {photos.map((p, i) => (
+            <button
+              key={p}
+              aria-label={"الصوره " + (i + 1)}
+              aria-pressed={photo === i}
+              onClick={() => setPhoto(i)}
+            />
+          ))}
+        </div>
+      )}
       <div className="card-category">{auction.categoryLabel}</div>
       <h3>
         <button onClick={() => onOpen(auction)}>{auction.title}</button>
@@ -257,7 +313,12 @@ export function AuctionCard({ auction, onOpen }) {
         </span>
         <span>{money(auction.bid_count)} عروض</span>
       </div>
-      <button className="button outline card-details" onClick={()=>onOpen(auction)}>التفاصيل <Icon /></button>
+      <button
+        className="button outline card-details"
+        onClick={() => onOpen(auction)}
+      >
+        التفاصيل <Icon />
+      </button>
     </article>
   );
 }

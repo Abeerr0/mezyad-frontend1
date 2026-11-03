@@ -3778,4 +3778,250 @@ button:disabled {
   }
 }
 /* تم التعديل من عبير: حواف ناعمه وظلال ترفع العناصر مع الحفاظ على هويه مزياد. */
-.button,.pay-trigger{border-radius:999px;box-shadow:0 5px 12px #25282012}.paper-card,.auction-card,.modal,.auth-demo,.private-entry,.auction-ticket,.bid-console,.result-paper{border-radius:24px}.field input,.field select,.field textarea,.search-input{border-radius:14px}.auction-card{padding:14px;border:1px solid #ddd4c0;box-shadow:0 12px 30px #2528200c;overflow:hidden}.card-photo{border-radius:18px;overflow:hidden}.card-details{margin:16px 0 5px}.card-gallery{display:flex;justify-content:center;gap:8px;padding:12px}.card-gallery button{border:0;border-radius:50%;background:#cec5b2;width:10px;height:10px;padding:0}.card-gallery button[aria-pressed=true]{background:#95713c}.modal{box-shadow:0 25px 90px #0004}.button:focus-visible,.card-gallery button:focus-visible{outline:3px solid #b18a4b;outline-offset:4px}@media(prefers-reduced-motion:no-preference){.button,.auction-card{transition:transform .25s,box-shadow .25s,background .25s}.button:hover{transform:translateY(-3px);box-shadow:0 10px 20px #25282020}.button:active{transform:translateY(1px)}.auction-card:hover,.auction-card:focus-within{transform:translateY(-7px) scale(1.015);box-shadow:0 22px 45px #25282022}.card-photo img{transition:transform .6s}.auction-card:hover .card-photo img{transform:scale(1.06)}}
+.button,
+.pay-trigger {
+  border-radius: 999px;
+  box-shadow: 0 5px 12px #25282012;
+}
+.paper-card,
+.auction-card,
+.modal,
+.auth-demo,
+.private-entry,
+.auction-ticket,
+.bid-console,
+.result-paper {
+  border-radius: 24px;
+}
+.field input,
+.field select,
+.field textarea,
+.search-input {
+  border-radius: 14px;
+}
+.auction-card {
+  padding: 14px;
+  border: 1px solid #ddd4c0;
+  box-shadow: 0 12px 30px #2528200c;
+  overflow: hidden;
+}
+.card-photo {
+  border-radius: 18px;
+  overflow: hidden;
+}
+.card-details {
+  margin: 16px 0 5px;
+}
+.card-gallery {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+}
+.card-gallery button {
+  border: 0;
+  border-radius: 50%;
+  background: #cec5b2;
+  width: 10px;
+  height: 10px;
+  padding: 0;
+}
+.card-gallery button[aria-pressed="true"] {
+  background: #95713c;
+}
+.modal {
+  box-shadow: 0 25px 90px #0004;
+}
+.button:focus-visible,
+.card-gallery button:focus-visible {
+  outline: 3px solid #b18a4b;
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .button,
+  .auction-card {
+    transition:
+      transform 0.25s,
+      box-shadow 0.25s,
+      background 0.25s;
+  }
+  .button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px #25282020;
+  }
+  .button:active {
+    transform: translateY(1px);
+  }
+  .auction-card:hover,
+  .auction-card:focus-within {
+    transform: translateY(-7px) scale(1.015);
+    box-shadow: 0 22px 45px #25282022;
+  }
+  .card-photo img {
+    transition: transform 0.6s;
+  }
+  .auction-card:hover .card-photo img {
+    transform: scale(1.06);
+  }
+}
+@font-face {
+  font-family: Cairo;
+  src: url("/fonts/Cairo-SemiBold.ttf") format("truetype");
+  font-display: swap;
+}
+/* تم التعديل من عبير: نوحد انحناء العناصر ونضيف خط للعناوين والتوقيع بدون تغيير الوان الهويه. */
+.site-header {
+  width: min(1320px, calc(100% - 40px));
+  margin: 14px auto;
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  box-shadow: 0 8px 28px #2528200b;
+  top: 12px;
+}
+.header-inner {
+  min-height: 76px;
+  height: auto;
+  padding-block: 10px;
+}
+.site-header .brand img {
+  max-height: 56px;
+  width: auto;
+}
+.site-header .container {
+  width: calc(100% - 40px);
+}
+.private-invite {
+  border-radius: 28px;
+  border-color: #cdbb97;
+  background: linear-gradient(110deg, #f4eedf, #faf9f5);
+  box-shadow: 0 16px 40px #2528200a;
+  padding: 35px;
+  position: relative;
+}
+.private-invite:before {
+  content: "✦";
+  font-size: 80px;
+  position: absolute;
+  left: 20%;
+  color: #b18a4b10;
+  pointer-events: none;
+}
+.account-title h1,
+.auction-heading h1,
+.payment-page h1 {
+  font-family: Cairo, Noto, sans-serif;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+.eyebrow {
+  font-family: Cairo, Noto, sans-serif;
+  letter-spacing: 0.015em;
+}
+.abeer-signature {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+}
+.abeer-signature > b {
+  font:
+    italic 40px Georgia,
+    serif;
+  position: relative;
+}
+.abeer-signature > b > span {
+  font-size: 15px;
+  color: var(--gold);
+  position: absolute;
+  top: 2px;
+  right: -8px;
+}
+.abeer-signature small {
+  display: block;
+  letter-spacing: 0.25em;
+  font:
+    8px Cairo,
+    sans-serif;
+}
+.reset-link {
+  margin: 20px 0;
+}
+.reset-progress {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 20px;
+}
+.reset-progress span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.reset-progress .current {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 5px #b18a4b20;
+}
+.asset-stage,
+.private-art,
+.bank-status-card,
+.invitation-ticket,
+.security-card,
+.account-sidebar,
+.result-paper,
+.state-panel,
+.empty-box {
+  border-radius: 24px;
+}
+.asset-stage {
+  overflow: hidden;
+}
+.invitation-ticket {
+  border-radius: 22px;
+}
+.asset-thumbnails button {
+  border-radius: 12px;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .private-invite .invite-icon {
+    animation: invite-glow 5s ease-in-out infinite;
+  }
+  .abeer-signature:hover > b > span {
+    transform: rotate(90deg);
+    transition: transform 0.5s;
+  }
+  .main-nav a:after {
+    transition: width 0.25s;
+  }
+  .reset-progress .current {
+    animation: arrive 0.3s ease-out;
+  }
+}
+@keyframes invite-glow {
+  50% {
+    box-shadow: 0 0 0 10px #b18a4b0c;
+  }
+}
+@media (max-width: 700px) {
+  .site-header {
+    width: calc(100% - 20px);
+    border-radius: 24px;
+    top: 6px;
+  }
+  .private-invite {
+    padding: 24px;
+  }
+  .header-inner {
+    min-height: 66px;
+  }
+  .site-header .container {
+    width: calc(100% - 24px);
+  }
+}
+.brand-editorial{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;margin-block:80px;padding:30px;background:#eee9dc;border-radius:32px;overflow:hidden}.brand-editorial img{width:100%;height:420px;object-fit:cover;border-radius:22px}.brand-editorial h2{font-family:Messiri,serif;font-size:clamp(32px,4vw,60px)}@media(max-width:700px){.brand-editorial{grid-template-columns:1fr;gap:20px;padding:20px}.brand-editorial img{height:300px}}
+/* تم التعديل من عبير: نطبق الانحناء على حقول النوافذ وكلمه المرور بعد الانماط القديمه. */
+.password-control{border-radius:14px;overflow:hidden}.password-control input{border-radius:14px}.reset-flow fieldset input{border-radius:14px}.main-nav a{border-radius:12px}.main-nav.is-open{border-radius:22px}

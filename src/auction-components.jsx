@@ -24,7 +24,7 @@ export function AuctionLayout({
           <p>{description}</p>
         </div>
         <div className="auction-heading-mark">
-          <Auctioneer small character="auctioneer" motion="bid" />
+          <Auctioneer small character="curator" motion="bid" />
         </div>
       </header>
       {children}

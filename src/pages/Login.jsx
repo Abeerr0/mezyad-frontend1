@@ -1,3 +1,4 @@
+import PasswordReset from "../PasswordReset";
 import { notify } from "../InteractionUI";
 import { EmailAccess } from "../InteractionUI";
 import React, { useState } from "react";
@@ -110,13 +111,7 @@ export default function Login({ workspace, params }) {
           <p className="auth-switch">
             أول مرة هنا؟ <a href="#/register">أنشئ حسابك</a>
           </p>
-          <details className="auth-help">
-            <summary>نسيت كلمة المرور؟</summary>
-            <p>
-              استعادة كلمة المرور غير متاحة حاليًا. إذا كانت محفوظة عندك، تقدر
-              تلقاها في مدير كلمات المرور بمتصفحك.
-            </p>
-          </details>
+          <PasswordReset demo={workspace.demo} initialEmail={email} />
         </>
       )}
     </AuthLayout>

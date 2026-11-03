@@ -385,7 +385,14 @@ export default function App() {
             </div>
           </div>
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} مزياد. جميع الحقوق محفوظة.</span>
+            <span className="abeer-signature" aria-label="تصميم وتطوير عبير">
+              <b>
+                A<span>✦</span>
+              </b>
+              <span>
+                عبير <small>CRAFTED BY ABEER</small>
+              </span>
+            </span>
             <span>
               <i />
               المملكة العربية السعودية
