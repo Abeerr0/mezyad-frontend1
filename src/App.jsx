@@ -1,3 +1,5 @@
+import { Notices, PaymentPage } from "./InteractionUI";
+import "./interaction-ui.css";
 import { useMarket } from "./market";
 import AuctionDetails from "./pages/AuctionDetails";
 import PrivateAccess from "./pages/PrivateAccess";
@@ -27,6 +29,7 @@ import { Icon } from "./components";
 import { categoryLabels, demoAuctions, demoCategories } from "./data";
 
 const pageTitles = {
+  payment: "مراجعة الدفع",
   auction: "تفاصيل المزاد",
   "private-access": "المزاد الخاص",
   commitment: "الالتزام",
@@ -282,11 +285,13 @@ export default function App() {
           </div>
         </div>
       </header>
+      <Notices />
       <main id="main-content" ref={mainRef} tabIndex={-1}>
         <div
           key={route.page + "-" + demo + "-" + (route.params.get("id") || "")}
         >
           {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
+          {route.page === "payment" && <PaymentPage />}
           {route.page === "auction" && (
             <AuctionDetails market={market} id={route.params.get("id")} />
           )}

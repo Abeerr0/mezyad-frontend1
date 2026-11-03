@@ -1,3 +1,4 @@
+import { InvitationTicket } from "../InteractionUI";
 import React, { useState } from "react";
 import { AccountLayout, ResourceState } from "../account-components";
 import { Icon, money, dateText } from "../components";
@@ -108,25 +109,12 @@ export default function CreateAuction({ workspace, params }) {
             </p>
             {result.visibility === "PRIVATE" &&
               (result.accessCode ? (
-                <div className="private-code">
-                  <Icon name="lock" />
-                  <h3>رمز الدخول الخاص</h3>
-                  <p>
-                    احتفظ فيه قبل ما تطلع من الصفحة. شاركه مع الأشخاص اللي تبي
-                    تدعوهم فقط.
-                  </p>
-                  <input
-                    aria-label="رمز المزاد الخاص"
-                    dir="ltr"
-                    readOnly
-                    value={result.accessCode}
-                    onFocus={(e) => e.target.select()}
+                <>
+                  <InvitationTicket
+                    code={result.accessCode}
+                    title={item?.title}
                   />
-                  <button className="button outline" onClick={copyCode}>
-                    نسخ الرمز
-                  </button>
-                  <p role="status">{copyStatus}</p>
-                </div>
+                </>
               ) : (
                 <p role="alert" className="form-error">
                   تم إنشاء المزاد، لكن الرمز ما وصل. لا تنشئ مزاد ثاني؛ راجع

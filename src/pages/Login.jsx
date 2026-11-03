@@ -1,3 +1,5 @@
+import { notify } from "../InteractionUI";
+import { EmailAccess } from "../InteractionUI";
 import React, { useState } from "react";
 import { AuthLayout, PasswordField } from "../account-components";
 import { Icon } from "../components";
@@ -24,6 +26,7 @@ export default function Login({ workspace, params }) {
     setError("");
     try {
       await workspace.login(email.trim().toLowerCase(), password);
+      notify("حياك في مجلسك.");
       setPassword("");
       location.hash = destination;
     } catch (err) {
@@ -120,6 +123,7 @@ export default function Login({ workspace, params }) {
         <Icon name="lock" size={15} /> خلّ حسابك لك. لا تشارك كلمة المرور مع
         أحد.
       </p>
+      {!workspace.user && <EmailAccess demo={workspace.demo} />}
     </AuthLayout>
   );
 }

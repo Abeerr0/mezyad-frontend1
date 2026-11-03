@@ -1,3 +1,5 @@
+import { notify } from "../InteractionUI";
+import { EmailAccess } from "../InteractionUI";
 import React, { useState } from "react";
 import { AuthLayout, PasswordField } from "../account-components";
 import { Icon } from "../components";
@@ -60,6 +62,7 @@ export default function Register({ workspace }) {
       setPassword("");
       setConfirm("");
       setDone(true);
+      notify(workspace.demo ? "حساب التجربة جاهز." : "تم إنشاء حسابك.");
     } catch (err) {
       setError(err.message);
       setUncertain(Boolean(err.uncertain));
@@ -174,6 +177,7 @@ export default function Register({ workspace }) {
           </p>
         </>
       )}
+      {!workspace.user && <EmailAccess demo={workspace.demo} />}
     </AuthLayout>
   );
 }

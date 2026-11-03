@@ -1,3 +1,4 @@
+import { notify } from "./InteractionUI";
 import React, { useEffect, useRef, useState } from "react";
 import { Icon, Auctioneer } from "./components";
 import { imageUrl, validateImages } from "./api";
@@ -110,6 +111,7 @@ export default function ListingEditor({ workspace, existing }) {
         existing,
       );
       setSaved(result);
+      notify("إعلانك جاهز للمراجعة.");
       if (existing)
         location.hash =
           "/listings?item=" + encodeURIComponent(result.id) + "&saved=1";

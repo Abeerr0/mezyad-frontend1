@@ -1,0 +1,230 @@
+/* تم التعديل من عبير: نطابق النوافذ والتكت والمحفظه مع الوان مزياد ونخفف الحركه عند الطلب. */
+.email-access {
+  max-width: 440px;
+  margin: auto;
+}
+.ui-seal {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  background: var(--cream, #f3eddf);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  margin: 15px auto 28px;
+}
+.otp-input {
+  text-align: center;
+  font: 28px monospace;
+  letter-spacing: 0.45em;
+}
+.ui-wait {
+  text-align: center;
+  padding: 35px;
+}
+.ui-loader {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #b18a4b55;
+  border-top-color: #b18a4b;
+  border-radius: 50%;
+  animation: ui-spin 1s linear infinite;
+  vertical-align: middle;
+}
+.brand-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 48px);
+  padding: 16px 22px;
+  background: #252820;
+  color: #faf5e9;
+  box-shadow: 0 12px 45px #25282030;
+  border: 1px solid #b18a4b;
+}
+.invitation-panel {
+  margin: 30px auto;
+  max-width: 500px;
+}
+.invitation-ticket {
+  position: relative;
+  overflow: hidden;
+  max-width: 340px;
+  margin: 0 auto 30px;
+  padding: 30px;
+  background: #e9dfc7;
+  color: #252820;
+  box-shadow: 0 18px 28px #25282018;
+  border: 1px solid #b18a4b;
+}
+.invitation-ticket header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #b18a4b;
+  padding-bottom: 20px;
+  letter-spacing: 0.15em;
+}
+.invitation-ticket h3 {
+  font-size: 26px;
+  margin: 25px 0;
+}
+.ticket-marks {
+  position: absolute;
+  font-size: 80px;
+  opacity: 0.06;
+  transform: rotate(-25deg);
+  top: 100px;
+  pointer-events: none;
+}
+.ticket-stub {
+  margin: 35px -30px -30px;
+  padding: 25px 30px;
+  border-top: 2px dashed #b18a4b;
+  background: #f7f2e7;
+  position: relative;
+}
+.ticket-stub:before,
+.ticket-stub:after {
+  content: "";
+  position: absolute;
+  top: -13px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #faf8f2;
+}
+.ticket-stub:before {
+  right: -12px;
+}
+.ticket-stub:after {
+  left: -12px;
+}
+.ticket-stub input {
+  width: 100%;
+  font: 14px monospace;
+  text-align: center;
+}
+.payment-page {
+  max-width: 700px;
+  padding-block: 70px;
+  text-align: center;
+}
+.payment-page h1 {
+  font-size: 42px;
+}
+.brand-wallet {
+  position: relative;
+  width: 240px;
+  height: 175px;
+  margin: 60px auto 30px;
+  perspective: 800px;
+}
+.wallet-card {
+  position: absolute;
+  inset: 0 15px 40px;
+  background: #b18a4b;
+  color: #252820;
+  border-radius: 12px;
+  transform: rotate(-8deg);
+  padding: 20px;
+  text-align: left;
+  transition: transform 0.4s;
+}
+.wallet-card span {
+  display: block;
+  font-size: 12px;
+  margin-top: 20px;
+}
+.wallet-front {
+  position: absolute;
+  inset: 35px 0 0;
+  background: #34392e;
+  color: #f8f3e6;
+  border: 1px solid #b18a4b;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 20px 30px #25282025;
+}
+.brand-wallet:hover .wallet-card {
+  transform: translateY(-25px) rotate(4deg);
+}
+.pay-trigger {
+  margin: 20px auto;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: #252820;
+  color: #faf5e9;
+  padding: 18px 30px;
+  border: 1px solid #b18a4b;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    transform 0.25s;
+}
+.pay-trigger:hover {
+  background: #66502e;
+  transform: translateY(-3px);
+}
+.payment-sheet {
+  text-align: right;
+  margin: 20px auto;
+}
+.payment-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid #ddd;
+}
+.payment-summary dd {
+  margin: 0;
+}
+.payment-page > .text-link {
+  display: inline-flex;
+  margin-top: 25px;
+}
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ui-shake {
+  25%,
+  75% {
+    transform: translateX(3px);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-shake {
+    animation: ui-shake 0.3s 1;
+  }
+  .payment-sheet {
+    animation: arrive 0.35s ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-loader {
+    animation: none;
+  }
+  .wallet-card,
+  .pay-trigger {
+    transition: none;
+  }
+  .brand-wallet:hover .wallet-card,
+  .pay-trigger:hover {
+    transform: none;
+  }
+}

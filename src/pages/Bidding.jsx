@@ -1,3 +1,4 @@
+import { notify } from "../InteractionUI";
 import React, { useRef, useState } from "react";
 import { Icon, money } from "../components";
 import {
@@ -111,6 +112,7 @@ export default function Bidding({ market, id }) {
       const result = await market.bid(id, current.amount, current.requestId);
       remember(null);
       setSuccess(result);
+      notify(market.demo ? "تم قبول العرض التجريبي." : "تم قبول عرضك.");
       setReview(false);
       setAmount("");
       state.reload();

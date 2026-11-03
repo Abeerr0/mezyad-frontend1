@@ -66,6 +66,11 @@ export default function AuctionResult({ market, id }) {
               {r?.winner_bid_id && !market.userId && (
                 <p>سجّل دخولك عشان تعرف نتيجة مشاركتك.</p>
               )}
+              {r?.isWinner && (
+                <a className="pay-trigger" href="#/payment">
+                  مراجعة الدفع <Icon name="lock" />
+                </a>
+              )}
               <p className="result-footnote">
                 هذي نتيجة المنافسة. الدفع ونقل الملكية ما يتمّون من خلال الموقع
                 حاليًا.
