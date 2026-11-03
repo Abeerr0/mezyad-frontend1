@@ -1,3 +1,4 @@
+import { compactDemo } from "./compact-demo.js";
 import "../src/config.js";
 import bcrypt from "bcryptjs";
 import sharp from "sharp";
@@ -9,29 +10,21 @@ import { resolve, join } from "node:path";
 // تم التعديل من عبير: معرفات ثابته تخلي اعاده التشغيل تضيف الناقص بدون تكرار او تغيير الموجود.
 export function demoId(label) {
   const hex = createHash("sha256")
-    .update("mezyad-showcase-v1:" + label)
+    .update(
+      (label.startsWith("account:")
+        ? "mezyad-showcase-v1:"
+        : "mezyad-showcase-v2:") + label,
+    )
     .digest("hex");
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
-export const demoNames = [
-  "Tala",
-  "Abeer",
-  "Ghadi",
-  "Aseel",
-  "Noura",
-  "Sara",
-  "Reem",
-  "Lama",
-  "Haya",
-  "Reema",
-  "Nouf",
-  "Dana",
-];
+export const demoNames = ["Tala", "Abeer", "Ghadi", "Aseel", "Arwa", "Ali"];
+export const auctionOwners = ["Ghadi", "Abeer", "Aseel", "Tala", "Arwa", "Ali"];
 export const demoPassword = "Aa112233";
-export const privateIndexes = [1, 6, 10, 15, 19, 25];
+export const privateIndexes = [1, 3];
 export function demoCode(index) {
   return createHash("sha256")
-    .update("mezyad-local-demo-invite-v1:" + index)
+    .update("mezyad-local-demo-invite-v2:" + index)
     .digest("hex")
     .slice(0, 24);
 }
@@ -40,72 +33,8 @@ export const catalog = [
   ["فيلا في حي حطين", "Real Estate", 4200000, "hittin-villa.jpg"],
   ["إبل وضح من سلالة مختارة", "Camels", 180000, "category-camels-hero.png"],
   ["لوحة ن ج د 1", "Vehicle Plates", 95000, "plate-njd1.jpg"],
-  ["حقيبة جلد كلاسيكية", "Luxury Handbags", 8500, null],
   ["سيارة كلاسيكية حمراء", "Rare Vehicles", 195000, "notion/red-classic.webp"],
-  ["مجلس بتصميم نجدي", "Real Estate", 1350000, "notion/heritage.webp"],
-  ["ناقة وضحاء", "Camels", 135000, "category-camels-hero.png"],
-  ["حقيبة سهرة جلدية", "Luxury Handbags", 12500, null],
-  [
-    "كلاسيكية بلون عنابي",
-    "Rare Vehicles",
-    245000,
-    "notion/burgundy-classic.webp",
-  ],
-  ["لوحة حروف نجد", "Vehicle Plates", 110000, "plate-njd1.jpg"],
-  ["فيلا بمجلس واسع", "Real Estate", 3850000, "hittin-villa.jpg"],
   ["سيارة كوبيه سوداء", "Rare Vehicles", 365000, "notion/black-coupe.webp"],
-  ["ناقة من مزرعة خاصة", "Camels", 165000, "category-camels-hero.png"],
-  ["حقيبة يد بلون هادئ", "Luxury Handbags", 9500, null],
-  ["فيلا بتفاصيل داخلية أنيقة", "Real Estate", 2950000, "home-interior.jpg"],
-  ["لوحة برقم منفرد", "Vehicle Plates", 78000, "plate-njd1.jpg"],
-  [
-    "كلاسيكية حمراء للمقتني",
-    "Rare Vehicles",
-    225000,
-    "notion/red-classic.webp",
-  ],
-  ["أصل عقاري بطابع تراثي", "Real Estate", 1950000, "notion/heritage.webp"],
-  ["حقيبة جلد للمقتني", "Luxury Handbags", 15000, null],
-  [
-    "بورش كاريرا من مجموعة خاصة",
-    "Rare Vehicles",
-    3950000,
-    "porsche-carrera-gt.jpg",
-  ],
-  ["إبل من مجموعة خاصة", "Camels", 195000, "category-camels-hero.png"],
-  ["لوحة مميزة للمقتني", "Vehicle Plates", 125000, "plate-njd1.jpg"],
-  ["فيلا بتصميم معاصر", "Real Estate", 3650000, "hittin-villa.jpg"],
-  [
-    "سيارة كلاسيكية عنابية",
-    "Rare Vehicles",
-    185000,
-    "notion/burgundy-classic.webp",
-  ],
-  [
-    "كوبيه سوداء من مجموعة خاصة",
-    "Rare Vehicles",
-    325000,
-    "notion/black-coupe.webp",
-  ],
-  ["كلاسيكية حمراء نادرة", "Rare Vehicles", 265000, "notion/red-classic.webp"],
-  [
-    "بورش كاريرا فضية للمقتني",
-    "Rare Vehicles",
-    4350000,
-    "porsche-carrera-gt.jpg",
-  ],
-  [
-    "سيارة عنابية بطابع كلاسيكي",
-    "Rare Vehicles",
-    215000,
-    "notion/burgundy-classic.webp",
-  ],
-  [
-    "كوبيه سوداء بتفاصيل مميزة",
-    "Rare Vehicles",
-    395000,
-    "notion/black-coupe.webp",
-  ],
 ];
 // تم التعديل من عبير: هذي بيانات محليه معروفه الباسورد وما تنزرع ببيئه انتاج او اتصال بعيد.
 export function assertLocalDemo(
@@ -140,6 +69,8 @@ export async function seedDemo({
       "SELECT pg_advisory_xact_lock(hashtext('mezyad-showcase-v1'))",
     );
     await c.query("SELECT access_code_lookup FROM auctions LIMIT 0");
+    // تم التعديل من عبير: نصحح التعبئه القديمه بنفس المعامله ونوقف الحذف لو البيانات صار عليها شغل.
+    const cleanup = await compactDemo(c);
     const passwordHash = await bcrypt.hash(demoPassword, 12);
     const accounts = [];
     for (const name of demoNames) {
@@ -168,7 +99,7 @@ export async function seedDemo({
       });
     }
     const admin = accounts[0],
-      sellers = accounts.slice(1),
+      sellers = accounts,
       categories = new Map();
     for (const name of [
       "Camels",
@@ -258,7 +189,10 @@ export async function seedDemo({
     const auctions = [];
     for (let i = 0; i < catalog.length; i++) {
       const [title, category, price, photo] = catalog[i],
-        seller = i === 1 ? sellers[0] : sellers[i % sellers.length];
+        seller = sellers.find(
+          (user) =>
+            user.email === auctionOwners[i].toLowerCase() + "@example.com",
+        );
       const itemId = await listing(
         "auction:" + i,
         title,
@@ -268,15 +202,15 @@ export async function seedDemo({
         seller,
         "APPROVED",
       );
-      const status = i < 12 ? "ACTIVE" : i < 20 ? "SCHEDULED" : "CLOSED",
+      const status = i < 2 ? "ACTIVE" : i < 4 ? "SCHEDULED" : "CLOSED",
         isPrivate = privateIndexes.includes(i),
         code = demoCode(i);
       const startHours =
         status === "ACTIVE"
           ? -2
           : status === "SCHEDULED"
-            ? 24 + (i - 12) * 6
-            : -72 - (i - 20) * 12;
+            ? 24 + (i - 2) * 6
+            : -72 - (i - 4) * 12;
       const endHours =
         status === "ACTIVE"
           ? 72 + i * 2
@@ -334,16 +268,20 @@ export async function seedDemo({
       });
     }
     // تم التعديل من عبير: نترك اعلانات للمراجعه والرفض واعلانات معتمده يقدر المستخدم ينشئ لها مزاد بنفسه.
-    for (let i = 0; i < 14; i++) {
-      const status =
-        i < 6 ? "PENDING_REVIEW" : i < 10 ? "REJECTED" : "APPROVED";
-      const source = catalog[i % catalog.length],
-        seller =
-          i === 0
-            ? sellers[0]
-            : i === 6
-              ? sellers[1]
-              : sellers[i % sellers.length];
+    for (let i = 0; i < catalog.length; i++) {
+      const status = [
+        "PENDING_REVIEW",
+        "REJECTED",
+        "APPROVED",
+        "PENDING_REVIEW",
+        "REJECTED",
+        "APPROVED",
+      ][i];
+      const source = catalog[i],
+        seller = sellers.find(
+          (user) =>
+            user.email === auctionOwners[i].toLowerCase() + "@example.com",
+        );
       await listing(
         "extra:" + i,
         source[0] + " — " + (i + 1),
@@ -360,7 +298,8 @@ export async function seedDemo({
     return {
       accounts: accounts.map(({ password_hash, ...user }) => user),
       auctions,
-      listingCount: 44,
+      listingCount: 12,
+      cleanup,
     };
   } catch (error) {
     await c.query("ROLLBACK");
@@ -384,8 +323,9 @@ async function main() {
         : undefined,
     });
     console.log(
-      "Local demo data saved. Existing data, passwords and auction times were preserved.",
+      "Compact demo data saved. Unrelated data and existing passwords were preserved.",
     );
+    console.log("Previous demo cleanup:", result.cleanup);
     console.table(
       result.accounts.map(({ name, email, role, password, created }) => ({
         name,

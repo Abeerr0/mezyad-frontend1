@@ -109,10 +109,7 @@ export async function checkDemo({
       const expected = (
         await pool.query(
           `SELECT a.id FROM auctions a WHERE a.visibility='PUBLIC' AND a.id=ANY($1::uuid[]) AND (CASE WHEN a.status='CLOSED' OR a.end_time<=clock_timestamp() THEN 'CLOSED' WHEN a.start_time<=clock_timestamp() THEN 'ACTIVE' ELSE 'SCHEDULED' END)=$2`,
-          [
-            Array.from({ length: 30 }, (_, i) => demoId("auction:" + i)),
-            status,
-          ],
+          [Array.from({ length: 6 }, (_, i) => demoId("auction:" + i)), status],
         )
       ).rows;
       const actual = response.json.data;
@@ -210,7 +207,14 @@ export async function checkDemo({
       const commitment = (
         await pool.query(
           "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS'",
-          [publicId, user.id],
+          [
+            publicId,
+            (
+              await pool.query(
+                "SELECT id FROM users WHERE email='aseel@example.com'",
+              )
+            ).rows[0].id,
+          ],
         )
       ).rowCount;
       if (!commitment)
@@ -218,7 +222,7 @@ export async function checkDemo({
           "Bid needs verified commitment",
           await request("/auctions/" + publicId + "/bids", {
             method: "POST",
-            token: tokens.get("Ghadi"),
+            token: tokens.get("Aseel"),
             body: { amount: 1, requestId: randomUUID() },
           }),
           403,
@@ -250,7 +254,7 @@ export async function checkDemo({
     }
     check(
       "Closed auction result",
-      await request("/auctions/" + demoId("auction:20")),
+      await request("/auctions/" + demoId("auction:4")),
       200,
     );
     return {
