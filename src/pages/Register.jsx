@@ -1,5 +1,10 @@
 import { notify } from "../InteractionUI";
-import { EmailAccess } from "../InteractionUI";
+import {
+  GoogleAccess,
+  SignupVerification,
+  signupPaths,
+  signupReady,
+} from "../AccountVerification";
 import React, { useState } from "react";
 import { AuthLayout, PasswordField } from "../account-components";
 import { Icon } from "../components";
@@ -15,6 +20,7 @@ export default function Register({ workspace }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [uncertain, setUncertain] = useState(false);
   async function submit(event) {
     event.preventDefault();
@@ -36,14 +42,12 @@ export default function Register({ workspace }) {
     setBusy(true);
     setError("");
     try {
-      if (workspace.demo)
-        workspace.enterPreview({
-          ...previewUser,
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-        });
-      else {
-        const result = await request("/auth/register", {
+      if (!workspace.demo) {
+        if (!signupReady())
+          throw new Error(
+            "التحقق بالبريد غير متاح حاليًا. حاول إنشاء حسابك لاحقًا.",
+          );
+        await request(signupPaths.start, {
           method: "POST",
           body: {
             name: name.trim(),
@@ -51,18 +55,8 @@ export default function Register({ workspace }) {
             password,
           },
         });
-        if (!result?.id) {
-          const err = new Error(
-            "ما تأكدنا من إنشاء الحساب. جرّب تسجيل الدخول قبل إعادة التسجيل.",
-          );
-          err.uncertain = true;
-          throw err;
-        }
       }
-      setPassword("");
-      setConfirm("");
-      setDone(true);
-      notify(workspace.demo ? "حساب التجربة جاهز." : "تم إنشاء حسابك.");
+      setVerifying(true);
     } catch (err) {
       setError(err.message);
       setUncertain(Boolean(err.uncertain));
@@ -72,6 +66,31 @@ export default function Register({ workspace }) {
   }
   return (
     <AuthLayout register>
+      {verifying && (
+        <SignupVerification
+          email={email.trim().toLowerCase()}
+          demo={workspace.demo}
+          onClose={() => setVerifying(false)}
+          onComplete={async () => {
+            if (workspace.demo)
+              workspace.enterPreview({
+                ...previewUser,
+                name: name.trim(),
+                email: email.trim().toLowerCase(),
+              });
+            else await workspace.login(email.trim().toLowerCase(), password);
+            setPassword("");
+            setConfirm("");
+            setVerifying(false);
+            location.hash = "/";
+            notify(
+              workspace.demo
+                ? "حياك في تجربة مزياد ✦"
+                : "تم إنشاء حسابك بنجاح. حياك في مزياد ✦",
+            );
+          }}
+        />
+      )}
       <p className="eyebrow">يا هلا بالبدايات</p>
       <h1>
         مكانك <em>محفوظ.</em>
@@ -177,7 +196,7 @@ export default function Register({ workspace }) {
           </p>
         </>
       )}
-      {!workspace.user && <EmailAccess demo={workspace.demo} />}
+      {!workspace.user && <GoogleAccess />}
     </AuthLayout>
   );
 }

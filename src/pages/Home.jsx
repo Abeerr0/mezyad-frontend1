@@ -140,6 +140,12 @@ export default function Home({
             </p>
           </div>
           <div className="category-links">
+            <div className="category-ornaments" aria-hidden="true">
+              <Icon name="gavel" size={38} />
+              <Icon name="flag" size={38} />
+              <Icon name="image" size={38} />
+              <span>✦</span>
+            </div>
             {categories.map((c, i) => (
               <a
                 key={c.id}

@@ -1,6 +1,6 @@
 import PasswordReset from "../PasswordReset";
 import { notify } from "../InteractionUI";
-import { EmailAccess } from "../InteractionUI";
+import { GoogleAccess } from "../AccountVerification";
 import React, { useState } from "react";
 import { AuthLayout, PasswordField } from "../account-components";
 import { Icon } from "../components";
@@ -42,6 +42,7 @@ export default function Login({ workspace, params }) {
       <h1>
         المجلس <em>مجلسك.</em>
       </h1>
+      <GoogleAccess />
       <p className="form-intro">ادخل لحسابك، وتابع اللي يهمك.</p>
       {workspace.notice && (
         <p role="status" className="inline-notice">

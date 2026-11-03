@@ -4022,6 +4022,242 @@ button:disabled {
     width: calc(100% - 24px);
   }
 }
-.brand-editorial{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;margin-block:80px;padding:30px;background:#eee9dc;border-radius:32px;overflow:hidden}.brand-editorial img{width:100%;height:420px;object-fit:cover;border-radius:22px}.brand-editorial h2{font-family:Messiri,serif;font-size:clamp(32px,4vw,60px)}@media(max-width:700px){.brand-editorial{grid-template-columns:1fr;gap:20px;padding:20px}.brand-editorial img{height:300px}}
+.brand-editorial {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 60px;
+  margin-block: 80px;
+  padding: 30px;
+  background: #eee9dc;
+  border-radius: 32px;
+  overflow: hidden;
+}
+.brand-editorial img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 22px;
+}
+.brand-editorial h2 {
+  font-family: Messiri, serif;
+  font-size: clamp(32px, 4vw, 60px);
+}
+@media (max-width: 700px) {
+  .brand-editorial {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  .brand-editorial img {
+    height: 300px;
+  }
+}
 /* تم التعديل من عبير: نطبق الانحناء على حقول النوافذ وكلمه المرور بعد الانماط القديمه. */
-.password-control{border-radius:14px;overflow:hidden}.password-control input{border-radius:14px}.reset-flow fieldset input{border-radius:14px}.main-nav a{border-radius:12px}.main-nav.is-open{border-radius:22px}
+.password-control {
+  border-radius: 14px;
+  overflow: hidden;
+}
+.password-control input {
+  border-radius: 14px;
+}
+.reset-flow fieldset input {
+  border-radius: 14px;
+}
+.main-nav a {
+  border-radius: 12px;
+}
+.main-nav.is-open {
+  border-radius: 22px;
+}
+/* تم التعديل من عبير: الهيدر يطفو فوق الصور ونبعد النصوص عنه عشان ما تتغطى. */
+.site-header {
+  position: relative;
+  z-index: 50;
+  margin-bottom: -104px;
+  background: #faf9f5f5;
+  backdrop-filter: blur(16px);
+}
+.home-hero .hero-copy {
+  padding-top: 190px;
+}
+.auth-art-top {
+  top: 125px;
+}
+.auth-form-panel {
+  padding-top: 140px;
+}
+.browse-page,
+.guide-page > .container,
+.help-page,
+.account-layout,
+.auction-experience,
+.payment-page {
+  padding-top: 125px;
+}
+.home-hero {
+  padding-top: 0;
+}
+.home-hero .hero-image {
+  top: 0;
+}
+.category-ornaments {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--gold);
+  padding-bottom: 20px;
+  border-bottom: 1px solid #b18a4b33;
+}
+.category-ornaments span {
+  font-size: 55px;
+}
+.category-links {
+  position: relative;
+}
+.category-links a {
+  padding-inline: 18px;
+  border-radius: 16px;
+}
+.page-heading {
+  position: relative;
+  overflow: hidden;
+}
+.page-heading:after {
+  content: "✦";
+  position: absolute;
+  left: 20%;
+  top: -25px;
+  font-size: 150px;
+  color: #b18a4b0b;
+  pointer-events: none;
+}
+h1 em,
+h2 em {
+  font-family: Messiri, serif;
+  font-style: normal;
+  position: relative;
+  text-shadow: 0 3px 18px #b18a4b22;
+}
+.comparison-grid article {
+  border-radius: 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 28px #25282009;
+  border: 1px solid #b18a4b26;
+}
+.comparison-grid article:after {
+  content: "✦";
+  position: absolute;
+  left: -15px;
+  top: 0;
+  font-size: 150px;
+  color: #b18a4b0a;
+  pointer-events: none;
+}
+.mascot-head {
+  animation: none !important;
+}
+.google-access {
+  margin: 24px 0;
+}
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  padding: 15px 22px;
+  border: 1px solid #d8d3c6;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px #25282008;
+  cursor: pointer;
+}
+.google-mark {
+  font:
+    bold 23px Arial,
+    sans-serif;
+  color: #4285f4;
+}
+.signup-verify {
+  text-align: center;
+}
+.welcome-success {
+  padding: 30px;
+}
+.welcome-check {
+  width: 95px;
+  height: 95px;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  border-radius: 50%;
+  background: #e7f2e5;
+  color: #347443;
+  box-shadow:
+    0 0 0 10px #3474430b,
+    0 0 35px #34744330;
+}
+.welcome-success > span {
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 14px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  h1 em,
+  h2 em {
+    animation: gold-light 6s ease-in-out infinite;
+  }
+  .category-ornaments svg:nth-child(2) {
+    animation: nudge 5s ease-in-out infinite;
+  }
+  .comparison-grid article {
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+  }
+  .comparison-grid article:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 35px #25282015;
+  }
+  .welcome-check {
+    animation: seal-in 0.5s ease-out;
+  }
+  .google-button {
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
+  }
+  .google-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px #25282016;
+  }
+}
+@keyframes gold-light {
+  50% {
+    text-shadow: 0 0 20px #b18a4b55;
+  }
+}
+@media (max-width: 700px) {
+  .site-header {
+    margin-bottom: -90px;
+  }
+  .home-hero .hero-copy {
+    padding-top: 150px;
+  }
+  .auth-art-top {
+    top: 100px;
+  }
+  .auth-form-panel {
+    padding-top: 120px;
+  }
+  .browse-page,
+  .guide-page > .container,
+  .help-page,
+  .account-layout,
+  .auction-experience,
+  .payment-page {
+    padding-top: 110px;
+  }
+}
