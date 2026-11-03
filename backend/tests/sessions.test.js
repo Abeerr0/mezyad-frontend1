@@ -28,7 +28,9 @@ test(
       method: "POST",
       body: { name: "Session fixture", email, password },
     });
-    assert.equal(registered.status, 201);
+    assert.equal(registered.status, 202);
+    const verified=await q.api("/auth/signup/complete",{method:"POST",body:{email,code:q.emailCode(email)}});
+    assert.equal(verified.status,200);
 
     // تسجيل الدخول بالحساب الجديد
     const login = await q.api("/auth/login", {
@@ -38,7 +40,7 @@ test(
     assert.equal(login.status, 200);
 
     const token = login.json.data.token,
-      id = registered.json.data.id;
+      id = verified.json.data.id;
 
     // نتأكد أن الجلسة مخزنة في قاعدة البيانات
     const row = (
@@ -86,3 +88,4 @@ test(
     );
   },
 );
+

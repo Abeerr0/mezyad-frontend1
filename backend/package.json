@@ -16,8 +16,12 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
-    "pg": "^8.13.1",
     "multer": "^2.4.0",
-    "sharp": "^0.34.5"
+    "nodemailer": "^10.3.1",
+    "pg": "^8.13.1",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "smtp-server": "^3.21.3"
   }
 }

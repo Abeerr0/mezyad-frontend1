@@ -1,3 +1,8 @@
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import "./config.js";
+import { emailAuth } from "./email-auth.js";
+import { bankRoutes } from "./bank.js";
 import express from "express";
 import cors from "cors";
 import bcrypt from "bcryptjs";
@@ -8,7 +13,6 @@ import { validMoney, toCents } from "./money.js";
 import { listings, withImages, withListingImages } from "./listings.js";
 import { imageLink, serveImage } from "./uploads.js";
 import { attemptLimit } from "./limits.js";
-import { startCommitment } from "./bank.js";
 import { auctionStatus, resultFor, participationFor } from "./auctions.js";
 
 export const app = express();
@@ -16,6 +20,11 @@ app.use(
   cors({ origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173" }),
 );
 app.use(express.json({ limit: "100kb" }));
+// تم التعديل من عبير: نفس مسارات الربط تعمل بالعنوان الموحد وبالعنوان القديم.
+app.use("/api/v1/auth", emailAuth);
+app.use("/auth", emailAuth);
+app.use("/api/v1", bankRoutes);
+app.use(bankRoutes);
 const err = (res, status, code, message) =>
   res.status(status).json({ error: { code, message } });
 const validUuid = (x) =>
@@ -127,97 +136,9 @@ app.get("/health", (_req, res) => res.json({ data: { status: "ok" } }));
 // نستخدم async عشان نقدر نستخدم await لانتظار نتيجة عملية، مثل حفظ الحساب في قاعدة البيانات.
 //عندما يصل طلب POST لمسار تسجيل الحساب، نفّذ التعليمات الموجودة داخل هذه الدالة
 // هذا الرمز يعني او || إذا كان الاسم ليس نصًا، أو كان فارغًا بعد إزالة المسافات من الأطراف، نرفض الطلب.
-app.post("/auth/register", async (req, res, next) => {
-  try {
-    const data = req.body || {};
-    const name = data.name;
-    const email = data.email;
-    const password = data.password;
-    if (
-      //اول شي الاسم لازم يتحقق انو سترينق يعني حروف
-      typeof name !== "string" ||
-      //يتحقق هل الاسم فارغ ولا مكنوب فيه مسافات فقط
-      !name.trim() ||
-      // نرفض الاسم إذا تجاوز طوله 160 بعد إزالة المسافات من بدايته ونهايته، لأن هذا هو الحد المحدد له في قاعدة البيانات.
-      name.trim().length > 160 ||
-      //نوع الايميل المدخل يكون سترينق حروف فقط
-      typeof email !== "string" ||
-      // نرفض الإيميل إذا تجاوز طوله 254، وهو الحد الموجود في قاعدة البيانات
-      email.trim().toLowerCase().length > 254 ||
-      // نتحقق من شكل الإيميل: علامة @ واحدة، وجزء قبلها وبعدها ونقطة، وبدون مسافات
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      //. نوع الباس لازم يكون نص ويحتوي ارقام وحروف ورموز وعلامه التعجب تعني انو يتحقق ان القيمه مو نص
-      typeof password !== "string" ||
-      //طول الباسوورد يكون ٨ او اكثر
-      password.length < 8 ||
-      // نرفض كلمة المرور إذا تجاوز حجمها 72 بايت، وهو حد bcrypt
-      Buffer.byteLength(password, "utf8") > 72
-    )
-      //داله err تجهز رد الخطا وارساله  return تنهي طلب تنفيذ الداله بعد الاستدعاء
-      return err(
-        //رد اللي يوفره express نمرره للداله عشان تقدر ترد للمستخدم
-        res,
-        // رقم حاله http تعني خطا من المستخدم بسبب بيانات غير صحيحه
-        400,
-        // رمز الخطا اللي يظهر اللي معتمدينه بالمشروع الفرق بينه وبين ٤٠٠ ان هذا يرسل داخل بيانات الرد لتوضيح نوع الخطأ للتطبيق لكن. ٤٠٠ نتوضح نوع الخطا
-        "INVALID_INPUT",
-        //
-        "Valid name, email and password (8+ chars) required",
-      );
-    const hash = await bcrypt.hash(password, 12);
-    const r = await query(
-      "INSERT INTO users(name,email,password_hash) VALUES($1,$2,$3) RETURNING id,name,email,role",
-      [name.trim(), email.trim().toLowerCase(), hash],
-    );
-    res.status(201).json({ data: r.rows[0] });
-    // إذا كان رمز الخطأ 23505، نرسل رد 409 ورسالة أن الإيميل مسجل مسبقًا.
-    // الدالة err تجهز رد الخطأ وترسله.
-    // return تنهي معالجة طلب التسجيل الحالي، ويظل الباك إند شغالًا.
-    // إذا صار خطأ غير تكرار الإيميل، مثل فشل الاتصال بقاعدة البيانات،
-    // نستخدم next(e) لتمريره إلى الجزء المسؤول عن إرسال رد يوضح الخطأ.
-  } catch (e) {
-    if (e.code === "23505")
-      return err(res, 409, "DUPLICATE_EMAIL", "Email already registered");
-    next(e);
-  }
-});
 const accounts = express.Router();
 app.use("/auth", accounts);
 app.use("/api/v1/auth", accounts);
-accounts.post("/register", async (req, res, next) => {
-  try {
-    // نتحقق من بيانات الحساب قبل ما نحفظه.
-    const { name, email, password } = req.body || {};
-    if (
-      typeof name !== "string" ||
-      !name.trim() ||
-      name.trim().length > 160 ||
-      typeof email !== "string" ||
-      email.trim().toLowerCase().length > 254 ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      typeof password !== "string" ||
-      password.length < 8 ||
-      Buffer.byteLength(password, "utf8") > 72
-    )
-      return err(
-        res,
-        400,
-        "INVALID_INPUT",
-        "Valid name, email and password (8+ chars) required",
-      );
-    const hash = await bcrypt.hash(password, 12);
-    // الحساب العام يطلع USER؛ ما ناخذ صلاحية الأدمن من الطلب.
-    const r = await query(
-      "INSERT INTO users(name,email,password_hash) VALUES($1,$2,$3) RETURNING id,name,email,role",
-      [name.trim(), email.trim().toLowerCase(), hash],
-    );
-    res.status(201).json({ data: r.rows[0] });
-  } catch (e) {
-    if (e.code === "23505")
-      return err(res, 409, "DUPLICATE_EMAIL", "Email already registered");
-    next(e);
-  }
-});
 app.post("/auth/login", async (req, res, next) => {
   try {
     // ياخذ بيانات الطلب وإذا ما وصلت بيانات يستخدم كائن فارغ.
@@ -1046,26 +967,11 @@ api.get("/auctions/:id", async (req, res, next) => {
     next(e);
   }
 });
-app.post("/auctions/:id/commitment", auth, async (req, res, next) => {
-  try {
-    const a = await auction(req.params.id);
-    if (!a || !(await accessible(a, req.user)))
-      return err(res, 404, "NOT_FOUND", "Auction not found");
-    if (a.seller_id === req.user.id)
-      return err(res, 403, "OWNER", "Cannot commit to own auction");
-    return err(
-      res,
-      503,
-      "BANK_SANDBOX_UNAVAILABLE",
-      "Official sandbox provider and operation have not been verified; no commitment approved",
-    );
-  } catch (e) {
-    next(e);
-  }
-});
+
 api.post(
   // المشارك يدخل برمز المزاد فقط.
-  "/auctions/access",
+  // تم التعديل من عبير: ندعم الرابط القديم ونفس تحقق الرمز بدون كشف المزاد الخاص.
+  ["/auctions/access", "/auctions/:id/access"],
   auth,
   attemptLimit({
     // نحسب محاولات إدخال الرمز لكل مشارك حسب حسابه.
@@ -1102,6 +1008,8 @@ api.post(
         auctionId = result.rows[0].id;
       
 
+      // تم التعديل من عبير: الرابط القديم لازم يطابق المزاد اللي رجع من الرمز.
+      if (req.params.id && req.params.id !== auctionId) return err(res,403,"INVALID_CODE","Invalid access code");
       // نجيب بيانات المزاد بمعرّفه عشان نكمل التحقق قبل ما نسمح بالدخول.
       const a = await auction(auctionId);
       if (!a || a.visibility !== "PRIVATE")
@@ -1124,47 +1032,9 @@ api.post(
     }
   },
 );
-api.post("/auctions/:id/commitment", auth, async (req, res, next) => {
-  try {
-    const a = await auction(req.params.id);
-    if (!a || !(await accessible(a, req.user)))
-      return err(res, 404, "NOT_FOUND", "Auction not found");
-    if (a.seller_id === req.user.id)
-      return err(res, 403, "OWNER", "Cannot commit to own auction");
-    if (a.status === "CLOSED" || new Date(a.end_time) <= new Date())
-      return err(res, 409, "AUCTION_NOT_ACTIVE", "Auction ended");
-    await startCommitment({ auctionId: a.id, userId: req.user.id });
-  } catch (e) {
-    next(e);
-  }
-});
-app.get("/auctions/:id/commitment", auth, async (req, res, next) => {
-  try {
-    const r = await query(
-      "SELECT id,status,sandbox_reference,created_at FROM bid_commitments WHERE auction_id=$1 AND user_id=$2",
-      [req.params.id, req.user.id],
-    );
-    if (!r.rowCount) return err(res, 404, "NOT_FOUND", "No commitment");
-    res.json({ data: r.rows[0] });
-  } catch (e) {
-    next(e);
-  }
-});
-api.get("/auctions/:id/commitment", auth, async (req, res, next) => {
-  try {
-    const a = await auction(req.params.id);
-    if (!a || !(await accessible(a, req.user)))
-      return err(res, 404, "NOT_FOUND", "Auction not found");
-    const r = await query(
-      "SELECT id,status,sandbox_reference,created_at FROM bid_commitments WHERE auction_id=$1 AND user_id=$2",
-      [req.params.id, req.user.id],
-    );
-    if (!r.rowCount) return err(res, 404, "NOT_FOUND", "No commitment");
-    res.json({ data: r.rows[0] });
-  } catch (e) {
-    next(e);
-  }
-});
+
+
+
 app.post("/auctions/:id/bids", auth, async (req, res, next) => {
   const { amount, requestId } = req.body || {};
   if (!validMoney(amount) || !validUuid(requestId) || !validUuid(req.params.id))
@@ -1213,11 +1083,11 @@ app.post("/auctions/:id/bids", auth, async (req, res, next) => {
         "Bid request already processed",
       );
     }
-    // BE-14 | نفحص الالتزام البنكي فقط إذا فعّلنا الإعداد.
-    // حاليًا الفحص اختياري عشان نكمل تجربة المزايدة واختبارات BE-04.
-    if (process.env.REQUIRE_BANK_COMMITMENT === "true") {
+    // تم التعديل من عبير: الالتزام الموثق من ميسر شرط للمزايده.
+    // تم التعديل من عبير: نرفض الالتزام المنتهي او المرجع غير الموثق.
+    {
       const commitment = await c.query(
-        "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS'",
+        "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS' AND provider='MOYASAR' AND payment_id IS NOT NULL AND expires_at>clock_timestamp()",
         [a.id, req.user.id],
       );
       if (!commitment.rowCount) {
@@ -1328,10 +1198,10 @@ api.post("/auctions/:id/bids", auth, async (req, res, next) => {
         "Bid request already processed",
       );
     }
-        // BE-14 | نفحص الالتزام البنكي فقط إذا فعّلنا الإعداد.
-    if (process.env.REQUIRE_BANK_COMMITMENT === "true") {
+        // تم التعديل من عبير: الالتزام الموثق من ميسر شرط للمزايده.
+    {
       const commitment = await c.query(
-        "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS'",
+        "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS' AND provider='MOYASAR' AND payment_id IS NOT NULL AND expires_at>clock_timestamp()",
         [a.id, req.user.id],
       );
       if (!commitment.rowCount) {
@@ -1489,6 +1359,9 @@ api.get("/me/auctions", auth, async (req, res, next) => {
     next(e);
   }
 });
+// تم التعديل من عبير: نقدم ملفات الواجهه المبنيه من نفس عنوان API بدون تغيير التصميم.
+const frontendDirectory=fileURLToPath(new URL("../../Frontend/dist/",import.meta.url));
+if (existsSync(frontendDirectory+"index.html")) app.use(express.static(frontendDirectory));
 app.use((_req, res) => err(res, 404, "NOT_FOUND", "Route not found"));
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
@@ -1509,6 +1382,9 @@ app.use((error, req, res, next) => {
   if (error.code === "22021" || error.code === "22P05") {
     return err(res, 400, "INVALID_INPUT", "Invalid characters in request");
   }
+  // تم التعديل من عبير: نرجع اخطاء البريد وميسر للواجهه بدون تفاصيل المفاتيح.
+  if (error.apiCode && Number.isInteger(error.status)) return err(res,error.status,error.apiCode,error.message);
   console.error("API error", error.code || "INTERNAL_ERROR");
   err(res, 500, "INTERNAL_ERROR", "Unexpected server error");
 });
+

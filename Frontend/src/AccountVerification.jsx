@@ -4,8 +4,8 @@ import { request } from "./api";
 
 // تم التعديل من عبير: الربط الحقيقي يحتاج مسارات تحقق، وما نستخدم رمز الواجهه لانشاء حساب فعلي.
 export const signupPaths = {
-  start: import.meta.env.VITE_SIGNUP_REQUEST_PATH,
-  complete: import.meta.env.VITE_SIGNUP_COMPLETE_PATH,
+  start: import.meta.env.VITE_SIGNUP_REQUEST_PATH || "/auth/signup/request",
+  complete: import.meta.env.VITE_SIGNUP_COMPLETE_PATH || "/auth/signup/complete",
 };
 export function signupReady() {
   return Object.values(signupPaths).every(
@@ -202,3 +202,4 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
     </Modal>
   );
 }
+

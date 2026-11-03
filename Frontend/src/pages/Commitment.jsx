@@ -28,7 +28,12 @@ export default function Commitment({ market, id }) {
     setBusy(true);
     setMessage("");
     try {
-      await market.commit(id);
+      // تم التعديل من عبير: نربط زر الالتزام بنفس صفحه الدفع المعتمده بدون تغيير تصميمها.
+      const result = await market.commit(id);
+      if (result.status !== "SUCCESS") {
+        location.hash = "/payment?id=" + encodeURIComponent(id);
+        return;
+      }
       state.reload();
       setMessage("تم إرسال طلبك. تابع حالة الالتزام هنا.");
     } catch (err) {
@@ -149,3 +154,4 @@ export default function Commitment({ market, id }) {
     </AuctionLayout>
   );
 }
+

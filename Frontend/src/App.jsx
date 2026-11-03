@@ -54,6 +54,11 @@ const pageTitles = {
   "create-auction": "إعداد المزاد",
 };
 function readRoute() {
+  // تم التعديل من عبير: نلتقط رجعه ميسر ونخلي الباك يتحقق من معرف العمليه.
+  const callback = new URLSearchParams(location.search);
+  if (!location.hash && callback.has("moyasarAuction") && callback.has("id")) {
+    return {page:"payment",params:new URLSearchParams({id:callback.get("moyasarAuction"),paymentId:callback.get("id")})};
+  }
   const [path, query] = (location.hash.slice(1) || "/").split("?");
   const name = path.replace(/^\//, "") || "home";
   return { page: name, params: new URLSearchParams(query || "") };
@@ -293,7 +298,7 @@ export default function App() {
           key={route.page + "-" + demo + "-" + (route.params.get("id") || "")}
         >
           {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
-          {route.page === "payment" && <PaymentPage />}
+          {route.page === "payment" && <PaymentPage market={market} id={route.params.get("id")} paymentId={route.params.get("paymentId")} />}
           {route.page === "auction" && (
             <AuctionDetails market={market} id={route.params.get("id")} />
           )}
@@ -407,3 +412,4 @@ export default function App() {
     </>
   );
 }
+

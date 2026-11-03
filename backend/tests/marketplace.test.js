@@ -403,6 +403,8 @@ check(
   "COMMIT-01 / QA-07 partial: unavailable bank fails closed; browser SUCCESS and repeated requests do not approve",
   async () => {
     const a = await q.auction();
+    const savedSecret=process.env.MOYASAR_SECRET_KEY;
+    delete process.env.MOYASAR_SECRET_KEY;
     for (let i = 0; i < 2; i++)
       expectError(
         await q.api("/auctions/" + a.id + "/commitment", {
@@ -422,6 +424,7 @@ check(
       ).rows[0].n,
       0,
     );
+    if(savedSecret) process.env.MOYASAR_SECRET_KEY=savedSecret;
     expectError(await q.bid(a), 403, "COMMITMENT_REQUIRED");
   },
 );
@@ -477,3 +480,4 @@ check(
     );
   },
 );
+

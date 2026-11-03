@@ -28,7 +28,7 @@ const check = (name, fn) => test(name, { skip: databaseSkip }, fn);
 // --- الاختبار الاول ---
 // نتاكد ان الجداول العشره الاساسيه انخلقت وكل واحد له "مفتاح اساسي" (Primary Key)
 check(
-  "DB-01: migration creates exactly the ten Stage 3 core tables, each with a primary key",
+  "DB-01: migration creates the Stage 3 core tables and email verification table, each with a primary key",
   async () => {
     // هذا استعلام SQL وظيفته يروح يقرا من الداتا بيس ويجيب اسماء الجداول وكم مفتاح اساسي بكل جدول
     const result = await q.pool.query(
@@ -48,6 +48,7 @@ check(
         "bid_commitments",
         "bids",
         "categories",
+        "email_challenges",
         "item_images",
         "items",
         "private_auction_access",
@@ -410,7 +411,7 @@ check(
         [q.schema],
       )
     ).rows;
-    assert.equal(timestamps.length, 9);
+    assert.equal(timestamps.length, 11);
     assert.ok(
       timestamps.every(
         (field) => field.data_type === "timestamp with time zone",
@@ -428,7 +429,9 @@ check(
       "idx_auctions_status_end",
       "idx_bids_auction_time",
       "idx_commitments_user",
+      "idx_email_challenges_expiry",
       "idx_items_seller",
     ]);
   },
 );
+

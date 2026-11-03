@@ -25,7 +25,7 @@ test('DB-07: setup creates a clean schema and repeats without duplicate tables o
         assert.equal(result.status,0,result.stderr||result.stdout);
         const tables=(await control.query(
           "SELECT count(*)::int AS n FROM information_schema.tables WHERE table_schema=$1 AND table_type='BASE TABLE'",[schema])).rows[0].n;
-        assert.equal(tables,10);
+        assert.equal(tables,11);
         const count=(await control.query('SELECT count(*)::int AS n FROM "'+schema+'".categories')).rows[0].n;
         assert.equal(count,5);
       }
@@ -34,3 +34,4 @@ test('DB-07: setup creates a clean schema and repeats without duplicate tables o
       await control.end();
     }
 });
+

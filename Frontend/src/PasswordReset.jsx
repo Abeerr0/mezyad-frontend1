@@ -5,9 +5,9 @@ import { request, validEmail, validPassword } from "./api";
 
 // تم التعديل من عبير: نفصل مسارات الاستعاده باعدادات واضحه، وما نعلن نجاح بدون رد فعلي.
 const paths = {
-  start: import.meta.env.VITE_RESET_REQUEST_PATH,
-  verify: import.meta.env.VITE_RESET_VERIFY_PATH,
-  save: import.meta.env.VITE_RESET_CONFIRM_PATH,
+  start: import.meta.env.VITE_RESET_REQUEST_PATH || "/auth/password/request",
+  verify: import.meta.env.VITE_RESET_VERIFY_PATH || "/auth/password/verify",
+  save: import.meta.env.VITE_RESET_CONFIRM_PATH || "/auth/password/confirm",
 };
 export default function PasswordReset({ demo, initialEmail = "" }) {
   const [open, setOpen] = useState(false),
@@ -303,3 +303,4 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
     </>
   );
 }
+

@@ -229,11 +229,10 @@ export function useMarket(workspace) {
   async function commit(id) {
     if (workspace.demo) throw new Error(messages.BANK_SANDBOX_UNAVAILABLE);
     // تم التعديل من عبير: ما نعتمد الالتزام من زر او رابط؛ نرجع نفحصه من الباك.
-    await marketRequest("/auctions/" + encodeURIComponent(id) + "/commitment", {
+    return marketRequest("/auctions/" + encodeURIComponent(id) + "/commitment", {
       method: "POST",
       token,
     });
-    return getCommitment(id);
   }
   async function bid(id, amount, requestId) {
     if (workspace.demo) {
@@ -392,3 +391,4 @@ export function useAuction(
   ]);
   return { ...state, reload: () => setRefresh((n) => n + 1) };
 }
+

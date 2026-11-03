@@ -1,8 +1,5 @@
-import "dotenv/config";
+import "./config.js";
 import { app } from "./app.js";
-
-// نشغّل السيرفر على المنفذ الموجود في الإعدادات.
-const port = Number(process.env.PORT || 3000);
-app.listen(port, () => {
-  console.log("Mezyad API listening on " + port);
-});
+// تم التعديل من عبير: نستخدم نفس المنفذ للواجهه المبنيه وAPI.
+const port=Number(process.env.PORT||3000);
+app.listen(port,()=>console.log("Mezyad listening on http://localhost:"+port));
