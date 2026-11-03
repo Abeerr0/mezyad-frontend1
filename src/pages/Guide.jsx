@@ -118,7 +118,7 @@ export default function Guide({ onFeature }) {
             </a>
           </div>
         </section>
-        <section className="brand-editorial"><img src="C:\Users\bibi_\mezyad-frontend1\public\images\natural.jpg" alt="  من عمق الصحراء وتاريخ الأجداد.. نستمد أصولنا  " loading="lazy"/><div><p className="eyebrow">من هنا، ولأهل القيمة.</p><h2>نظرة أبعد.<br/><em>واختيار له معنى.</em></h2><p>خذ وقتك مع التفاصيل، وخلّ اختيارك يعكس ذوقك.</p></div></section>
+        <section className="brand-editorial"><img src="\images\natural.jpg" alt="  من عمق الصحراء وتاريخ الأجداد.. نستمد أصولنا  " loading="lazy"/><div><p className="eyebrow">من هنا، ولأهل القيمة.</p><h2>نظرة أبعد.<br/><em>واختيار له معنى.</em></h2><p>خذ وقتك مع التفاصيل، وخلّ اختيارك يعكس ذوقك.</p></div></section>
         <section className="guide-cta">
           <p className="eyebrow">الخطوة الجاية لك</p>
           <h2>
