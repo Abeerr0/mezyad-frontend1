@@ -1,3 +1,13 @@
+import { useMarket } from "./market";
+import AuctionDetails from "./pages/AuctionDetails";
+import PrivateAccess from "./pages/PrivateAccess";
+import Commitment from "./pages/Commitment";
+import Bidding from "./pages/Bidding";
+import BidHistory from "./pages/BidHistory";
+import AuctionResult from "./pages/AuctionResult";
+import MyAuctions from "./pages/MyAuctions";
+import BankStatus from "./pages/BankStatus";
+import "./auction-pages.css";
 import React, { useEffect, useRef, useState } from "react";
 import Home from "./pages/Home";
 import Browse from "./pages/Browse";
@@ -24,6 +34,14 @@ import {
 import { categoryLabels, demoAuctions, demoCategories } from "./data";
 
 const pageTitles = {
+  auction: "تفاصيل المزاد",
+  "private-access": "المزاد الخاص",
+  commitment: "الالتزام",
+  bid: "تقديم عرض",
+  "bid-history": "سجل العروض",
+  "auction-result": "نتيجة المزاد",
+  "my-auctions": "مزاداتي",
+  "bank-status": "حالة البنك",
   home: "الرئيسية",
   auctions: "استكشاف المزادات",
   guide: "كيف تشتغل مزياد",
@@ -55,6 +73,7 @@ export default function App() {
     }
   });
   const workspace = useWorkspace(demo);
+  const market = useMarket(workspace);
   const [catalog, setCatalog] = useState({ auctions: [], categories: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -179,47 +198,19 @@ export default function App() {
     };
   }, [demo, route.page, category, status, refresh]);
 
-  async function openAuction(auction) {
-    detailRequest.current?.abort();
-    const controller = new AbortController();
-    detailRequest.current = controller;
-    setModal({ type: "auction", title: auction.title });
-    setDetail(auction);
-    setDetailError("");
-    setDetailBusy(!demo);
-    if (demo) return;
-    try {
-      const response = await fetch(
-        API + "/auctions/" + encodeURIComponent(auction.id),
-        {
-          signal: controller.signal,
-          headers: workspace.session?.token
-            ? { Authorization: "Bearer " + workspace.session.token }
-            : {},
-        },
-      );
-      const json = await response.json();
-      if (!response.ok || !json.data?.id)
-        throw new Error("Auction unavailable");
-      setDetail({
-        ...auction,
-        ...json.data,
-        image_url: imageUrl(json.data.images?.[0] || auction.image_url),
-      });
-    } catch (err) {
-      if (err.name !== "AbortError")
-        setDetailError(
-          "تعذر جلب تفاصيل المزاد الحالية. ارجع للقائمة وحاول مرة ثانية.",
-        );
-    } finally {
-      if (!controller.signal.aborted) setDetailBusy(false);
-    }
+  // تم التعديل من عبير: نفتح صفحه المزاد الكامله بدل نافذه التفاصيل القديمه.
+  function openAuction(auction) {
+    location.hash = "/auction?id=" + encodeURIComponent(auction.id);
   }
   function closeModal() {
     detailRequest.current?.abort();
     setModal(null);
   }
   function onFeature(type) {
+    if (type === "private") {
+      location.hash = "/private-access";
+      return;
+    }
     if (type === "sell") {
       location.hash = workspace.user
         ? "/create-listing"
@@ -240,8 +231,26 @@ export default function App() {
             : "حسابك في مزياد",
     });
   }
+  // تم التعديل من عبير: نخلي سعر المعاينه ومشاركات المستخدم متوافقه بين الصفحات القديمه والجديده.
+  const accountWorkspace = demo
+    ? {
+        ...workspace,
+        auctions: [
+          ...workspace.auctions,
+          ...market.records.filter((a) =>
+            a.bids.some((b) => b.bidder_id === workspace.user?.id),
+          ),
+        ],
+      }
+    : workspace;
   const common = {
     ...catalog,
+    auctions: demo
+      ? catalog.auctions.map((a) => ({
+          ...a,
+          ...market.records.find((r) => r.id === a.id),
+        }))
+      : catalog.auctions,
     loading,
     error,
     retry: () => setRefresh((n) => n + 1),
@@ -268,7 +277,7 @@ export default function App() {
           {demo
             ? "معاينة التصميم · بيانات توضيحية غير معروضة للبيع"
             : "وضع API · بيانات الباك المحلي"}
-          <small>المجموعات 01 — 03</small>
+          <small>المجموعات 01 — 05</small>
         </span>
         <button onClick={() => changeMode(!demo)}>
           {demo ? "ربط بيانات الباك" : "الرجوع للمعاينة"}
@@ -328,13 +337,34 @@ export default function App() {
         <div
           key={route.page + "-" + demo + "-" + (route.params.get("id") || "")}
         >
+          {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
+          {route.page === "auction" && (
+            <AuctionDetails market={market} id={route.params.get("id")} />
+          )}
+          {route.page === "private-access" && <PrivateAccess market={market} />}
+          {route.page === "commitment" && (
+            <Commitment market={market} id={route.params.get("id")} />
+          )}
+          {route.page === "bid" && (
+            <Bidding market={market} id={route.params.get("id")} />
+          )}
+          {route.page === "bid-history" && (
+            <BidHistory market={market} id={route.params.get("id")} />
+          )}
+          {route.page === "auction-result" && (
+            <AuctionResult market={market} id={route.params.get("id")} />
+          )}
+          {route.page === "my-auctions" && <MyAuctions market={market} />}
+          {route.page === "bank-status" && (
+            <BankStatus market={market} id={route.params.get("id")} />
+          )}
           {route.page === "login" && (
             <Login workspace={workspace} params={route.params} />
           )}
           {route.page === "register" && <Register workspace={workspace} />}
           {route.page === "profile" && <Profile workspace={workspace} />}
           {route.page === "activity" && (
-            <Activity workspace={workspace} onOpen={openAuction} />
+            <Activity workspace={accountWorkspace} onOpen={openAuction} />
           )}
           {route.page === "listings" && (
             <MyListings workspace={workspace} params={route.params} />

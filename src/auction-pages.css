@@ -1,0 +1,664 @@
+/* تم التعديل من عبير: نكمل صفحات المنافسه بنفس الالوان والخطوط ونراعي الجوال والحركه الهاديه. */
+.auction-experience {
+  padding-block: 36px 90px;
+}
+.auction-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin: 35px 0;
+}
+.auction-heading h1 {
+  font-family: "El Messiri", serif;
+  font-size: clamp(32px, 4.5vw, 56px);
+  margin: 12px 0;
+}
+.auction-heading p {
+  max-width: 650px;
+  line-height: 1.9;
+}
+.auction-heading-mark {
+  width: 145px;
+  flex-shrink: 0;
+}
+.auction-heading-mark .auctioneer {
+  width: 100%;
+  height: auto;
+}
+.auction-tabs {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 26px 0;
+  border-bottom: 1px solid var(--line, #d8d4c7);
+  padding-bottom: 12px;
+}
+.auction-tabs a,
+.auction-tabs button {
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  background: transparent;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.auction-tabs [aria-current="page"],
+.auction-tabs [aria-pressed="true"] {
+  background: #282c23;
+  color: #faf8f2;
+}
+.auction-tabs a:hover,
+.auction-tabs button:hover {
+  border-color: #ad9767;
+}
+.auction-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 22px 0 32px;
+}
+.auction-summary h2 {
+  margin: 8px 0 14px;
+  font-size: 26px;
+}
+.auction-summary > div:last-child {
+  text-align: left;
+}
+.auction-summary strong {
+  display: block;
+  font-size: 28px;
+  margin-top: 8px;
+}
+.auction-summary small {
+  font-size: 13px;
+  color: #706f64;
+}
+.auction-state {
+  display: inline-flex;
+  padding: 6px 12px;
+  background: #e6e7dc;
+  font-size: 12px;
+}
+.auction-state.closed {
+  background: #e9e3d9;
+}
+.auction-detail-grid,
+.bidding-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(310px, 1fr);
+  gap: 34px;
+  align-items: start;
+}
+.asset-stage {
+  position: relative;
+  background: #e7e3d9;
+  aspect-ratio: 1.35;
+  overflow: hidden;
+}
+.asset-stage > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.asset-edition {
+  position: absolute;
+  bottom: 18px;
+  left: 20px;
+  background: #faf8f2e8;
+  padding: 9px 14px;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+.asset-thumbnails {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  overflow: auto;
+}
+.asset-thumbnails button {
+  width: 85px;
+  height: 70px;
+  flex-shrink: 0;
+  padding: 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.asset-thumbnails [aria-pressed="true"] {
+  border-color: #a88f57;
+}
+.asset-thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.asset-story {
+  margin-top: 25px;
+}
+.asset-story > p:not(.eyebrow) {
+  white-space: pre-wrap;
+  line-height: 2;
+}
+.auction-ticket {
+  background: #eeeadf;
+  border: 1px solid #d5ccbb;
+  padding: 30px;
+  position: sticky;
+  top: 24px;
+}
+.auction-ticket h2 {
+  font-size: 25px;
+  line-height: 1.6;
+}
+.ticket-price {
+  padding: 24px 0;
+  border-bottom: 1px dashed #c5b99e;
+}
+.ticket-price strong {
+  display: block;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.5;
+}
+.ticket-price small,
+.ticket-price span {
+  font-size: 13px;
+  color: #676a5e;
+}
+.auction-ticket dl {
+  margin: 22px 0;
+}
+.auction-ticket dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  font-size: 13px;
+}
+.auction-ticket dd {
+  margin: 0;
+  text-align: left;
+}
+.auction-ticket .button {
+  margin-top: 12px;
+}
+.auction-ticket .field-hint {
+  margin-top: 22px;
+  line-height: 1.9;
+}
+.private-entry {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 36px 0;
+}
+.private-art {
+  background: #292d24;
+  color: #eee9dc;
+  padding: 55px 45px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 480px;
+  position: relative;
+  overflow: hidden;
+}
+.private-art:after {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border: 1px solid #9b8757;
+  border-radius: 50%;
+  left: -90px;
+  bottom: -110px;
+}
+.private-art > svg {
+  color: #b9a16d;
+  margin-bottom: 28px;
+}
+.private-art > span {
+  letter-spacing: 4px;
+  font-size: 11px;
+  color: #cbb888;
+}
+.private-art h2 {
+  font-family: "El Messiri", serif;
+  font-size: 38px;
+  line-height: 1.6;
+}
+.private-art p {
+  line-height: 1.9;
+  color: #cecebf;
+}
+.private-entry form {
+  padding: 42px;
+  margin: 0;
+}
+.private-entry form > p {
+  line-height: 1.9;
+}
+.private-entry .field {
+  margin-top: 30px;
+}
+.commitment-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 30px;
+}
+.bank-emblem {
+  width: 88px;
+  height: 88px;
+  border: 1px solid #b7a47b;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #9d844c;
+  margin-bottom: 25px;
+}
+.bank-steps {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0 0;
+}
+.bank-steps li {
+  display: flex;
+  gap: 22px;
+  border-top: 1px solid #ddd7c8;
+  padding: 22px 0;
+}
+.bank-steps b {
+  font-size: 22px;
+  color: #a08b59;
+}
+.bank-steps h3 {
+  margin: 0 0 6px;
+}
+.bank-steps p {
+  margin: 0;
+  color: #77766c;
+  line-height: 1.9;
+}
+.bank-status-card {
+  max-width: 780px;
+  margin: 45px auto;
+  text-align: center;
+  padding: 50px;
+}
+.bank-status-card .bank-emblem {
+  margin-inline: auto;
+}
+.bank-status-card h2 {
+  font-size: 33px;
+}
+.bank-status-card > p {
+  line-height: 2;
+}
+.bank-status-card .form-actions {
+  justify-content: center;
+  margin-top: 25px;
+}
+.bid-console {
+  padding: 35px;
+  background: #292e25;
+  color: #f4f0e5;
+}
+.live-indicator {
+  font-size: 12px;
+  color: #d4d8bd;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.live-indicator i,
+.bid-dot {
+  width: 7px;
+  height: 7px;
+  background: #b9c396;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 8px;
+}
+.live-price {
+  font-size: clamp(34px, 4vw, 54px);
+  font-weight: 600;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.live-price small {
+  font-size: 16px;
+  font-weight: 400;
+  color: #c7b484;
+}
+.bid-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  border-block: 1px solid #505447;
+  padding-block: 20px;
+  margin-bottom: 25px;
+}
+.bid-metrics small,
+.bid-metrics strong {
+  display: block;
+}
+.bid-metrics small {
+  color: #c4c6b8;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.bid-console .field input {
+  background: #f7f4ec;
+  color: #282c23;
+}
+.bid-console .button.gold {
+  background: #c5ad77;
+  color: #25291f;
+  border: 1px solid #c5ad77;
+}
+.bid-console .button.outline {
+  color: inherit;
+  border-color: #aaa690;
+}
+.bid-console .text-link {
+  color: #e7d09e;
+  margin: 12px 0;
+}
+.bid-console .inline-notice,
+.bid-console .form-error {
+  color: #282d22;
+}
+.demo-bid-note {
+  font-size: 12px;
+  color: #dad6c4;
+  line-height: 1.9;
+}
+.bid-confirmation,
+.attempt-notice {
+  padding: 24px 0;
+  border-block: 1px solid #666b59;
+  margin-top: 22px;
+  line-height: 1.9;
+}
+.bid-success {
+  border: 1px solid #b5c59e;
+  padding: 25px;
+  margin-top: 25px;
+}
+.bid-success > a {
+  color: #e3cf9f;
+}
+.bid-table {
+  overflow-x: auto;
+}
+.bid-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.bid-table th {
+  text-align: right;
+  color: #797469;
+  font-weight: 400;
+}
+.bid-table td,
+.bid-table th {
+  padding: 18px 9px;
+  border-bottom: 1px solid #e1ddcf;
+  white-space: nowrap;
+}
+.bid-table td:nth-child(2) {
+  font-weight: 600;
+}
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  gap: 12px;
+}
+.result-paper {
+  margin: 35px auto;
+  max-width: 900px;
+  text-align: center;
+  background: #f2eee3;
+  border: 1px solid #d6cdb9;
+  padding: 45px 50px;
+  position: relative;
+}
+.result-paper:before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid #dfd7c5;
+  pointer-events: none;
+}
+.result-illustration {
+  max-width: 190px;
+  margin: 0 auto;
+}
+.result-illustration svg {
+  width: 100%;
+  height: auto;
+}
+.result-paper h2 {
+  font-family: "El Messiri", serif;
+  font-size: clamp(28px, 4vw, 43px);
+  margin: 10px 0 25px;
+}
+.result-paper h3 {
+  font-weight: 400;
+  color: #747364;
+}
+.winning-price {
+  padding: 25px 0;
+}
+.winning-price small,
+.winning-price strong {
+  display: block;
+}
+.winning-price strong {
+  font-size: 38px;
+  color: #93804c;
+  margin-top: 12px;
+}
+.winning-price span {
+  font-size: 16px;
+}
+.result-paper .form-actions {
+  justify-content: center;
+  margin-top: 24px;
+}
+.result-footnote {
+  font-size: 13px;
+  line-height: 1.9;
+  max-width: 520px;
+  margin: 25px auto;
+}
+.result-paper.is-winner {
+  border-color: #b69b5f;
+}
+.participation-list article {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 22px;
+  align-items: center;
+  padding: 25px 0;
+  border-bottom: 1px solid #ded9cb;
+}
+.participation-image {
+  height: 105px;
+  background: #e9e6dc;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.participation-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.participation-list h3 {
+  margin: 7px 0;
+}
+.participation-list small,
+.participation-list p {
+  color: #727365;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.auction-experience .button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.auction-experience .form-actions {
+  flex-wrap: wrap;
+}
+.auction-experience :is(input, button, a):focus-visible {
+  outline: 2px solid #b79c62;
+  outline-offset: 4px;
+}
+@media (max-width: 850px) {
+  .auction-detail-grid,
+  .bidding-grid,
+  .commitment-grid {
+    grid-template-columns: 1fr;
+  }
+  .auction-ticket {
+    position: static;
+  }
+  .private-entry {
+    grid-template-columns: 1fr;
+  }
+  .private-art {
+    min-height: 260px;
+    padding: 30px;
+  }
+  .private-art > svg {
+    display: none;
+  }
+  .private-art h2 {
+    font-size: 30px;
+    margin: 16px 0;
+  }
+  .auction-heading-mark {
+    width: 100px;
+  }
+  .participation-list article {
+    grid-template-columns: 90px 1fr;
+  }
+  .participation-list article > .button {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .auction-heading h1 {
+    font-size: 36px;
+  }
+  .auction-summary {
+    align-items: flex-start;
+  }
+  .auction-summary strong {
+    font-size: 22px;
+  }
+}
+@media (max-width: 520px) {
+  .auction-experience {
+    padding-top: 15px;
+  }
+  .auction-heading {
+    margin: 24px 0;
+    gap: 12px;
+  }
+  .auction-heading-mark {
+    display: none;
+  }
+  .auction-heading h1 {
+    font-size: 31px;
+  }
+  .auction-tabs {
+    gap: 3px;
+  }
+  .auction-tabs a,
+  .auction-tabs button {
+    padding: 10px;
+    font-size: 12px;
+  }
+  .auction-summary {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .auction-summary > div:last-child {
+    text-align: right;
+  }
+  .auction-summary h2 {
+    font-size: 23px;
+  }
+  .auction-ticket,
+  .bid-console,
+  .private-entry form {
+    padding: 24px;
+  }
+  .private-art {
+    padding: 28px;
+  }
+  .bank-status-card,
+  .result-paper {
+    padding: 30px 22px;
+  }
+  .bank-status-card h2 {
+    font-size: 27px;
+  }
+  .bid-metrics {
+    gap: 10px;
+    font-size: 14px;
+  }
+  .participation-list article {
+    grid-template-columns: 70px 1fr;
+    gap: 14px;
+  }
+  .participation-image {
+    height: 85px;
+  }
+  .history-pagination .button {
+    padding: 10px 15px;
+  }
+  .live-price {
+    font-size: 35px;
+  }
+  .auction-detail-grid {
+    gap: 20px;
+  }
+  .auction-experience .form-actions > .button {
+    flex: 1;
+  }
+  .bid-table td,
+  .bid-table th {
+    padding: 14px 7px;
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .result-illustration {
+    animation: result-arrival 0.6s ease-out;
+  }
+  .live-indicator i {
+    animation: live-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @keyframes result-arrival {
+    from {
+      transform: translateY(12px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}

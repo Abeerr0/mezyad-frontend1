@@ -9,9 +9,10 @@ export default function Login({ workspace, params }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const next = params.get("next");
+  // تم التعديل من عبير: نرجع المستخدم لصفحه المزاد اللي طلبها بعد تسجيل الدخول.
   const destination =
     next &&
-    /^\/(profile|activity|listings|create-listing|edit-listing|create-auction)(\?|$)/.test(
+    /^\/(profile|activity|listings|create-listing|edit-listing|create-auction|auction|private-access|commitment|bid|bid-history|auction-result|my-auctions|bank-status)(\?|$)/.test(
       next,
     )
       ? next

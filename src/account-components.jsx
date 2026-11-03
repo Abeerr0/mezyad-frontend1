@@ -64,6 +64,8 @@ export function AccountLayout({
         <nav aria-label="صفحات حسابي">
           {[
             ["activity", "نشاطي", "gavel"],
+            // تم التعديل من عبير: نضيف رابط المتابعه للمجموعه الخامسه بدون تغيير صفحات الحساب.
+            ["my-auctions", "مزاداتي ومشاركاتي", "flag"],
             ["listings", "إعلاناتي", "image"],
             ["profile", "الملف الشخصي", "user"],
           ].map(([page, label, icon]) => (
@@ -216,7 +218,7 @@ export function AuthLayout({ register, children }) {
         </div>
         <div className="auth-art-bottom">
           <span>مزياد · للقيمة عنوان</span>
-          <span>01 — 03</span>
+          <span>01 — 05</span>
         </div>
       </aside>
       <div className="auth-form-panel">
