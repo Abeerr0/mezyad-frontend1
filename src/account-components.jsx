@@ -1,3 +1,4 @@
+import { Avatar } from "./Avatar";
 import React, { useState } from "react";
 import { Auctioneer, Icon } from "./components";
 
@@ -55,7 +56,7 @@ export function AccountLayout({
     <div className="container account-layout">
       <aside className="account-sidebar">
         <div className="member-mark">
-          <span>{workspace.user.name?.slice(0, 1) || "م"}</span>
+          <Avatar value={workspace.avatar} name={workspace.user.name} />
           <div>
             <strong>{workspace.user.name}</strong>
             <small>{workspace.demo ? "حساب تجربة" : "عضو مزياد"}</small>

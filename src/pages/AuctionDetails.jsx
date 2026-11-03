@@ -1,3 +1,4 @@
+import { Avatar } from "../Avatar";
 import React, { useState } from "react";
 import { Icon, money, dateText } from "../components";
 import { imageUrl } from "../api";
@@ -82,6 +83,8 @@ export default function AuctionDetails({ market, id }) {
                 </section>
               </div>
               <aside className="auction-ticket">
+                {/* تم التعديل من عبير: نعرض هويه صاحب الجلسه بدون نسب اسمه او افتاره لبائع ثاني. */}
+                {market.workspace.user && <div className="auction-member"><Avatar value={market.workspace.avatar} name={market.workspace.user.name} /><div><strong>{market.workspace.user.name}</strong><small>{owner ? "هذا مزادك" : "تتصفح بحسابك"}</small></div></div>}
                 <p className="eyebrow">شروط المجلس</p>
                 <div className="ticket-price">
                   <small>السعر الحالي</small>

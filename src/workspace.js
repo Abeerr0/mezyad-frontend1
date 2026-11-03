@@ -61,6 +61,21 @@ export function useWorkspace(demo) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [refresh, setRefresh] = useState(0);
+  // تم التعديل من عبير: نحفظ افتار كل حساب لحاله على نفس المتصفح بدون تغيير بيانات الباك.
+  const [avatar, setAvatar] = useState(0);
+  const avatarKey = session?.user?.id ? `mezyad-avatar-${demo ? "preview" : "account"}-${session.user.id}` : null;
+  useEffect(() => {
+    let value = 0;
+    try { value = Number(localStorage.getItem(avatarKey)); } catch {}
+    setAvatar(Number.isInteger(value) && value >= 0 && value < 25 ? value : 0);
+  }, [avatarKey]);
+  function chooseAvatar(value) {
+    if (!avatarKey) return false;
+    try { localStorage.setItem(avatarKey, String(value)); }
+    catch { return false; }
+    setAvatar(value);
+    return true;
+  }
 
   useEffect(() => {
     setSession(null);
@@ -294,6 +309,8 @@ export function useWorkspace(demo) {
 
   return {
     demo,
+    avatar,
+    chooseAvatar,
     session,
     user: session?.user,
     items,

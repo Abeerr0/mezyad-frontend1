@@ -1,3 +1,4 @@
+import { Avatar, avatarCells } from "../Avatar";
 import React, { useState } from "react";
 import { AccountLayout } from "../account-components";
 import { Icon } from "../components";
@@ -10,6 +11,15 @@ export default function Profile({ workspace }) {
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
+  // تم التعديل من عبير: الاسهم تقلب الافتارات والحفظ يحدث صوره الحساب بكل الصفحات.
+  const [avatarChoice, setAvatarChoice] = useState(workspace.avatar || 0);
+  const [avatarMessage, setAvatarMessage] = useState("");
+  React.useEffect(() => { setAvatarChoice(workspace.avatar || 0); }, [workspace.avatar]);
+  function turnAvatar(direction) {
+    const index = avatarCells.indexOf(avatarChoice);
+    setAvatarChoice(avatarCells[(index + direction + avatarCells.length) % avatarCells.length]);
+    setAvatarMessage("");
+  }
   function save(event) {
     event.preventDefault();
     if (!workspace.demo) return;
@@ -33,9 +43,7 @@ export default function Profile({ workspace }) {
       {workspace.user && (
         <>
           <div className="profile-banner">
-            <div className="profile-avatar">
-              {workspace.user.name?.slice(0, 1)}
-            </div>
+            <Avatar value={workspace.avatar} name={workspace.user.name} className="profile-avatar" />
             <div>
               <h2>{workspace.user.name}</h2>
               <p dir="ltr">{workspace.user.email}</p>
@@ -44,6 +52,20 @@ export default function Profile({ workspace }) {
               {workspace.demo ? "حساب تجربة" : "عضو مزياد"}
             </span>
           </div>
+          {/* تم التعديل من عبير: اختيار افتار مستقل للحساب مع تنبيه واضح لمكان حفظه. */}
+          <section className="paper-card avatar-picker" aria-labelledby="avatar-heading">
+            <div><p className="eyebrow">صورتك في المجلس</p><h2 id="avatar-heading">اختر اللي يمثلك.</h2><p>تظهر صورتك مع حسابك في صفحات مزياد.</p></div>
+            <div className="avatar-carousel" dir="ltr">
+              <button type="button" className="icon-button" aria-label="الافتار السابق" onClick={() => turnAvatar(-1)}>←</button>
+              <Avatar value={avatarChoice} name={workspace.user.name} />
+              <button type="button" className="icon-button" aria-label="الافتار التالي" onClick={() => turnAvatar(1)}>→</button>
+            </div>
+            <p className="avatar-counter" dir="ltr" aria-live="polite">{avatarCells.indexOf(avatarChoice) + 1} / {avatarCells.length}</p>
+            <div className="avatar-options" aria-label="صور الحساب">{avatarCells.map((value, i) => <button type="button" key={value} aria-label={"اختيار الافتار " + (i + 1)} aria-pressed={avatarChoice === value} onClick={() => { setAvatarChoice(value); setAvatarMessage(""); }}><Avatar value={value} /></button>)}</div>
+            <button type="button" className="button dark" onClick={() => setAvatarMessage(workspace.chooseAvatar(avatarChoice) ? "تم حفظ صورتك." : "تعذّر حفظ الصورة. اسمح للمتصفح بحفظ بيانات الموقع وحاول من جديد.")}>اعتمد صورتي <Icon name="check" /></button>
+            <p className="avatar-storage-note">اختيارك محفوظ لهذا الحساب على هذا المتصفح.</p>
+            <p role="status">{avatarMessage}</p>
+          </section>
           <section className="paper-card">
             <div className="section-heading">
               <div>

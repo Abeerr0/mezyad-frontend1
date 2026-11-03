@@ -126,20 +126,14 @@ export default function Home({
 
       <section className="category-section">
         {/* تم التعديل من عبير: صوره الرياض بقصه منحنيه مع عنوان بخط عربي مستقل. */}
-        <figure className="category-portrait">
-          <img
-            src="/images/riyadh-architecture.webp"
-            alt="صورة فوتوغرافية لعمارة الرياض ونخلة، بعدسة يوسف بوزوينة"
-            loading="lazy"
-          />
-          <figcaption>
-            <span>الرياض</span>
-            <small>أصالة نعيشها. وقيمة نختارها.</small>
-          </figcaption>
-          <span className="portrait-orbit" aria-hidden="true">
-            ✦
-          </span>
-        </figure>
+        {/* تم التعديل من عبير: الاطار اكبر والنص بمكان مستقل والرموز موزعه حول المنحنى. */}
+        <div className="category-portrait-wrap">
+          <figure className="category-portrait">
+            <img src="/images/riyadh-architecture.webp" alt="عمارة الرياض ونخلة، بعدسة يوسف بوزوينة" loading="lazy" />
+            <figcaption><span>الرياض</span><small>أصالة نعيشها. وقيمة نختارها.</small></figcaption>
+          </figure>
+          <div className="portrait-symbols" aria-hidden="true"><span><Icon name="image" size={30} /></span><span><Icon name="flag" size={30} /></span><span><Icon name="gavel" size={30} /></span></div>
+        </div>
         <div className="container category-layout">
           <div>
             <p className="eyebrow">لكل قيمة مكان</p>
@@ -155,12 +149,6 @@ export default function Home({
             </p>
           </div>
           <div className="category-links">
-            <div className="category-ornaments" aria-hidden="true">
-              <Icon name="gavel" size={38} />
-              <Icon name="flag" size={38} />
-              <Icon name="image" size={38} />
-              <span>✦</span>
-            </div>
             {categories.map((c, i) => (
               <a
                 key={c.id}
@@ -178,7 +166,7 @@ export default function Home({
       <section className="section container journey-section">
         <div className="journey-art">
           <div className="art-ring" />
-          <span className="art-star">✦</span>
+          <span className="art-star">𓃗</span>
           <Auctioneer character="auctioneer" motion="gavel" />
           <span className="art-stamp">حياك في المَجلس</span>
         </div>

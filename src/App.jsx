@@ -1,3 +1,5 @@
+import { Avatar } from "./Avatar";
+import BrandScene from "./BrandScene";
 import { Notices, PaymentPage } from "./InteractionUI";
 import "./interaction-ui.css";
 import { useMarket } from "./market";
@@ -265,7 +267,7 @@ export default function App() {
               className="account-button"
               onClick={() => onFeature("account")}
             >
-              <Icon name="user" size={17} />
+              {workspace.user ? <Avatar value={workspace.avatar} name={workspace.user.name} /> : <Icon name="user" size={17} />}
               <span>{workspace.user ? "مجلسي" : "تسجيل الدخول"}</span>
             </button>
             <button
@@ -350,6 +352,7 @@ export default function App() {
             </a>
           </div>
         )}
+        <BrandScene page={route.page} />
       </main>
       <footer className="site-footer">
         <div className="container">
