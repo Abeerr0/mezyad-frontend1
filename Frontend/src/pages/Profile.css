@@ -56,3 +56,42 @@
     height: 126px;
   }
 }
+
+/* تم التعديل من عبير: بيانات الحساب والامان بجلسه وحده ومسافات واضحه لكل اجراء. */
+.profile-settings .field > span,
+.profile-security h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.profile-settings input[readonly] {
+  background: #eeede5;
+  color: #555a4d;
+  cursor: default;
+}
+.profile-settings .field small {
+  font-size: 11px;
+  color: #747767;
+}
+.profile-security {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.profile-security h3 {
+  font-size: 20px;
+}
+.profile-security > div > p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+.profile-security form {
+  max-width: 700px;
+}
+.profile-settings .success-text {
+  padding: 12px 16px;
+  background: #edf2e6;
+  border-radius: 12px;
+  color: #35512b;
+}

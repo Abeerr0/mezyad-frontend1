@@ -3,12 +3,17 @@ import { Avatar, avatarCells } from "../Avatar";
 import React, { useState } from "react";
 import { AccountLayout } from "../account-components";
 import { Icon } from "../components";
-import { validEmail } from "../api";
+import { validPassword } from "../api";
 
-// تم التعديل من عبير: تعديل البروفايل يعمل بالمعاينه بس لان الباك ما يوفر مسار تحديث حساب.
+// تم التعديل من عبير: نجمع بيانات الحساب والامان ونحفظ الاسم والباسورد من المسارات الفعليه.
 export default function Profile({ workspace }) {
   const [name, setName] = useState(workspace.user?.name || "");
-  const [email, setEmail] = useState(workspace.user?.email || "");
+  const [busy, setBusy] = useState(false);
+  const [passwordStep, setPasswordStep] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [verificationToken, setVerificationToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
@@ -27,17 +32,77 @@ export default function Profile({ workspace }) {
     );
     setAvatarMessage("");
   }
-  function save(event) {
+  async function save(event) {
     event.preventDefault();
-    if (!workspace.demo) return;
-    if (!name.trim() || name.trim().length > 160 || !validEmail(email)) {
-      setError("راجع اسمك وبريدك قبل الحفظ.");
+    if (busy) return;
+    if (
+      !/^[\p{L}\p{M}][\p{L}\p{M} .'-]*$/u.test(name.trim()) ||
+      name.trim().length < 2 ||
+      name.trim().length > 160
+    ) {
+      setError("اكتب اسمك بشكل صحيح، بحروف عربية أو إنجليزية.");
       return;
     }
-    workspace.updatePreviewProfile(name.trim(), email.trim().toLowerCase());
-    setEditing(false);
+    setBusy(true);
     setError("");
-    setMessage("تم تحديث بيانات حساب التجربة.");
+    setMessage("");
+    try {
+      await workspace.updateProfile(name.trim());
+      setEditing(false);
+      setMessage("تم حفظ اسمك.");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  // تم التعديل من عبير: ما نفتح الباسورد الجديد الا بعد تحقق السيرفر من الحالي ونطابق التاكيد قبل الحفظ.
+  async function secure(event) {
+    event.preventDefault();
+    if (busy) return;
+    setError("");
+    setMessage("");
+    if (
+      verificationToken &&
+      (!validPassword(password) || password !== confirmation)
+    ) {
+      setError(
+        "اكتب كلمة مرور من 8 أحرف على الأقل، وتأكد أن الخانتين متطابقتين.",
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      if (!verificationToken) {
+        const result = await workspace.verifyPassword(currentPassword);
+        setVerificationToken(result.verificationToken);
+        setCurrentPassword("");
+      } else {
+        await workspace.changePassword({
+          verificationToken,
+          password,
+          confirmPassword: confirmation,
+        });
+        resetPassword();
+        setMessage("تم تغيير كلمة مرورك وإنهاء الجلسات الثانية.");
+      }
+    } catch (error) {
+      setError(error.message);
+      if (verificationToken) {
+        setVerificationToken("");
+        setPassword("");
+        setConfirmation("");
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  function resetPassword() {
+    setPasswordStep(false);
+    setVerificationToken("");
+    setCurrentPassword("");
+    setPassword("");
+    setConfirmation("");
   }
   return (
     <AccountLayout
@@ -129,26 +194,14 @@ export default function Profile({ workspace }) {
             </p>
             <p role="status">{avatarMessage}</p>
           </section>
-          <section className="paper-card">
+          {/* تم التعديل من عبير: الاسم قابل للتعديل والبريد ثابت والامان بنفس كرت الحساب. */}
+          <section className="paper-card profile-settings">
             <div className="section-heading">
               <div>
-                <span className="section-number">01</span>
-                <h2>معلومات الحساب</h2>
+                <p className="eyebrow">حسابك تحت يدك</p>
+                <h2>بيانات الحساب والأمان</h2>
               </div>
-              {!editing && (
-                <button
-                  className="text-link"
-                  disabled={!workspace.demo}
-                  onClick={() => {
-                    setName(workspace.user.name);
-                    setEmail(workspace.user.email);
-                    setEditing(true);
-                    setMessage("");
-                  }}
-                >
-                  تعديل البيانات <Icon size={16} />
-                </button>
-              )}
+              <Icon name="shield" size={28} />
             </div>
             <form onSubmit={save} className="form-stack">
               <div className="two-fields">
@@ -156,73 +209,177 @@ export default function Profile({ workspace }) {
                   <span>الاسم الكامل</span>
                   <input
                     value={editing ? name : workspace.user.name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(event) => setName(event.target.value)}
                     readOnly={!editing}
                     required
+                    minLength={2}
                     maxLength={160}
                     autoComplete="name"
                   />
                 </label>
                 <label className="field">
-                  <span>البريد الإلكتروني</span>
+                  <span>
+                    البريد الإلكتروني <Icon name="lock" size={14} />
+                  </span>
                   <input
+                    value={workspace.user.email}
                     type="email"
-                    value={editing ? email : workspace.user.email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    readOnly={!editing}
-                    required
-                    maxLength={254}
+                    readOnly
                     dir="ltr"
                     autoComplete="email"
                   />
+                  <small>بريدك مرتبط بحسابك ولا يمكن تغييره.</small>
                 </label>
               </div>
-              {editing && (
-                <div className="form-actions">
-                  <button className="button dark" type="submit">
-                    حفظ التعديل <Icon name="check" />
-                  </button>
+              <div className="form-actions">
+                {editing ? (
+                  <>
+                    <button
+                      type="submit"
+                      disabled={busy}
+                      className="button dark"
+                    >
+                      {busy ? "جاري الحفظ…" : "حفظ الاسم"}
+                      <Icon name="check" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className="button outline"
+                      onClick={() => {
+                        setEditing(false);
+                        setError("");
+                      }}
+                    >
+                      إلغاء
+                    </button>
+                  </>
+                ) : (
                   <button
-                    className="button outline"
                     type="button"
-                    onClick={() => {
-                      setEditing(false);
+                    className="button outline"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setName(workspace.user.name);
+                      setEditing(true);
                       setError("");
+                      setMessage("");
                     }}
                   >
-                    إلغاء
+                    تعديل الاسم <Icon size={16} />
                   </button>
-                </div>
-              )}
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
-              {message && (
-                <p className="success-text" role="status">
-                  {message}
-                </p>
-              )}
+                )}
+              </div>
             </form>
-            {!workspace.demo && (
-              <p className="inline-notice">
-                تعديل بيانات الحساب غير متاح حاليًا. تقدر تشوف اسمك وبريدك هنا.
+            <div className="profile-security">
+              <div>
+                <h3>
+                  <Icon name="lock" /> كلمة المرور
+                </h3>
+                <p>
+                  غيّر كلمة مرورك من هنا. نتحقق من الحالية أولًا لحماية حسابك.
+                </p>
+              </div>
+              {!passwordStep ? (
+                <button
+                  type="button"
+                  className="button outline"
+                  onClick={() => {
+                    setPasswordStep(true);
+                    setError("");
+                    setMessage("");
+                  }}
+                >
+                  تغيير كلمة المرور <Icon />
+                </button>
+              ) : (
+                <form onSubmit={secure} className="form-stack">
+                  {!verificationToken ? (
+                    <label className="field">
+                      <span>كلمة المرور الحالية</span>
+                      <input
+                        autoFocus
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        required
+                        autoComplete="current-password"
+                        maxLength={72}
+                      />
+                    </label>
+                  ) : (
+                    <>
+                      <p className="success-text">
+                        <Icon name="check" /> تم التحقق. اختر كلمة مرورك
+                        الجديدة.
+                      </p>
+                      <div className="two-fields">
+                        <label className="field">
+                          <span>كلمة المرور الجديدة</span>
+                          <input
+                            autoFocus
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            minLength={8}
+                            maxLength={72}
+                            autoComplete="new-password"
+                          />
+                        </label>
+                        <label className="field">
+                          <span>تأكيد كلمة المرور</span>
+                          <input
+                            type="password"
+                            value={confirmation}
+                            onChange={(e) => setConfirmation(e.target.value)}
+                            required
+                            minLength={8}
+                            maxLength={72}
+                            autoComplete="new-password"
+                          />
+                        </label>
+                      </div>
+                    </>
+                  )}
+                  <div className="form-actions">
+                    <button
+                      type="submit"
+                      className="button dark"
+                      disabled={busy}
+                    >
+                      {busy
+                        ? "جاري التحقق…"
+                        : verificationToken
+                          ? "حفظ كلمة المرور"
+                          : "تحقق وتابع"}
+                      <Icon name="lock" />
+                    </button>
+                    <button
+                      type="button"
+                      className="button outline"
+                      disabled={busy}
+                      onClick={() => {
+                        resetPassword();
+                        setError("");
+                      }}
+                    >
+                      إلغاء
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+            {error && (
+              <p className="form-error" role="alert">
+                {error}
               </p>
             )}
-          </section>
-          <section className="paper-card security-card">
-            <Icon name="lock" size={30} />
-            <div>
-              <h2>أمان حسابك</h2>
-              <p>
-                احتفظ بكلمة مرورك لنفسك. تغيير كلمة المرور واستعادتها غير متاحين
-                حاليًا.
+            {message && (
+              <p className="success-text" role="status">
+                {message}
               </p>
-              <a className="text-link" href="#/help">
-                روح للمساعدة <Icon size={16} />
-              </a>
-            </div>
+            )}
           </section>
         </>
       )}

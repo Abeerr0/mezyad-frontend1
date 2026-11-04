@@ -36,12 +36,6 @@ export default function Browse({
       );
     return result;
   }, [auctions, search, sort]);
-  const activeFilters = Boolean(category || status || search);
-  function clear() {
-    setSearch("");
-    setSort("default");
-    location.hash = "/auctions";
-  }
   return (
     <div className="container browse-page">
       <div className="breadcrumb">
@@ -92,7 +86,6 @@ export default function Browse({
         <aside className="filters" aria-label="فلاتر المزادات">
           <div className="filter-heading">
             <h2>اختر تفاصيلك</h2>
-            {activeFilters && <button onClick={clear}>مسح الكل</button>}
           </div>
           <fieldset>
             <legend>الفئة</legend>
@@ -170,9 +163,6 @@ export default function Browse({
               <Icon name="search" size={34} />
               <h3>ما لقينا أصلًا بهالاختيار</h3>
               <p>جرّب فئة ثانية، أو خفف الفلاتر. يمكن اللي يلفت نظرك قريب.</p>
-              <button className="button dark" onClick={clear}>
-                مسح الفلاتر <Icon name="refresh" />
-              </button>
             </div>
           )}
         </section>

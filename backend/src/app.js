@@ -1,3 +1,4 @@
+import { profile } from "./profile.js";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import "./config.js";
@@ -23,6 +24,8 @@ app.use(express.json({ limit: "100kb" }));
 // تم التعديل من عبير: نفس مسارات الربط تعمل بالعنوان الموحد وبالعنوان القديم.
 app.use("/api/v1/auth", emailAuth);
 app.use("/auth", emailAuth);
+app.use("/api/v1", profile);
+app.use(profile);
 app.use("/api/v1", bankRoutes);
 app.use(bankRoutes);
 const err = (res, status, code, message) =>
@@ -1387,4 +1390,5 @@ app.use((error, req, res, next) => {
   console.error("API error", error.code || "INTERNAL_ERROR");
   err(res, 500, "INTERNAL_ERROR", "Unexpected server error");
 });
+
 

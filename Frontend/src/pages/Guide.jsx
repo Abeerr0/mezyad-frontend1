@@ -10,7 +10,7 @@ export default function Guide({ onFeature }) {
       <div className="container">
         <div className="breadcrumb">
           <a href="#/">الرئيسية</a>
-          <span>/</span>كيف تشتغل مزياد
+          <span>/</span>كيف يعمل مزياد
         </div>
         <section className="guide-intro">
           <div>
@@ -118,7 +118,22 @@ export default function Guide({ onFeature }) {
             </a>
           </div>
         </section>
-        <section className="brand-editorial"><img src="/images/riyadh-architecture.webp" alt="عمارة حديثة ونخلة في الرياض" loading="lazy"/><div><p className="eyebrow">من هنا، ولأهل القيمة.</p><h2>نظرة أبعد.<br/><em>واختيار له معنى.</em></h2><p>خذ وقتك مع التفاصيل، وخلّ اختيارك يعكس ذوقك.</p></div></section>
+        <section className="brand-editorial">
+          <img
+            src="/images/riyadh-architecture.webp"
+            alt="عمارة حديثة ونخلة في الرياض"
+            loading="lazy"
+          />
+          <div>
+            <p className="eyebrow">من هنا، ولأهل القيمة.</p>
+            <h2>
+              نظرة أبعد.
+              <br />
+              <em>واختيار له معنى.</em>
+            </h2>
+            <p>خذ وقتك مع التفاصيل، وخلّ اختيارك يعكس ذوقك.</p>
+          </div>
+        </section>
         <section className="guide-cta">
           <p className="eyebrow">الخطوة الجاية لك</p>
           <h2>

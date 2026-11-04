@@ -4,10 +4,15 @@ export const API = (import.meta.env.VITE_API_URL || "/api/v1").replace(
 );
 
 const messages = {
+  CURRENT_PASSWORD_INCORRECT: "كلمة المرور الحالية غير صحيحة.",
+  PASSWORD_VERIFICATION_EXPIRED:
+    "انتهى التحقق. اكتب كلمة المرور الحالية من جديد.",
+  PASSWORD_UNCHANGED: "اختر كلمة مرور تختلف عن الحالية.",
   EMAIL_UNAVAILABLE: "تعذّر إرسال البريد. حاول لاحقًا.",
   INVALID_CODE: "الرمز غير صحيح أو انتهت صلاحيته. اطلب رمز جديد.",
   TOO_MANY_REQUESTS: "طلبات كثيرة خلال وقت قصير. انتظر شوي وحاول.",
-  BANK_SANDBOX_UNAVAILABLE: "خدمة التحقق من الالتزام غير متاحة حاليًا. حاول لاحقًا.",
+  BANK_SANDBOX_UNAVAILABLE:
+    "خدمة التحقق من الالتزام غير متاحة حاليًا. حاول لاحقًا.",
   PAYMENT_MISMATCH: "بيانات العملية ما تطابق طلب الالتزام.",
   PAYMENT_NOT_FOUND: "ما لقينا العملية. تحقق من حالة طلبك.",
   DUPLICATE_EMAIL: "هالبريد مسجل من قبل. جرّب تسجيل الدخول.",
@@ -132,4 +137,3 @@ export function validateImages(files, required = true) {
     return "كل صورة لازم يكون حجمها 5 MiB أو أقل.";
   return "";
 }
-

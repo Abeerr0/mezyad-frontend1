@@ -208,10 +208,23 @@ export function useWorkspace(demo) {
     remember(null);
     location.hash = "/login";
   }
-  function updatePreviewProfile(name, email) {
-    const user = { ...session.user, name, email };
-    setDemoUser(user);
-    remember({ user });
+  // تم التعديل من عبير: نحفظ الاسم من API ونثبت البريد ونحدث الحساب في كل الصفحات.
+  async function updateProfile(name) {
+    const user = demo
+      ? { ...session.user, name }
+      : await call("/me/profile", { method: "PATCH", body: { name } });
+    if (demo) setDemoUser(user);
+    remember({ ...session, user });
+  }
+  async function verifyPassword(currentPassword) {
+    if (demo) throw new Error("سجل دخولك بحسابك للتحقق من كلمة المرور.");
+    return call("/me/password/verify", {
+      method: "POST",
+      body: { currentPassword },
+    });
+  }
+  async function changePassword(input) {
+    return call("/me/password", { method: "POST", body: input });
   }
 
   // تم التعديل من عبير: المعاينه تحفظ بالذاكره فقط، والربط الحقيقي يرسل نفس حقول الباك.
@@ -332,7 +345,9 @@ export function useWorkspace(demo) {
     enterPreview,
     login,
     logout,
-    updatePreviewProfile,
+    updateProfile,
+    verifyPassword,
+    changePassword,
     saveListing,
     createAuction,
   };

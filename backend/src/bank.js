@@ -130,6 +130,8 @@ const publicRow = (row) =>
     created_at: row.created_at,
     expires_at: row.expires_at,
     paymentId: row.payment_id,
+    amountMinor: row.amount_minor,
+    currency: "SAR",
     ...(row.resumeUrl ? { resumeUrl: row.resumeUrl } : {}),
   };
 export const bankRoutes = Router();
@@ -270,3 +272,4 @@ bankRoutes.post("/auctions/:id/bids", auth, async (req, res, next) => {
 export function startCommitment() {
   throw fail(503, "BANK_SANDBOX_UNAVAILABLE");
 }
+

@@ -1,0 +1,71 @@
+/* تم التعديل من عبير: كل تصنيف له حقول واضحه والاضافات تنمسح خانه خانه بدون تغيير ترتيب النموذج. */
+.category-details {
+  padding: 22px;
+  margin-block: 20px;
+  background: #f1efe4;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.category-details h3 {
+  margin: 0 0 18px;
+  font-size: 19px;
+}
+.category-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.editor-card .spec-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 14px;
+  background: #f6f4ec;
+  border-radius: 15px;
+}
+.spec-cell {
+  position: relative;
+  min-width: 0;
+}
+.spec-cell input {
+  width: 100%;
+  padding-inline-end: 40px;
+  border-radius: 12px;
+}
+.spec-cell .clear-spec {
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #7c6750;
+}
+.clear-spec:hover {
+  background: #e8e2d2;
+}
+.editor-card .editor-actions {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+.editor-actions .previous-step svg {
+  transform: rotate(180deg);
+}
+@media (max-width: 600px) {
+  .category-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .editor-card .spec-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editor-card .spec-row > button {
+    grid-column: auto;
+    justify-self: end;
+  }
+}

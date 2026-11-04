@@ -1,3 +1,5 @@
+import "./ListingEditor.css";
+import { listingFields, categoryIssue } from "./listing-fields";
 import { notify } from "./InteractionUI";
 import React, { useEffect, useRef, useState } from "react";
 import { Icon, Auctioneer } from "./components";
@@ -17,8 +19,17 @@ export default function ListingEditor({ workspace, existing }) {
   const [title, setTitle] = useState(existing?.title || "");
   const [description, setDescription] = useState(existing?.description || "");
   const [specs, setSpecs] = useState(
-    initialSpecs.length ? initialSpecs : [{ name: "", value: "" }],
+    initialSpecs.filter(
+      (row) =>
+        !(
+          listingFields[
+            workspace.categories.find((c) => c.id === existing?.category_id)
+              ?.name
+          ]?.fields || []
+        ).some((field) => field.name === row.name),
+    ),
   );
+  const [details, setDetails] = useState(initialFields);
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -29,6 +40,7 @@ export default function ListingEditor({ workspace, existing }) {
   const fileInput = useRef(null);
   const stepRef = useRef(null);
   const category = workspace.categories.find((c) => c.id === categoryId);
+  const schema = listingFields[category?.name];
   const shownImages = files.length
     ? previews
     : (existing?.images || []).map(imageUrl);
@@ -53,17 +65,25 @@ export default function ListingEditor({ workspace, existing }) {
     setError("");
   }
   function categoryFields() {
-    if (existing && JSON.stringify(specs) === JSON.stringify(initialSpecs))
-      return initialFields;
-    return Object.fromEntries(
-      specs
-        .filter((s) => s.name.trim())
-        .map((s) => [s.name.trim(), s.value.trim()]),
-    );
+    return {
+      ...Object.fromEntries(
+        specs
+          .filter((s) => s.name.trim())
+          .map((s) => [s.name.trim(), s.value.trim()]),
+      ),
+      ...Object.fromEntries(
+        (schema?.fields || []).map((field) => [
+          field.name,
+          String(details[field.name] ?? "").trim(),
+        ]),
+      ),
+    };
   }
   function checkStep() {
     if (step === 0 && !category) return "اختر تصنيف الأصل عشان نكمل.";
     if (step === 1) {
+      const issue = categoryIssue(schema, details);
+      if (issue) return issue;
       if (!title.trim() || Array.from(title.trim()).length > 240)
         return "اكتب عنوان واضح، بحد أقصى 240 حرف.";
       if (!description.trim() || description.length > 20000)
@@ -183,6 +203,12 @@ export default function ListingEditor({ workspace, existing }) {
                         key={c.id}
                         aria-pressed={categoryId === c.id}
                         onClick={() => {
+                          if (categoryId !== c.id) {
+                            setDetails({});
+                            setSpecs([]);
+                            setTitle("");
+                            setDescription("");
+                          }
                           setCategoryId(c.id);
                           setError("");
                         }}
@@ -225,6 +251,57 @@ export default function ListingEditor({ workspace, existing }) {
                   <span className="pill">
                     {categoryLabels[category?.name] || category?.name}
                   </span>
+                  {/* تم التعديل من عبير: الحقول المطلوبه تتغير مع التصنيف ونمنع الانتقال اذا ناقصه. */}
+                  {schema && (
+                    <section className="category-details">
+                      <h3>
+                        تفاصيل{" "}
+                        {categoryLabels[category?.name] || category?.name}
+                      </h3>
+                      <div className="category-detail-grid">
+                        {schema.fields.map((field) => (
+                          <label className="field" key={field.name}>
+                            <span>
+                              {field.name} <small>مطلوب</small>
+                            </span>
+                            {field.options ? (
+                              <select
+                                value={details[field.name] || ""}
+                                onChange={(event) =>
+                                  setDetails({
+                                    ...details,
+                                    [field.name]: event.target.value,
+                                  })
+                                }
+                                required
+                              >
+                                <option value="">اختر {field.name}</option>
+                                {field.options.map((option) => (
+                                  <option key={option}>{option}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type={field.type || "text"}
+                                min={field.min}
+                                max={field.max}
+                                step={field.type === "number" ? 1 : undefined}
+                                value={details[field.name] ?? ""}
+                                onChange={(event) =>
+                                  setDetails({
+                                    ...details,
+                                    [field.name]: event.target.value,
+                                  })
+                                }
+                                maxLength={160}
+                                required
+                              />
+                            )}
+                          </label>
+                        ))}
+                      </div>
+                    </section>
+                  )}
                   <label className="field">
                     <span>
                       عنوان الإعلان <small>مطلوب</small>
@@ -233,7 +310,9 @@ export default function ListingEditor({ workspace, existing }) {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       maxLength={480}
-                      placeholder="مثال: بورش كاريرا GT — 2005"
+                      placeholder={
+                        "مثال: " + (schema?.example || "عنوان واضح للأصل")
+                      }
                     />
                     <small className="field-counter">
                       {Array.from(title).length} / 240
@@ -265,26 +344,42 @@ export default function ListingEditor({ workspace, existing }) {
                       <Icon name="plus" size={16} /> إضافة مواصفة
                     </button>
                   </div>
+                  {/* تم التعديل من عبير: لكل خانه مسح مستقل والمواصفات الاضافيه تنضاف حسب الحاجه. */}
                   {specs.map((row, index) => (
                     <div className="spec-row" key={index}>
-                      <input
-                        aria-label={"اسم المواصفة " + (index + 1)}
-                        placeholder="المواصفة، مثل اللون"
-                        value={row.name}
-                        maxLength={100}
-                        onChange={(e) =>
-                          changeSpec(index, "name", e.target.value)
-                        }
-                      />
-                      <input
-                        aria-label={"قيمة المواصفة " + (index + 1)}
-                        placeholder="القيمة، مثل فضي"
-                        value={row.value}
-                        maxLength={1000}
-                        onChange={(e) =>
-                          changeSpec(index, "value", e.target.value)
-                        }
-                      />
+                      {["name", "value"].map((field) => (
+                        <div className="spec-cell" key={field}>
+                          <input
+                            aria-label={
+                              (field === "name"
+                                ? "اسم المواصفة "
+                                : "قيمة المواصفة ") +
+                              (index + 1)
+                            }
+                            placeholder={
+                              field === "name" ? "اسم المواصفة" : "قيمتها"
+                            }
+                            value={row[field]}
+                            maxLength={field === "name" ? 100 : 1000}
+                            onChange={(event) =>
+                              changeSpec(index, field, event.target.value)
+                            }
+                          />
+                          <button
+                            type="button"
+                            className="clear-spec"
+                            aria-label={
+                              (field === "name"
+                                ? "مسح اسم المواصفة "
+                                : "مسح قيمة المواصفة ") +
+                              (index + 1)
+                            }
+                            onClick={() => changeSpec(index, field, "")}
+                          >
+                            <Icon name="close" size={14} />
+                          </button>
+                        </div>
+                      ))}
                       <button
                         type="button"
                         className="icon-button"
@@ -442,13 +537,13 @@ export default function ListingEditor({ workspace, existing }) {
               {step > (existing ? 1 : 0) && (
                 <button
                   type="button"
-                  className="button outline"
+                  className="button outline previous-step"
                   onClick={() => {
                     setStep(step - 1);
                     setError("");
                   }}
                 >
-                  السابق
+                  السابق <Icon />
                 </button>
               )}
             </div>

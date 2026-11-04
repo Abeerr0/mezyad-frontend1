@@ -1,3 +1,4 @@
+import "./MoyasarCheckout.css";
 import { useAutoRefresh } from "./useAutoRefresh";
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./components";
@@ -39,12 +40,44 @@ function loadMoyasar() {
   return sdkPromise;
 }
 export default function MoyasarCheckout({ market, id, paymentId }) {
-  const [open, setOpen] = useState(Boolean(paymentId)),
-    [busy, setBusy] = useState(false),
+  const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [checkout, setCheckout] = useState(null),
     [success, setSuccess] = useState(false),
     [resumeUrl, setResumeUrl] = useState("");
+  const [summary, setSummary] = useState(null);
+  const [auctionTitle, setAuctionTitle] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [accepted, setAccepted] = useState(false);
+  // تم التعديل من عبير: نعرض مبلغ الطلب المحفوظ بدون انشاء عمليه دفع من فتح الصفحه.
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    if (!id || !market.userId) {
+      setLoading(false);
+      return;
+    }
+    Promise.all([
+      market.getAuction(id, controller.signal),
+      market.getCommitment(id, controller.signal),
+    ])
+      .then(([auction, row]) => {
+        if (!controller.signal.aborted) {
+          setAuctionTitle(auction.title);
+          setSummary(row);
+          if (row?.paymentId) currentPayment.current = row.paymentId;
+          setResumeUrl(row?.resumeUrl || "");
+          if (row?.status === "SUCCESS") setSuccess(true);
+        }
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) setMessage(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [id, market.userId, market.token, market.demo]);
   const currentPayment = useRef(paymentId);
   useAutoRefresh(
     () =>
@@ -64,6 +97,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
       token: market.token,
       body: { paymentId: value },
     });
+    setSummary(result);
     setSuccess(result.status === "SUCCESS");
     setResumeUrl(result.resumeUrl || "");
     setMessage(
@@ -97,7 +131,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
   }, [paymentId, market.token, id]);
   async function check(event) {
     event.preventDefault();
-    if (sending.current) return;
+    if (sending.current || !accepted) return;
     if (!id || !market.token || market.demo) {
       setMessage("افتح طلب الالتزام من صفحة المزاد بعد تسجيل الدخول.");
       return;
@@ -111,6 +145,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         return;
       }
       const result = await market.commit(id);
+      setSummary(result);
       if (result.status === "SUCCESS") {
         setSuccess(true);
         setMessage("التزامك مؤكد لهذا المزاد.");
@@ -140,7 +175,11 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         credit_card: { manual: true },
         metadata: result.checkout.metadata,
         on_completed: async (payment) => {
-          await verify(payment.id);
+          try {
+            await verify(payment.id);
+          } catch (error) {
+            setMessage(error.message);
+          }
         },
       });
     } catch (error) {
@@ -150,102 +189,187 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
       setBusy(false);
     }
   }
+  const amount = checkout?.amount ?? summary?.amountMinor;
+  const amountText = Number.isSafeInteger(amount)
+    ? (amount / 100).toLocaleString("ar-SA", { minimumFractionDigits: 2 })
+    : "—";
   return (
     <section className="container payment-page">
-      <p className="eyebrow">خطوتك على بيّنة</p>
-      <h1>مراجعة الدفع</h1>
-      <p>راجع تفاصيل العملية قبل المتابعة.</p>
-      <p className="inline-notice">
-        بيئة ميسر التجريبية: استخدم بطاقات الاختبار فقط. ما يتم تحصيل قيمة الأصل
-        هنا.
-      </p>
-      <div className="brand-wallet" aria-hidden="true">
-        <div className="wallet-card">
-          MEZYAD <span>للقيمة أهلها</span>
-        </div>
-        <div className="wallet-front">
-          <Icon name="lock" size={30} />
-          <span>محفظتك</span>
-          <b>••••</b>
-        </div>
+      <div className="breadcrumb">
+        <a href="#/activity">حسابي</a>
+        <span>/</span>محفظة المشاركة
       </div>
-      <button
-        className="pay-trigger"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        <Icon name="lock" />
-        <span>{open ? "إخفاء تفاصيل العملية" : "مراجعة العملية"}</span>
-        <Icon />
-      </button>
-      <section
-        className="payment-sheet paper-card"
-        hidden={!open}
-        style={{ display: open ? undefined : "none" }}
-      >
-        <p className="eyebrow">تفاصيل العملية</p>
-        <h2>كل التفاصيل، قبل القرار.</h2>
-        <dl className="payment-summary">
-          <div>
-            <dt>مبلغ التفويض</dt>
-            <dd>
-              {checkout
-                ? (checkout.amount / 100).toLocaleString("ar-SA") + " ر.س"
-                : "يحدده طلب الالتزام"}
-            </dd>
+      <div className="payment-heading">
+        <div>
+          <p className="eyebrow">كل خطوة بثقة</p>
+          <h1>محفظة المشاركة</h1>
+          <p>راجع مبلغك، وأكمل تأمين مشاركتك في المزاد.</p>
+        </div>
+        <span className="payment-safe">
+          <Icon name="shield" /> اتصال آمن
+        </span>
+      </div>
+      {/* تم التعديل من عبير: المحفظه تعرض مبلغ التامين المرتبط بالمزاد ولا نخترع رصيد قابل للسحب. */}
+      <div className="wallet-layout">
+        <aside className="wallet-overview">
+          <div className="brand-wallet" aria-hidden="true">
+            <div className="wallet-card">
+              MEZYAD <span>للقيمة أهلها</span>
+            </div>
+            <div className="wallet-front">
+              <Icon name="lock" size={30} />
+              <span>محفظة المشاركة</span>
+              <b>••••</b>
+            </div>
           </div>
-          <div>
-            <dt>وسيلة الدفع</dt>
-            <dd>بطاقة عبر ميسر</dd>
+          <div className="wallet-balance">
+            <p>{success ? "مبلغ مشاركتك المؤكد" : "مبلغ تأمين المشاركة"}</p>
+            <strong>
+              {amountText} <small>ر.س</small>
+            </strong>
+            <span
+              className={success ? "wallet-status confirmed" : "wallet-status"}
+            >
+              <i />
+              {success
+                ? "تم التأكيد"
+                : loading
+                  ? "جاري جلب التفاصيل"
+                  : "بانتظار إكمال العملية"}
+            </span>
           </div>
-        </dl>
-        <div ref={mount} />
-        {!success && !paymentId && (
-          <button
-            className="button dark full"
-            disabled={busy || Boolean(checkout)}
-            onClick={check}
-          >
-            {busy ? (
-              <>
-                <span className="ui-loader" />
-                جاري التحقق…
-              </>
-            ) : (
-              "متابعة التفويض"
-            )}
-          </button>
-        )}
-        {message && (
-          <p role="status" className="inline-notice">
-            {message}
+          <p className="wallet-caption">
+            المبلغ مرتبط بهذا المزاد، وما يُعتبر رصيدًا عامًا أو دفعة لقيمة
+            الأصل.
           </p>
-        )}
-        {resumeUrl && !success && (
-          <a className="button dark full" href={resumeUrl}>
-            كمّل التحقق من البطاقة <Icon />
-          </a>
-        )}
-        {success && (
+          <div className="wallet-assurances">
+            <p>
+              <Icon name="lock" /> بيانات بطاقتك ما تنحفظ عندنا
+            </p>
+            <p>
+              <Icon name="shield" /> تأكيد العملية قبل تفعيل المشاركة
+            </p>
+            <p>
+              <Icon name="check" /> راجع التفاصيل قبل المتابعة
+            </p>
+          </div>
+        </aside>
+        <section
+          className="payment-sheet paper-card"
+          aria-label="تفاصيل العملية"
+        >
+          <div className="payment-section-title">
+            <div>
+              <p className="eyebrow">تفاصيل العملية</p>
+              <h2>{success ? "مشاركتك جاهزة." : "خطوتك للمنافسة."}</h2>
+            </div>
+            <Icon name={success ? "check" : "lock"} size={26} />
+          </div>
+          <p className="payment-auction">
+            {auctionTitle || "اختر مزادك لعرض تفاصيل التأمين."}
+          </p>
+          <dl className="payment-summary">
+            <div>
+              <dt>نوع العملية</dt>
+              <dd>تأمين مشاركة في مزاد</dd>
+            </div>
+            <div>
+              <dt>مبلغ التأمين</dt>
+              <dd>{amountText} ر.س</dd>
+            </div>
+            <div>
+              <dt>وسيلة الدفع</dt>
+              <dd>
+                بطاقة بنكية{" "}
+                <span className="card-networks" dir="ltr">
+                  mada · VISA · Mastercard
+                </span>
+              </dd>
+            </div>
+            <div className="payment-total">
+              <dt>{success ? "المبلغ المؤكد" : "إجمالي التأمين"}</dt>
+              <dd>{amountText} ر.س</dd>
+            </div>
+          </dl>
+          {!market.userId ? (
+            <a
+              href={
+                "#/login?next=" +
+                encodeURIComponent("/payment?id=" + (id || ""))
+              }
+              className="button dark full"
+            >
+              سجل دخولك للمتابعة <Icon />
+            </a>
+          ) : !id ? (
+            <a className="button dark full" href="#/auctions">
+              اختر مزادك <Icon />
+            </a>
+          ) : (
+            <>
+              {!success && !paymentId && !checkout && (
+                <label className="checkbox-label payment-consent">
+                  <input
+                    type="checkbox"
+                    checked={accepted}
+                    onChange={(event) => setAccepted(event.target.checked)}
+                  />
+                  راجعت تفاصيل العملية، وأفهم أن المبلغ تأمين للمشاركة في هذا
+                  المزاد.
+                </label>
+              )}
+              <div ref={mount} className="secure-payment-form" />
+              {!success && !paymentId && !checkout && (
+                <button
+                  className="button dark full payment-submit"
+                  disabled={busy || loading || !accepted || market.demo}
+                  onClick={check}
+                >
+                  {busy ? (
+                    <>
+                      <span className="ui-loader" /> جاري تجهيز الدفع…
+                    </>
+                  ) : (
+                    <>
+                      المتابعة للدفع <Icon name="lock" />
+                    </>
+                  )}
+                </button>
+              )}
+              {resumeUrl && !success && (
+                <a className="button dark full" href={resumeUrl}>
+                  كمّل التحقق من البطاقة <Icon />
+                </a>
+              )}
+              {success && (
+                <a
+                  className="button dark full"
+                  href={"#/bid?id=" + encodeURIComponent(id)}
+                >
+                  ادخل المنافسة <Icon />
+                </a>
+              )}
+            </>
+          )}
+          {message && (
+            <p role="status" className="inline-notice">
+              {message}
+            </p>
+          )}
+          <p className="payment-footnote">
+            <Icon name="shield" size={15} /> نؤكد مشاركتك بعد التحقق من العملية.{" "}
+            <span>بيئة اختبار · لا تستخدم بطاقة حقيقية.</span>
+          </p>
           <a
-            className="button dark full"
-            href={"#/bid?id=" + encodeURIComponent(id)}
+            className="text-link"
+            href={
+              id ? "#/commitment?id=" + encodeURIComponent(id) : "#/my-auctions"
+            }
           >
-            قدّم عرضك <Icon />
+            الرجوع لتفاصيل المشاركة <Icon />
           </a>
-        )}
-        <p className="field-hint">
-          التفويض يخص مشاركتك في هذا المزاد، وما يعني دفع قيمة الأصل.
-        </p>
-      </section>
-      <a
-        className="text-link"
-        href={
-          id ? "#/commitment?id=" + encodeURIComponent(id) : "#/my-auctions"
-        }
-      >
-        الرجوع للالتزام <Icon />
-      </a>
+        </section>
+      </div>
     </section>
   );
 }

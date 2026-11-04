@@ -101,3 +101,21 @@
     transition: none;
   }
 }
+
+/* تم التعديل من عبير: نوضح العدد داخل التبويب المحدد ونميز تسجيل الخروج بالاحمر. */
+.account-main .filter-tabs button[aria-pressed="true"] span {
+  color: #fff;
+  background: #59614d;
+  border: 1px solid #8c967b;
+  font-weight: 800;
+  min-width: 27px;
+  border-radius: 8px;
+}
+.account-sidebar .logout-button {
+  color: #ad3030;
+}
+.account-sidebar .logout-button:hover {
+  color: #8c2020;
+  background: #f8e8e3;
+  border-radius: 12px;
+}

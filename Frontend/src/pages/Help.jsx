@@ -109,7 +109,7 @@ export default function Help({ topic = "" }) {
           <h2>خلّينا نوريك الرحلة.</h2>
           <p>دليل قصير يشرح لك خطوات البيع والمزايدة، بدون تعقيد.</p>
           <a className="button dark" href="#/guide">
-            كيف تشتغل مزياد <Icon />
+            كيف يعمل مزياد <Icon />
           </a>
         </div>
         <Auctioneer small character="expert" motion="inspect" />

@@ -43,7 +43,7 @@ const pageTitles = {
   "bank-status": "حالة البنك",
   home: "الرئيسية",
   auctions: "استكشاف المزادات",
-  guide: "كيف تشتغل مزياد",
+  guide: "كيف يعمل مزياد",
   help: "المساعدة",
   login: "تسجيل الدخول",
   register: "إنشاء حساب",
@@ -266,7 +266,7 @@ export default function App() {
             {[
               ["home", "/", "الرئيسية"],
               ["auctions", "/auctions", "المزادات"],
-              ["guide", "/guide", "كيف تشتغل مزياد"],
+              ["guide", "/guide", "كيف يعمل مزياد"],
               ["help", "/help", "المساعدة"],
             ].map(([key, path, label]) => (
               <a
@@ -403,7 +403,7 @@ export default function App() {
             <div>
               <h2>خذ لفة</h2>
               <a href="#/auctions">المزادات العامة</a>
-              <a href="#/guide">كيف تشتغل مزياد</a>
+              <a href="#/guide">كيف يعمل مزياد</a>
               <a href="#/help">المساعدة والأسئلة</a>
             </div>
             <div>
