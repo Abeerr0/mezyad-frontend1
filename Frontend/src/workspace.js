@@ -1,3 +1,4 @@
+import { useAutoRefresh } from "./useAutoRefresh";
 import { useEffect, useState } from "react";
 import { request } from "./api";
 import { demoCategories } from "./data";
@@ -61,18 +62,26 @@ export function useWorkspace(demo) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [refresh, setRefresh] = useState(0);
+  useAutoRefresh(() => setRefresh((n) => n + 1), Boolean(session) && !demo);
   // تم التعديل من عبير: نحفظ افتار كل حساب لحاله على نفس المتصفح بدون تغيير بيانات الباك.
   const [avatar, setAvatar] = useState(0);
-  const avatarKey = session?.user?.id ? `mezyad-avatar-${demo ? "preview" : "account"}-${session.user.id}` : null;
+  const avatarKey = session?.user?.id
+    ? `mezyad-avatar-${demo ? "preview" : "account"}-${session.user.id}`
+    : null;
   useEffect(() => {
     let value = 0;
-    try { value = Number(localStorage.getItem(avatarKey)); } catch {}
+    try {
+      value = Number(localStorage.getItem(avatarKey));
+    } catch {}
     setAvatar(Number.isInteger(value) && value >= 0 && value < 25 ? value : 0);
   }, [avatarKey]);
   function chooseAvatar(value) {
     if (!avatarKey) return false;
-    try { localStorage.setItem(avatarKey, String(value)); }
-    catch { return false; }
+    try {
+      localStorage.setItem(avatarKey, String(value));
+    } catch {
+      return false;
+    }
     setAvatar(value);
     return true;
   }
@@ -134,7 +143,7 @@ export function useWorkspace(demo) {
       return;
     }
     const controller = new AbortController();
-    setLoading(true);
+    setLoading(items.length === 0 && auctions.length === 0);
     setError("");
     Promise.all([
       request("/me/items", { token: session.token, signal: controller.signal }),

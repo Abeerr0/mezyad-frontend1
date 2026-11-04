@@ -1,3 +1,4 @@
+import { useAutoRefresh } from "./useAutoRefresh";
 import { Avatar } from "./Avatar";
 import BrandScene from "./BrandScene";
 import { Notices, PaymentPage } from "./InteractionUI";
@@ -57,7 +58,13 @@ function readRoute() {
   // تم التعديل من عبير: نلتقط رجعه ميسر ونخلي الباك يتحقق من معرف العمليه.
   const callback = new URLSearchParams(location.search);
   if (!location.hash && callback.has("moyasarAuction") && callback.has("id")) {
-    return {page:"payment",params:new URLSearchParams({id:callback.get("moyasarAuction"),paymentId:callback.get("id")})};
+    return {
+      page: "payment",
+      params: new URLSearchParams({
+        id: callback.get("moyasarAuction"),
+        paymentId: callback.get("id"),
+      }),
+    };
   }
   const [path, query] = (location.hash.slice(1) || "/").split("?");
   const name = path.replace(/^\//, "") || "home";
@@ -75,6 +82,10 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
+  useAutoRefresh(
+    () => setRefresh((n) => n + 1),
+    !demo && ["home", "auctions"].includes(route.page),
+  );
   const [menu, setMenu] = useState(false);
   const mainRef = useRef(null);
   const category =
@@ -272,15 +283,26 @@ export default function App() {
               className="account-button"
               onClick={() => onFeature("account")}
             >
-              {workspace.user ? <Avatar value={workspace.avatar} name={workspace.user.name} /> : <Icon name="user" size={17} />}
+              {workspace.user ? (
+                <Avatar value={workspace.avatar} name={workspace.user.name} />
+              ) : (
+                <Icon name="user" size={17} />
+              )}
               <span>{workspace.user ? "مجلسي" : "تسجيل الدخول"}</span>
             </button>
-            <button
-              className="button small dark sell-button"
-              onClick={() => onFeature("sell")}
-            >
-              اعرض أصلك <Icon name="plus" size={17} />
-            </button>
+            {![
+              "listings",
+              "create-listing",
+              "edit-listing",
+              "create-auction",
+            ].includes(route.page) && (
+              <button
+                className="button small dark sell-button"
+                onClick={() => onFeature("sell")}
+              >
+                اعرض أصلك <Icon name="plus" size={17} />
+              </button>
+            )}
             <button
               className="icon-button menu-button"
               onClick={() => setMenu(!menu)}
@@ -298,7 +320,13 @@ export default function App() {
           key={route.page + "-" + demo + "-" + (route.params.get("id") || "")}
         >
           {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
-          {route.page === "payment" && <PaymentPage market={market} id={route.params.get("id")} paymentId={route.params.get("paymentId")} />}
+          {route.page === "payment" && (
+            <PaymentPage
+              market={market}
+              id={route.params.get("id")}
+              paymentId={route.params.get("paymentId")}
+            />
+          )}
           {route.page === "auction" && (
             <AuctionDetails market={market} id={route.params.get("id")} />
           )}
@@ -357,7 +385,9 @@ export default function App() {
             </a>
           </div>
         )}
-        <BrandScene page={route.page} />
+        {!["activity", "listings", "profile", "my-auctions"].includes(
+          route.page,
+        ) && <BrandScene page={route.page} />}
       </main>
       <footer className="site-footer">
         <div className="container">
@@ -378,9 +408,8 @@ export default function App() {
             </div>
             <div>
               <h2>نبدأ من هنا</h2>
-              <button onClick={() => onFeature("sell")}>
-                عرض أصل للمراجعة
-              </button>
+              {/* تم التعديل من عبير: نخلي عرض الاصل بمكان واحد ونوجه هنا لشرح خطوات البيع. */}
+              <a href="#/guide">خطوات عرض أصلك</a>
               <button onClick={() => onFeature("private")}>
                 دخول مزاد خاص
               </button>
@@ -412,4 +441,3 @@ export default function App() {
     </>
   );
 }
-

@@ -1,0 +1,58 @@
+/* تم التعديل من عبير: اختيار الصوره بمنتصف الاطار وكل الخيارات لها نفس الدائره بدون قص عشوائي. */
+.account-page-profile .profile-banner {
+  background: #eeece0;
+  border: 1px solid #d7cfb8;
+  border-radius: 25px;
+  padding: 26px;
+  margin-bottom: 22px;
+}
+.account-page-profile .avatar-picker {
+  background: #fffdf7;
+  padding: 36px;
+}
+.account-page-profile .avatar-picker h2 {
+  font-family: AmiriUI, serif;
+  font-size: 38px;
+}
+.account-page-profile .avatar-carousel .member-avatar {
+  width: 146px;
+  height: 146px;
+  box-shadow:
+    0 0 0 5px #d9cba6,
+    0 14px 24px #30342225;
+}
+.account-page-profile .avatar-options {
+  gap: 15px;
+}
+.account-page-profile .avatar-options button {
+  padding: 5px;
+}
+.account-page-profile .avatar-options .member-avatar {
+  width: 52px;
+  height: 52px;
+}
+.account-page-profile .avatar-options button[aria-pressed="true"] {
+  background: #e8dfc6;
+  border-color: #98743a;
+}
+.member-avatar {
+  overflow: hidden;
+  border-radius: 50%;
+  background-repeat: no-repeat;
+}
+@media (max-width: 600px) {
+  .account-page-profile .avatar-picker {
+    padding: 25px 16px;
+  }
+  .account-page-profile .avatar-options {
+    gap: 8px;
+  }
+  .account-page-profile .avatar-options .member-avatar {
+    width: 42px;
+    height: 42px;
+  }
+  .account-page-profile .avatar-carousel .member-avatar {
+    width: 126px;
+    height: 126px;
+  }
+}

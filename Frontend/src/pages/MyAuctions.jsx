@@ -1,3 +1,5 @@
+import "./MyAuctions.css";
+import { useAutoRefresh } from "../useAutoRefresh";
 import React, { useEffect, useRef, useState } from "react";
 import { AccountLayout } from "../account-components";
 import { Icon, money } from "../components";
@@ -11,6 +13,10 @@ export default function MyAuctions({ market }) {
     [error, setError] = useState(""),
     [filter, setFilter] = useState("ALL"),
     [refresh, setRefresh] = useState(0);
+  useAutoRefresh(
+    () => setRefresh((n) => n + 1),
+    Boolean(market.userId) && !market.demo,
+  );
   const latest = useRef(market);
   latest.current = market;
   useEffect(() => {
@@ -20,7 +26,7 @@ export default function MyAuctions({ market }) {
       return;
     }
     const controller = new AbortController();
-    setLoading(true);
+    setLoading(rows.length === 0);
     setError("");
     async function load() {
       try {
@@ -64,13 +70,7 @@ export default function MyAuctions({ market }) {
       <section className="paper-card">
         <div className="section-heading">
           <h2>وين وصلت المنافسة؟</h2>
-          <button
-            className="button outline"
-            disabled={loading}
-            onClick={() => setRefresh((n) => n + 1)}
-          >
-            تحديث <Icon name="refresh" />
-          </button>
+          {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
         </div>
         <div className="auction-tabs" role="group" aria-label="فلترة مزاداتي">
           {[

@@ -57,13 +57,7 @@ export default function BankStatus({ market, id }) {
               </dl>
             )}
             <div className="form-actions">
-              <button
-                className="button outline"
-                onClick={state.reload}
-                disabled={state.loading}
-              >
-                تحديث الحالة <Icon name="refresh" />
-              </button>
+              {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
               <a
                 className="button dark"
                 href={auctionLink(

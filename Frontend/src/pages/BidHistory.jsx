@@ -33,21 +33,12 @@ export default function BidHistory({ market, id }) {
                     <p className="eyebrow">THE BID LEDGER</p>
                     <h2>سجل العروض</h2>
                   </div>
-                  <button
-                    className="button outline"
-                    disabled={state.loading}
-                    onClick={() => {
-                      setOffset(0);
-                      state.reload();
-                    }}
-                  >
-                    آخر العروض <Icon name="refresh" />
-                  </button>
+                  {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
                 </div>
                 {offset > 0 && (
                   <p className="inline-notice">
-                    قد تتحرك الصفحات مع وصول عروض جديدة. ارجع لآخر العروض
-                    لمتابعة الأحدث.
+                    قد تتحرك الصفحات مع وصول عروض جديدة. استخدم «السابق» للوصول
+                    لأول صفحة ومتابعة الأحدث.
                   </p>
                 )}
                 <BidRows rows={state.bids} />

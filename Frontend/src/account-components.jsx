@@ -1,3 +1,4 @@
+import "./account-components.css";
 import { Avatar } from "./Avatar";
 import React, { useState } from "react";
 import { Auctioneer, Icon } from "./components";
@@ -53,7 +54,7 @@ export function AccountLayout({
       </section>
     );
   return (
-    <div className="container account-layout">
+    <div className={"container account-layout account-page-" + active}>
       <aside className="account-sidebar">
         <div className="member-mark">
           <Avatar value={workspace.avatar} name={workspace.user.name} />
@@ -81,9 +82,7 @@ export function AccountLayout({
             </a>
           ))}
         </nav>
-        <a className="button dark" href="#/create-listing">
-          <Icon name="plus" /> اعرض أصلك
-        </a>
+        {/* تم التعديل من عبير: زر عرض الاصل بمكان واحد وما نكرره بالقائمه. */}
         <div className="sidebar-tip">
           <Auctioneer small character="collector" motion="inspect" />
           <p>
@@ -135,9 +134,7 @@ export function ResourceState({ workspace, children }) {
         <Icon name="refresh" size={32} />
         <h2>ما قدرنا نجيب البيانات</h2>
         <p role="alert">{workspace.error}</p>
-        <button className="button dark" onClick={workspace.reload}>
-          حاول مرة ثانية
-        </button>
+        {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
       </div>
     );
   return children;

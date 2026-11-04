@@ -44,9 +44,7 @@ export function AuctionState({ state, children }) {
         <Icon name="lock" size={36} />
         <h2>ما قدرنا نفتح المزاد.</h2>
         <p role="alert">{state.error}</p>
-        <button className="button dark" onClick={state.reload}>
-          حاول من جديد
-        </button>
+        {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
         <a className="text-link" href="#/private-access">
           معك رمز؟ ادخل هنا
         </a>

@@ -1,3 +1,5 @@
+import "./Activity.css";
+import { imageUrl } from "../api";
 import React, { useState } from "react";
 import {
   AccountLayout,
@@ -36,22 +38,34 @@ export default function Activity({ workspace, onOpen }) {
       <ResourceState workspace={workspace}>
         <div className="activity-welcome">
           <div>
-            <span className="eyebrow">البداية من عندك</span>
-            <h2>عندك أصل يستحق؟</h2>
-            <p>جهّز تفاصيله وصوره، وخلّ مزياد يجمع له المهتمين.</p>
-            <a href="#/create-listing" className="button dark">
-              اعرض أصلك <Icon name="plus" />
+            <span className="eyebrow">مجلسك، على مزاجك</span>
+            <h2>كل قيمة لها خطوتها.</h2>
+            <p>تابع أصولك، وراجع مشاركاتك، وخلك قريب من الفرصة الجاية.</p>
+            <a href="#/auctions" className="button dark">
+              استكشف المزادات <Icon name="arrow" />
             </a>
           </div>
           <Auctioneer character="collector" motion="bid" />
         </div>
         <div className="stat-grid">
-          {stats.map(([label, value, icon]) => (
-            <div className="stat-card" key={label}>
+          {stats.map(([label, value, icon], index) => (
+            <a
+              className="stat-card"
+              key={label}
+              href={
+                "#/listings" +
+                [
+                  "",
+                  "?status=PENDING_REVIEW",
+                  "?status=APPROVED",
+                  "?status=REJECTED",
+                ][index]
+              }
+            >
               <Icon name={icon} />
               <strong>{value.toLocaleString("ar-SA")}</strong>
               <span>{label}</span>
-            </div>
+            </a>
           ))}
         </div>
         {items.some((i) => i.status === "REJECTED") && (
@@ -64,15 +78,13 @@ export default function Activity({ workspace, onOpen }) {
             <Icon />
           </a>
         )}
-        <section className="paper-card">
+        <section className="paper-card activity-auctions">
           <div className="section-heading">
             <div>
               <span className="section-number">01</span>
               <h2>مزاداتك ومشاركاتك</h2>
             </div>
-            <button className="text-link" onClick={workspace.reload}>
-              تحديث <Icon name="refresh" size={16} />
-            </button>
+            {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
           </div>
           <div className="filter-tabs" aria-label="فلترة مزاداتي">
             {[
@@ -136,7 +148,7 @@ export default function Activity({ workspace, onOpen }) {
             افتح أي مزاد لمتابعة تفاصيله، وراجع النتيجة بعد الإغلاق.
           </p>
         </section>
-        <section className="paper-card">
+        <section className="paper-card activity-recent">
           <div className="section-heading">
             <div>
               <span className="section-number">02</span>
@@ -155,7 +167,22 @@ export default function Activity({ workspace, onOpen }) {
                 key={item.id}
                 href={"#/listings?item=" + encodeURIComponent(item.id)}
               >
-                <span>{item.title}</span>
+                {item.images?.[0] ? (
+                  <img
+                    className="activity-listing-photo"
+                    src={imageUrl(item.images[0])}
+                    alt=""
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="activity-listing-photo placeholder">
+                    <Icon name="image" />
+                  </span>
+                )}
+                <span className="activity-listing-title">
+                  {item.title}
+                  <small>شوف التفاصيل وتابع حالة إعلانك</small>
+                </span>
                 <span className={"status-tag " + item.status.toLowerCase()}>
                   {listingLabels[item.status]}
                 </span>

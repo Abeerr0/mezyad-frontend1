@@ -1,3 +1,4 @@
+import "./MyListings.css";
 import React, { useState } from "react";
 import {
   AccountLayout,
@@ -70,13 +71,7 @@ export default function MyListings({ workspace, params }) {
           <a href="#/create-listing" className="button dark">
             إعلان جديد <Icon name="plus" size={18} />
           </a>
-          <button
-            className="icon-button"
-            aria-label="تحديث إعلاناتي"
-            onClick={workspace.reload}
-          >
-            <Icon name="refresh" />
-          </button>
+          {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
         </div>
         <div className="filter-tabs listing-tabs" aria-label="حالة إعلاناتي">
           {[

@@ -1,3 +1,4 @@
+import { useAutoRefresh } from "./useAutoRefresh";
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./components";
 import { request } from "./api";
@@ -44,10 +45,20 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
     [checkout, setCheckout] = useState(null),
     [success, setSuccess] = useState(false),
     [resumeUrl, setResumeUrl] = useState("");
+  const currentPayment = useRef(paymentId);
+  useAutoRefresh(
+    () =>
+      currentPayment.current &&
+      verify(currentPayment.current).catch((error) =>
+        setMessage(error.message),
+      ),
+    Boolean(market.token) && !market.demo && !success && !busy,
+  );
   const mount = useRef(),
     sending = useRef(false);
   const path = "/auctions/" + encodeURIComponent(id || "") + "/commitment";
   async function verify(value) {
+    currentPayment.current = value;
     const result = await request(path + "/verify", {
       method: "POST",
       token: market.token,
@@ -60,7 +71,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         ? "تم تأكيد الالتزام. تقدر ترجع للمزايدة."
         : result.status === "FAILED"
           ? "ما اكتمل التفويض. ارجع للالتزام وحاول ببطاقة ثانية."
-          : "طلبك بانتظار التحقق. حدّث الحالة بعد إكمال التحقق من البطاقة.",
+          : "طلبك بانتظار التحقق. بنحدّث حالته تلقائيًا بعد إكمال التحقق من البطاقة.",
     );
     return result;
   }
@@ -189,7 +200,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
           </div>
         </dl>
         <div ref={mount} />
-        {!success && (
+        {!success && !paymentId && (
           <button
             className="button dark full"
             disabled={busy || Boolean(checkout)}
@@ -200,8 +211,6 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
                 <span className="ui-loader" />
                 جاري التحقق…
               </>
-            ) : paymentId ? (
-              "تحديث حالة الالتزام"
             ) : (
               "متابعة التفويض"
             )}

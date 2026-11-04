@@ -1,0 +1,158 @@
+/* تم التعديل من عبير: ملخص الحساب له ترحيب واحد ومسارات واضحه بدل تكرار نفس الزر. */
+.account-page-activity .activity-welcome {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  padding: 34px 38px;
+  border: 1px solid #cfc8af;
+  border-radius: 30px;
+  background: #293226;
+  color: #f8f3e4;
+  box-shadow: 0 18px 38px #29302420;
+  min-height: 230px;
+}
+.account-page-activity .activity-welcome:before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 1px solid #d7b67435;
+  border-radius: 50%;
+  left: -60px;
+  top: -100px;
+  pointer-events: none;
+}
+.account-page-activity .activity-welcome h2 {
+  font-family: AmiriUI, serif;
+  font-size: 42px;
+  line-height: 1.4;
+  margin: 12px 0;
+}
+.account-page-activity .activity-welcome p {
+  color: #dedac8;
+  max-width: 38ch;
+  line-height: 1.9;
+}
+.account-page-activity .activity-welcome .button {
+  background: #eadbb7;
+  color: #293226;
+  margin-top: 12px;
+}
+.account-page-activity .activity-welcome .auctioneer {
+  flex-shrink: 0;
+  width: 180px;
+}
+/* تم التعديل من عبير: كل رقم يفتح القائمه اللي تخصه والصور تختصر عليك قراءه الاعلان. */
+.account-page-activity .stat-grid {
+  gap: 12px;
+  margin-block: 24px;
+}
+.account-page-activity .stat-card {
+  position: relative;
+  border: 1px solid #dfdccc;
+  border-radius: 22px;
+  padding: 23px;
+  background: #fffdf7;
+  text-decoration: none;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.account-page-activity .stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px #29302412;
+}
+.account-page-activity .stat-card strong {
+  font:
+    500 36px/1.4 ReemKufiUI,
+    Cairo,
+    sans-serif;
+}
+.account-page-activity .stat-card svg {
+  color: #a58447;
+}
+.account-page-activity .activity-list article {
+  background: #f1f0e7;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid #dfdccc;
+  margin-block: 10px;
+}
+.account-page-activity .activity-icon {
+  border-radius: 15px;
+  background: #e5dfcb;
+  color: #7e6030;
+}
+.account-page-activity .activity-recent .listing-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+}
+.activity-listing-photo {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 17px;
+  flex-shrink: 0;
+}
+.activity-listing-photo.placeholder {
+  display: grid;
+  place-items: center;
+  background: #e9e5d5;
+  color: #9c7b40;
+}
+.activity-listing-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+.activity-listing-title small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: #777c6c;
+  margin-top: 7px;
+}
+.account-page-activity .attention-note {
+  border-radius: 18px;
+  background: #f4e7cc;
+  border: 1px solid #e4c58a;
+  padding: 20px;
+  margin-block: 22px;
+}
+@media (max-width: 600px) {
+  .account-page-activity .activity-welcome {
+    padding: 25px;
+    min-height: 210px;
+  }
+  .account-page-activity .activity-welcome h2 {
+    font-size: 33px;
+  }
+  .account-page-activity .activity-welcome .auctioneer {
+    display: none;
+  }
+  .account-page-activity .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .account-page-activity .stat-card {
+    padding: 18px;
+  }
+  .activity-listing-photo {
+    width: 50px;
+    height: 58px;
+  }
+  .activity-listing-title small {
+    display: none;
+  }
+  .account-page-activity .listing-summary {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-page-activity .stat-card {
+    transition: none;
+  }
+}
