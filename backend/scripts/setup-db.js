@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "../src/env.js";
 import { readFile } from "node:fs/promises";
 import { pool } from "../src/db.js";
 import { localSeedEnabled, seedLocal } from "./seed-local.js";

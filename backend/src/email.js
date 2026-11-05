@@ -1,3 +1,4 @@
+import "./env.js";
 // نستورد اداة توليد الارقام العشوائيه
 import { randomInt } from "node:crypto";
 // نستورد مكتبة ارسال الايميل
@@ -18,20 +19,10 @@ export function newEmailCode() {
 }
 // تم التعديل من عبير: نعيد استخدام اتصال البريد ونحدد مهل الاتصال عشان الطلب ما يعلق.
 function emailTransport() {
-  // نبدأ فحص اعدادات خدمة البريد
-  if (
-    // نرفض اذا عنوان خادم البريد مو موجود
-    !process.env.SMTP_HOST ||
-    // نرفض اذا اسم مستخدم حساب الارسال مو موجود
-    !process.env.SMTP_USER ||
-    // نرفض اذا كلمة مرور خدمة البريد مو موجوده
-    !process.env.SMTP_PASS
-    // اذا فيه اعداد ناقص ندخل هنا
-  ) {
-    // نوقف الارسال ونوضح ان الاعدادات ناقصه
-    throw new Error("Email settings are missing");
-    // نهاية فحص اعدادات البريد
-  }
+  // تم التعديل من عبير: نحدد اسم الاعداد الناقص بدون كشف قيمه اي مفتاح.
+  const missing = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"].filter((name) => !process.env[name]?.trim());
+  if (missing.length) throw Object.assign(new Error("SMTP settings missing"), { code: "SMTP_CONFIGURATION_MISSING", missing });
+  if (/[:/\s]/.test(process.env.SMTP_HOST)) throw Object.assign(new Error("Invalid SMTP host"), { code: "SMTP_HOST_INVALID" });
   // نجهز اداة الارسال اذا ما تجهزت قبل
   if (!transporter) {
     // ناخذ المنفذ من الاعدادات ونستخدم ٤٦٥ اذا ما تحدد
@@ -39,7 +30,7 @@ function emailTransport() {
     // نتاكد ان المنفذ عدد صحيح داخل النطاق
     if (!Number.isInteger(port) || port < 1 || port > 65535) {
       // نوقف الداله اذا المنفذ غير صالح
-      throw new Error("Invalid SMTP port");
+      throw Object.assign(new Error("Invalid SMTP port"), { code: "SMTP_PORT_INVALID" });
       // نهاية فحص المنفذ
     }
     // نجهز اداة الارسال ونحفظها في المتغير

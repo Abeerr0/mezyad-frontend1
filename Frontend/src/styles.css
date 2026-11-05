@@ -4966,3 +4966,9 @@ h2 em {
 .footer-bottom > span > i {
   display: none;
 }
+
+/* تم التعديل من عبير: نخفي عين المتصفح الافتراضيه ونخلي زر اظهار النصي هو التحكم الوحيد. */
+.password-control input::-ms-reveal,
+.password-control input::-ms-clear {
+  display: none;
+}
