@@ -11,7 +11,9 @@ export function useAutoRefresh(refresh, enabled = true) {
       if (
         running ||
         document.hidden ||
-        document.querySelector("form, dialog[open]") ||
+        document.querySelector(
+          'form, dialog[open], [role="dialog"], [role="alertdialog"]',
+        ) ||
         document.activeElement?.matches(
           "input, textarea, select, [contenteditable=true]",
         )

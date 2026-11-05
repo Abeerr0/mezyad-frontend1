@@ -2,7 +2,7 @@ import "./MoyasarCheckout.css";
 import { useAutoRefresh } from "./useAutoRefresh";
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./components";
-import { request } from "./api";
+import { cents, displayStatus, normalizeCommitment } from "./market";
 let sdkPromise;
 // تم التعديل من عبير: بيانات البطاقه تروح لميسر مباشره وما تمر على الباك او تخزين الموقع.
 function loadMoyasar() {
@@ -65,7 +65,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         if (!controller.signal.aborted) {
           setAuctionTitle(auction.title);
           setSummary(row);
-          if (row?.sandbox_reference)
+          if (row?.sandbox_reference && row.status !== "RELEASED")
             currentPayment.current = row.sandbox_reference;
           setResumeUrl(row?.resumeUrl || "");
           if (row?.status === "SUCCESS") setSuccess(true);
@@ -93,7 +93,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
   const path = "/auctions/" + encodeURIComponent(id || "") + "/commitment";
   async function verify(value) {
     currentPayment.current = value;
-    const result = await market.commit(id, value);
+    const result = normalizeCommitment(await market.commit(id, value));
     setSummary(result);
     setSuccess(result.status === "SUCCESS");
     setResumeUrl(result.resumeUrl || "");
@@ -147,7 +147,10 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
       const auction = await market.getAuction(id);
       if (auction.seller_id === market.userId)
         throw new Error("ما تقدر تشارك في مزادك");
-      const selected = Math.round(Number(holdAmount) * 100);
+      // تم التعديل من عبير: نرفض المبلغ اذا فيه كسور زايده او المزاد انتهى قبل فتح بوابه الدفع.
+      if (displayStatus(auction) === "CLOSED")
+        throw new Error("انتهى المزاد وما تقدر تبدأ تأمين جديد له");
+      const selected = cents(holdAmount);
       const bids = await market.getBids(id, 0);
       const minimum = bids.length
         ? Math.round(Number(auction.current_price) * 100) +

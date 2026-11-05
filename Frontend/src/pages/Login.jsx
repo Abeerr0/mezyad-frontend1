@@ -1,4 +1,3 @@
-import PasswordReset from "../PasswordReset";
 import { notify } from "../InteractionUI";
 import { GoogleAccess, SignupVerification } from "../AccountVerification";
 import React, { useState } from "react";
@@ -16,7 +15,7 @@ export default function Login({ workspace, params }) {
   // تم التعديل من عبير: نرجع المستخدم لصفحه المزاد اللي طلبها بعد تسجيل الدخول.
   const destination =
     next &&
-    /^\/(profile|activity|listings|create-listing|edit-listing|create-auction|auction|private-access|commitment|bid|bid-history|auction-result|my-auctions|bank-status)(\?|$)/.test(
+    /^\/(profile|activity|listings|create-listing|edit-listing|create-auction|auction|private-access|commitment|bid|bid-history|auction-result|my-auctions|bank-status|payment)(\?|$)/.test(
       next,
     )
       ? next
@@ -44,6 +43,7 @@ export default function Login({ workspace, params }) {
         <SignupVerification
           email={email.trim().toLowerCase()}
           demo={workspace.demo}
+          initialSeconds={0}
           onClose={() => setVerifying(false)}
           onComplete={async () => {
             const user = await workspace.login(
@@ -72,8 +72,14 @@ export default function Login({ workspace, params }) {
           <Icon name="check" />
           <h2>أنت داخل بحسابك</h2>
           <p>{workspace.user.name}</p>
-          <a className="button dark" href="#/activity">
-            الذهاب لنشاطي <Icon />
+          <a
+            className="button dark"
+            href={workspace.user.role === "ADMIN" ? "#/admin" : "#/activity"}
+          >
+            {workspace.user.role === "ADMIN"
+              ? "الذهاب للإدارة"
+              : "الذهاب لنشاطي"}{" "}
+            <Icon />
           </a>
         </div>
       ) : (
@@ -88,9 +94,9 @@ export default function Login({ workspace, params }) {
               <button
                 className="button dark"
                 onClick={() => {
+                  // تم التعديل من عبير: حساب المعاينه يروح للمسار المطلوب بدون متغير من طلب الدخول الحقيقي.
                   workspace.enterPreview();
-                  location.hash =
-                    user?.role === "ADMIN" ? "/admin" : destination;
+                  location.hash = destination;
                 }}
               >
                 ابدأ التجربة <Icon />

@@ -33,8 +33,13 @@ export function commitmentLabel(status) {
     FAILED: "ما اكتمل الطلب",
     CANCELLED: "تم الإلغاء",
     EXPIRED: "انتهت الصلاحية",
+    RELEASED: "تم فك الحجز",
   };
   return labels[status] || "تحتاج متابعة";
+}
+// تم التعديل من عبير: الحجز اللي انفك ما يظهر كتامين ناجح حتى لو كانت حالته المحفوظه SUCCESS.
+export function normalizeCommitment(row) {
+  return row?.released_at ? { ...row, status: "RELEASED" } : row;
 }
 const messages = {
   INVALID_CODE: "رمز الدخول مو صحيح تأكد منه وحاول من جديد",
@@ -215,13 +220,15 @@ export function useMarket(workspace) {
   async function getCommitment(id, signal) {
     if (workspace.demo) return null;
     try {
-      return await marketRequest(
-        "/auctions/" + encodeURIComponent(id) + "/commitment",
-        {
-          token,
-          signal,
-          base: API.replace(/\/api\/v1$/, ""),
-        },
+      return normalizeCommitment(
+        await marketRequest(
+          "/auctions/" + encodeURIComponent(id) + "/commitment",
+          {
+            token,
+            signal,
+            base: API.replace(/\/api\/v1$/, ""),
+          },
+        ),
       );
     } catch (error) {
       if (error.status === 404 && error.code === "NOT_FOUND") return null;

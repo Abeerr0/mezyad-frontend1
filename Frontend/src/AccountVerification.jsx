@@ -39,12 +39,18 @@ export function GoogleAccess() {
     </div>
   );
 }
-export function SignupVerification({ email, demo, onComplete, onClose }) {
+export function SignupVerification({
+  email,
+  demo,
+  onComplete,
+  onClose,
+  initialSeconds = 60,
+}) {
   const [code, setCode] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [success, setSuccess] = useState(false),
-    [seconds, setSeconds] = useState(60);
+    [seconds, setSeconds] = useState(initialSeconds);
   const working = useRef(false),
     timer = useRef(),
     controller = useRef();
