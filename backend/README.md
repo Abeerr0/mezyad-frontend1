@@ -26,7 +26,7 @@ cp .env.example backend/.env
 ```
 
 Review the values in backend/.env to match your local setup.
-Leave the bank settings empty because the integration is postponed.
+Set your local SMTP and Moyasar test keys to use email verification and bank commitments. Never commit secret keys.
 
 The .env file is local to your computer and must not be uploaded to GitHub.
 
@@ -61,23 +61,34 @@ If PostgreSQL is not ready yet, wait briefly and run the readiness check again.
 
 After PostgreSQL is ready, run these commands from the project root.
 
-Create the tables using the existing schema file:
+Install the backend dependencies, then run the setup script:
 
 ```bash
-docker compose exec -T db psql -U postgres -d mezyad -v ON_ERROR_STOP=1 < database/migrations/001_schema.sql
+cd backend
+npm ci
+npm run db:setup
 ```
 
-After the command succeeds, add the asset categories using the existing seed file:
+The script applies all migrations, adds categories, and seeds local development data.
+It adds six sample accounts, seven listings with images, and five auctions:
+three active (including one private), one scheduled, and one closed without bids.
+The remaining listings are pending review and rejected.
 
-```bash
-docker compose exec -T db psql -U postgres -d mezyad -v ON_ERROR_STOP=1 < database/seeds/001_categories.sql
-```
+Sample emails: tala@example.com (ADMIN), abeer@example.com, ghadi@example.com,
+aseel@example.com, arwa@example.com, ali@example.com.
+New sample accounts use Aa112233 and are already email-verified for local testing.
+Ordinary registration still uses email verification. No bank commitments are seeded.
+The private sample belongs to Ghadi; another user can enter with code 112233445566778899aabbcc.
 
-The first command creates the project tables.
-The second command adds categories to the categories table.
+Running setup again preserves existing accounts, passwords, roles, listings, auctions,
+and their dates. It does not duplicate sample records or reset auction times.
+Existing accounts with the sample emails keep their current passwords and verification state.
+Images are copied through the normal upload processing into the local upload folder.
 
-This is a first-time setup step. It does not need to be repeated whenever the project starts.
-If an error appears, resolve it before continuing.
+Sample seeding is skipped when NODE_ENV=production, when the database host is not
+local or the Docker db service, or when SEED_LOCAL_DATA=false is set in backend/.env.
+Use SEED_LOCAL_DATA=false when preparing a production database through localhost.
+No existing records are deleted.
 
 
 ## 4. Install Dependencies and Start the Backend
