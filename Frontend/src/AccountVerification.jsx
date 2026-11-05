@@ -45,12 +45,16 @@ export function SignupVerification({
   onComplete,
   onClose,
   initialSeconds = 60,
+  initialDelivery = true,
 }) {
   const [code, setCode] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [success, setSuccess] = useState(false),
     [seconds, setSeconds] = useState(initialSeconds);
+  // تم التعديل من عبير: ما نقول الرمز وصلك اذا الباك رجع ان الارسال فشل.
+  const [delivery, setDelivery] = useState(initialDelivery);
+  const [resent, setResent] = useState(false);
   const working = useRef(false),
     timer = useRef(),
     controller = useRef();
@@ -127,6 +131,8 @@ export function SignupVerification({
             resend: true,
           },
         });
+      setDelivery(true);
+      setResent(true);
       setSeconds(60);
     } catch (err) {
       setError(err.message);
@@ -158,8 +164,20 @@ export function SignupVerification({
             <p>
               {demo
                 ? "أدخل الرمز لإكمال تجربة إنشاء الحساب"
-                : "أدخل رمز التحقق اللي وصلك لإكمال إنشاء حسابك"}
+                : delivery
+                  ? "أدخل رمز التحقق اللي وصلك لإكمال إنشاء حسابك"
+                  : "حسابك انحفظ لكن تعذر إرسال رمز التحقق اطلب رمز جديد"}
             </p>
+            {resent && (
+              <p role="status">
+                تم طلب رمز جديد راجع الوارد والبريد غير المرغوب
+              </p>
+            )}
+            {!delivery && (
+              <p role="alert" className="form-error">
+                ما تم إرسال الرمز حاول إعادة الإرسال
+              </p>
+            )}
             <bdi>{email.replace(/^(.)(.*)(@.*)$/, "$1••••$3")}</bdi>
             {demo && (
               <p className="field-hint">

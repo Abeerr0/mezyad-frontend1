@@ -19,24 +19,6 @@ export const listingFields = {
       },
     ],
   },
-  "Luxury Handbags": {
-    example: "حقيبة هيرميس بيركين — جلد أسود",
-    fields: [
-      {
-        name: "العلامة التجارية",
-      },
-      {
-        name: "الموديل",
-      },
-      {
-        name: "الحالة",
-        options: ["جديدة", "مستخدمة بحالة ممتازة", "مستخدمة"],
-      },
-      {
-        name: "المقاس",
-      },
-    ],
-  },
   "Rare Vehicles": {
     example: "بورش كاريرا GT — 2005",
     fields: [

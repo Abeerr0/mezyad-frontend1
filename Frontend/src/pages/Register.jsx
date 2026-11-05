@@ -22,6 +22,8 @@ export default function Register({ workspace }) {
   const [done, setDone] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [uncertain, setUncertain] = useState(false);
+  // تم التعديل من عبير: نافذه الرمز تعرف اذا البريد انرسل فعلا او فشل.
+  const [emailSent, setEmailSent] = useState(true);
   async function submit(event) {
     event.preventDefault();
     if (busy || done || uncertain) return;
@@ -55,10 +57,7 @@ export default function Register({ workspace }) {
             password,
           },
         });
-        if (registered.emailSent === false)
-          setError(
-            "حسابك انحفظ لكن تعذر إرسال الرمز اطلب إرساله من نافذة التحقق",
-          );
+        setEmailSent(registered.emailSent === true);
       }
       setVerifying(true);
     } catch (err) {
@@ -74,6 +73,8 @@ export default function Register({ workspace }) {
         <SignupVerification
           email={email.trim().toLowerCase()}
           demo={workspace.demo}
+          initialDelivery={emailSent}
+          initialSeconds={emailSent ? 60 : 0}
           onClose={() => setVerifying(false)}
           onComplete={async () => {
             if (workspace.demo)

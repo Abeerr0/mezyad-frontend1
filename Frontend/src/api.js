@@ -119,6 +119,11 @@ export async function request(
     error.uncertain = method !== "GET";
     throw error;
   }
+  // تم التعديل من عبير: نشيل خيار الحقائب من التصفح ونموذج الاعلان ونخلي بياناته القديمه محفوظه.
+  if (path === "/categories" && Array.isArray(result.data))
+    return result.data.filter(
+      (category) => category.name !== "Luxury Handbags",
+    );
   return result.data;
 }
 

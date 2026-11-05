@@ -16,26 +16,8 @@ export function newEmailCode() {
   return String(number).padStart(6, "0");
   // نهاية دالة توليد الرمز
 }
-// داله تستقبل ايميل المستخدم والرمز وترسل الرساله
-export async function sendVerificationCode(email, code) {
-  // نبدأ فحص الايميل
-  if (
-    // نرفض اذا الايميل مو نص
-    typeof email !== "string" ||
-    // نرفض اذا صيغة الايميل غير صحيحه
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    // اذا تحقق اي سبب للرفض ندخل هنا
-  ) {
-    // نوقف الداله بخطا يوضح ان الايميل غير صالح
-    throw new Error("Invalid email");
-    // نهاية فحص الايميل
-  }
-  // نرفض اذا الرمز مو نص من ٦ ارقام
-  if (typeof code !== "string" || !/^\d{6}$/.test(code)) {
-    // نوقف الداله اذا صيغة الرمز غلط
-    throw new Error("Invalid verification code");
-    // نهاية فحص الرمز
-  }
+// تم التعديل من عبير: نعيد استخدام اتصال البريد ونحدد مهل الاتصال عشان الطلب ما يعلق.
+function emailTransport() {
   // نبدأ فحص اعدادات خدمة البريد
   if (
     // نرفض اذا عنوان خادم البريد مو موجود
@@ -78,16 +60,52 @@ export async function sendVerificationCode(email, code) {
         pass: process.env.SMTP_PASS,
         // نهاية بيانات الدخول
       },
-      // ننتظر انشاء الاتصال ١٠ ثواني كحد اقصى
-      connectionTimeout: 10000,
-      // نوقف الاتصال اذا ما صار فيه نشاط لمدة ١٥ ثانيه
-      socketTimeout: 15000,
+      // تم التعديل من عبير: مهله الاتصال والتحيه ست ثواني عشان نرجع خطا واضح بسرعه.
+      pool: true,
+      maxConnections: 2,
+      maxMessages: 50,
+      greetingTimeout: 6000,
+      connectionTimeout: 6000,
+      // تم التعديل من عبير: نوقف الاتصال بعد عشر ثواني بدون نشاط.
+      socketTimeout: 10000,
       // نهاية تجهيز اداة الارسال
     });
     // نهاية شرط تجهيز الاداة اول مره
   }
+  return transporter;
+}
+// تم التعديل من عبير: نفحص اعدادات SMTP بدون ارسال رساله او طباعه المفاتيح.
+export async function verifyMailConfiguration() {
+  try {
+    await emailTransport().verify();
+  } finally {
+    transporter?.close();
+    transporter = null;
+  }
+}
+// داله تستقبل ايميل المستخدم والرمز وترسل الرساله
+export async function sendVerificationCode(email, code) {
+  // نبدأ فحص الايميل
+  if (
+    // نرفض اذا الايميل مو نص
+    typeof email !== "string" ||
+    // نرفض اذا صيغة الايميل غير صحيحه
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    // اذا تحقق اي سبب للرفض ندخل هنا
+  ) {
+    // نوقف الداله بخطا يوضح ان الايميل غير صالح
+    throw new Error("Invalid email");
+    // نهاية فحص الايميل
+  }
+  // نرفض اذا الرمز مو نص من ٦ ارقام
+  if (typeof code !== "string" || !/^\d{6}$/.test(code)) {
+    // نوقف الداله اذا صيغة الرمز غلط
+    throw new Error("Invalid verification code");
+    // نهاية فحص الرمز
+  }
+  const sender = emailTransport();
   // نرسل الرساله ونحفظ رد خادم البريد
-  const result = await transporter.sendMail({
+  const result = await sender.sendMail({
     // ناخذ عنوان المرسل ونستخدم حساب الارسال اذا ما تحدد
     from: process.env.MAIL_FROM || process.env.SMTP_USER,
     // نرسل الرساله الى ايميل المستخدم
@@ -149,6 +167,11 @@ export async function saveAndSendCode(user) {
   } catch (error) {
     // نطبع نوع الخطا بدون رمز التحقق
     console.error("Email send failed", error.code || "SMTP_ERROR");
+    // تم التعديل من عبير: اذا فشل الارسال نلغي الرمز ونسمح بطلب جديد بدون انتظار وهمي ونحمي الرمز الاحدث.
+    await query(
+      "UPDATE users SET email_code_hash=NULL,email_code_expires_at=NULL,email_code_sent_at=NULL WHERE id=$1 AND email_code_hash=$2 AND email_verified_at IS NULL",
+      [user.id, codeHash],
+    );
     // نرجع ان الارسال فشل
     return false;
     // نهاية معالجة خطا الارسال

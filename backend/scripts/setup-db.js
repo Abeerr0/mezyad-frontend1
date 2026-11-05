@@ -2,6 +2,7 @@ import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import { pool } from "../src/db.js";
 import { localSeedEnabled, seedLocal } from "./seed-local.js";
+import { refreshLocalListings } from "./refresh-local.js";
 import { removeImages } from "../src/uploads.js";
 
 if (!process.env.DATABASE_URL) throw new Error("Set DATABASE_URL before setup");
@@ -28,7 +29,11 @@ try {
     );
   }
   // تم التعديل من عبير: بعد الجداول نضيف بيانات محليه بدون تغيير الموجود او منطق البنك والبريد.
-  if (localSeedEnabled()) await seedLocal(client, savedImages);
+  if (localSeedEnabled()) {
+    await seedLocal(client, savedImages);
+    // تم التعديل من عبير: نشغل اصلاح اعلانات الاختبار القديمه بعد اضافه البيانات المحليه.
+    await refreshLocalListings(client, savedImages);
+  }
   await client.query("COMMIT");
   committed = true;
   console.log("Database schema and categories ready");

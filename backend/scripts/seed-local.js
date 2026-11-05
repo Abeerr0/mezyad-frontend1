@@ -56,6 +56,7 @@ export async function seedLocal(client, savedImages) {
     ["private", "ghadi", 2, "APPROVED", "PRIVATE", "ACTIVE"],
     ["upcoming", "aseel", 1, "APPROVED", "PUBLIC", "SCHEDULED"],
     ["closed", "arwa", 3, "APPROVED", "PUBLIC", "CLOSED"],
+    // تم التعديل من عبير: نحافظ على معرف الاعلان القديم لكن محتوى العنصر الرابع صار ارض.
     ["bag", "ali", 4, "APPROVED", "PUBLIC", "ACTIVE"],
     ["pending", "abeer", 4, "PENDING_REVIEW"],
     ["rejected", "ghadi", 2, "REJECTED"],

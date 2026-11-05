@@ -189,9 +189,8 @@ export default function Profile({ workspace }) {
             >
               اعتمد صورتي <Icon name="check" />
             </button>
-            <p className="avatar-storage-note">
-              اختيارك محفوظ لهذا الحساب على هذا المتصفح
-            </p>
+            {/* تم التعديل من عبير: نشيل تحديد المتصفح من نص اختيار الافتار. */}
+            <p className="avatar-storage-note">اختيارك محفوظ لهذا الحساب</p>
             <p role="status">{avatarMessage}</p>
           </section>
           {/* تم التعديل من عبير: الاسم قابل للتعديل والبريد ثابت والامان بنفس كرت الحساب. */}

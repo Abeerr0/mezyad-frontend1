@@ -22,11 +22,6 @@ export const demoCategories = [
     name: "Camels",
     label: "الإبل",
   },
-  {
-    id: "bags",
-    name: "Luxury Handbags",
-    label: "الحقائب الفاخرة",
-  },
 ];
 export const categoryLabels = Object.fromEntries(
   demoCategories.map((c) => [c.name, c.label]),
