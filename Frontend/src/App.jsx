@@ -28,7 +28,7 @@ import CreateListing from "./pages/CreateListing";
 import EditListing from "./pages/EditListing";
 import CreateAuction from "./pages/CreateAuction";
 import { useWorkspace } from "./workspace";
-import { API, imageUrl } from "./api";
+import { API, imageUrl, request } from "./api";
 import { Icon } from "./components";
 import { categoryLabels, demoAuctions, demoCategories } from "./data";
 const pageTitles = {
@@ -145,14 +145,12 @@ export default function App() {
         const params = new URLSearchParams();
         if (category) params.set("categoryId", category);
         if (status) params.set("status", status);
+        // تم التعديل من عبير: نستخدم طلب API الموحد ونظهر سبب فشل القائمه بدل رساله وحده لكل الاخطاء.
         async function get(path) {
-          const response = await fetch(API + path, {
-            signal: controller.signal,
-          });
-          const json = await response.json();
-          if (!response.ok || !Array.isArray(json.data))
-            throw new Error("Invalid API response");
-          return json.data;
+          const rows = await request(path, { signal: controller.signal });
+          if (!Array.isArray(rows))
+            throw new Error("وصلت قائمة غير مكتملة حاول تحديث الصفحة");
+          return rows;
         }
         const [categories, auctions] = await Promise.all([
           get("/categories"),
@@ -182,7 +180,9 @@ export default function App() {
             auctions: [],
             categories: [],
           });
-          setError("تعذّر تحميل المزادات الآن حاول مرة ثانية بعد شوي");
+          setError(
+            err.message || "تعذّر تحميل المزادات الآن حاول مرة ثانية بعد شوي",
+          );
         }
       } finally {
         if (active) setLoading(false);

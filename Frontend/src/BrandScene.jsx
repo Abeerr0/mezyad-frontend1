@@ -35,15 +35,15 @@ const scenes = {
     "guide",
   ],
   "private-access": [
-    "heritage",
-    "gold-birds",
+    "brand/masmak.jpg",
+    null,
     "مزاد خاص، بدعوتك",
     "رمزك يفتح لك تفاصيل المزاد اللي انَدعيت له",
     "تصفح المزادات العامة",
     "auctions",
   ],
   profile: [
-    "riyadh-drive",
+    "brand/murabba.jpg",
     "timepieces",
     "لك حضورك في المزاد",
     "اختر الصورة اللي تمثلك، وخلّ حسابك بطابعك",
@@ -51,7 +51,7 @@ const scenes = {
     "activity",
   ],
   listings: [
-    "collection",
+    "brand/bujairi.jpg",
     "burgundy-classic",
     "كل أصل له حكاية",
     "وضّح التفاصيل، وخلّ الصور تحكي الباقي",
@@ -59,7 +59,7 @@ const scenes = {
     "create-listing",
   ],
   activity: [
-    "desert-drive",
+    "brand/kindi.jpg",
     "black-coupe",
     "خطوتك الجاية تبدأ هنا",
     "تابع أصولك، وخلك قريب من المزاد",
@@ -71,16 +71,20 @@ export default function BrandScene({ page }) {
   const scene = scenes[page];
   if (!scene) return null;
   const [photo, cutout, title, text, label, link] = scene;
+  // تم التعديل من عبير: لكل صفحه صوره مختلفه وما نكرر صور العروض داخل هويه الموقع.
+  const photoPath = photo.includes("/")
+    ? "/images/" + photo
+    : `/images/notion/${photo}.webp`;
   return (
     <section className={"container brand-scene brand-scene-" + page}>
       <div className="brand-scene-photo">
         <img
-          src={`/images/notion/${photo}.webp`}
+          src={photoPath}
           loading="lazy"
           alt={
-            photo === "heritage"
-              ? "نخيل وعمارة بطابع نجدي"
-              : "سيارات وملامح من البيئة السعودية"
+            photo.startsWith("brand/") || photo === "heritage"
+              ? "تفاصيل من العماره والاحياء السعوديه"
+              : "تفاصيل من عالم مزياد"
           }
         />
       </div>
@@ -92,13 +96,18 @@ export default function BrandScene({ page }) {
           {label} <span aria-hidden="true">←</span>
         </a>
       </div>
-      {!["red-classic","black-coupe","burgundy-classic"].includes(cutout) && <img
-        className="brand-scene-cutout"
-        src={`/images/notion/${cutout}.webp`}
-        loading="lazy"
-        alt=""
-        aria-hidden="true"
-      />}
+      {cutout &&
+        !["red-classic", "black-coupe", "burgundy-classic"].includes(
+          cutout,
+        ) && (
+          <img
+            className="brand-scene-cutout"
+            src={`/images/notion/${cutout}.webp`}
+            loading="lazy"
+            alt=""
+            aria-hidden="true"
+          />
+        )}
     </section>
   );
 }

@@ -183,10 +183,11 @@ export function PasswordField({
 export function AuthLayout({ register, children }) {
   return (
     <section className="auth-layout">
+      {/* تم التعديل من عبير: نرجع صوره هويه الحساب مثل قبل ونفصلها عن صور العروض. */}
       <aside className="auth-art">
         <img
-          src="/images/catalog/landcruiser-field.jpg"
-          alt={"لاندكروزر كلاسيكي بتصوير حقيقي"}
+          src="/images/porsche-carrera-gt.jpg"
+          alt={"بورش فضيه ضمن مجموعه سيارات كلاسيكيه"}
         />
         <div className="auth-art-shade" />
         <div className="auth-art-top">

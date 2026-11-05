@@ -118,10 +118,11 @@ export default function Guide({ onFeature }) {
             </a>
           </div>
         </section>
+        {/* تم التعديل من عبير: نخلي صوره الدليل مختلفه عن صوره الرئيسيه. */}
         <section className="brand-editorial">
           <img
-            src="/images/riyadh-architecture.webp"
-            alt={"عمارة حديثة ونخلة في الرياض"}
+            src="/images/hittin-villa.jpg"
+            alt={"تفاصيل معماريه لفيلا في الرياض"}
             loading="lazy"
           />
           <div>

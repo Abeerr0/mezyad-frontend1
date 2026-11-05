@@ -1,7 +1,14 @@
-export const API = (import.meta.env.VITE_API_URL || "/api/v1").replace(
-  /\/+$/,
-  "",
-);
+// تم التعديل من عبير: نقبل عنوان الباك مع مسار API او بدونه عشان الاعداد المحلي ما يكرر المسار.
+export function normalizeApiBase(value) {
+  const base = String(value || "/api/v1")
+    .trim()
+    .replace(/\/+$/, "");
+  if (!base || base === "/") return "/api/v1";
+  if (/\/api\/v1$/i.test(base)) return base;
+  if (/\/api$/i.test(base)) return base + "/v1";
+  return base + "/api/v1";
+}
+export const API = normalizeApiBase(import.meta.env.VITE_API_URL);
 const messages = {
   EMAIL_NOT_VERIFIED: "أكد بريدك الإلكتروني عشان تكمل الدخول",
   ALREADY_VERIFIED: "بريدك مؤكد تقدر تسجل دخولك",
@@ -71,14 +78,27 @@ export async function request(
             ? JSON.stringify(body)
             : undefined,
     });
+    // تم التعديل من عبير: نفرق بين رد الباك وصفحه HTML اللي ترجع اذا عنوان API غلط.
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const error = new Error(
+        "عنوان خدمة الموقع غير صحيح حدّث الصفحة أو تواصل مع الدعم",
+      );
+      error.code = "API_RESPONSE_INVALID";
+      error.uncertain = method !== "GET";
+      error.status = response.status;
+      throw error;
+    }
     result = await response.json();
   } catch (cause) {
-    if (cause.name === "AbortError") throw cause;
+    if (cause.name === "AbortError" || cause.code === "API_RESPONSE_INVALID")
+      throw cause;
     const error = new Error(
       method === "GET"
         ? "تعذّر الاتصال تحقق من اتصالك وحاول مرة ثانية"
         : "انقطع الاتصال وما تأكدنا من حفظ الطلب تحقق من حسابك قبل إعادة الإرسال",
     );
+    error.code = "API_UNREACHABLE";
     error.uncertain = method !== "GET";
     throw error;
   }
