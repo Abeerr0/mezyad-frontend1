@@ -10,6 +10,7 @@ export function normalizeApiBase(value) {
 }
 export const API = normalizeApiBase(import.meta.env.VITE_API_URL);
 const messages = {
+  BACKEND_UNAVAILABLE: "الخدمة غير متاحة مؤقتا حاول بعد شوي",
   EMAIL_NOT_VERIFIED: "أكد بريدك الإلكتروني عشان تكمل الدخول",
   ALREADY_VERIFIED: "بريدك مؤكد تقدر تسجل دخولك",
   TOO_SOON: "انتظر دقيقة قبل طلب رمز جديد",
@@ -82,7 +83,7 @@ export async function request(
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
       const error = new Error(
-        "عنوان خدمة الموقع غير صحيح حدّث الصفحة أو تواصل مع الدعم",
+        response.status >= 500 ? "الخدمة غير متاحة مؤقتا حاول بعد شوي" : "وصل رد غير متوقع من الخدمة حاول تحديث الصفحة",
       );
       error.code = "API_RESPONSE_INVALID";
       error.uncertain = method !== "GET";

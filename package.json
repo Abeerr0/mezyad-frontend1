@@ -1,0 +1,7 @@
+{
+  "name": "mezyad",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev-local.mjs"
+  }
+}
