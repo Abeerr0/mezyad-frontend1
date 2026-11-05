@@ -10,14 +10,16 @@ import {
 
 // تم التعديل من عبير: نقرأ حاله البنك من السيرفر فقط ونتجاهل اي نجاح مكتوب بالرابط.
 export default function BankStatus({ market, id }) {
-  const state = useAuction(market, id, { commitment: true });
+  const state = useAuction(market, id, {
+    commitment: true,
+  });
   const bank = state.commitment;
   return (
     <AuctionLayout
       market={market}
-      title="وين وصل التزامك؟"
-      eyebrow="متابعة الالتزام"
-      description="تابع حالة التزامك، واعرف متى تقدر تدخل المنافسة."
+      title={"وين وصل التزامك؟"}
+      eyebrow={"متابعة الالتزام"}
+      description={"تابع حالة التزامك، واعرف متى تقدر تدخل المنافسة"}
     >
       <SignInGate market={market}>
         <AuctionState state={state}>
@@ -32,15 +34,15 @@ export default function BankStatus({ market, id }) {
             <p className="eyebrow">حالة الالتزام</p>
             <h2>
               {bank?.status === "SUCCESS"
-                ? "وصل تأكيد الالتزام."
+                ? "وصل تأكيد الالتزام"
                 : bank
-                  ? "طلبك له حالة مسجلة."
-                  : "ما وصل تأكيد التزام."}
+                  ? "طلبك له حالة مسجلة"
+                  : "ما وصل تأكيد التزام"}
             </h2>
             <p>
               {market.demo
-                ? "طلب الالتزام غير متاح في نسخة التجربة."
-                : "بعد تأكيد الالتزام، تقدر تنتقل للمزاد وتقدّم عرضك."}
+                ? "طلب الالتزام غير متاح في نسخة التجربة"
+                : "بعد تأكيد الالتزام، تقدر تنتقل للمزاد وتقدّم عرضك"}
             </p>
             {bank && (
               <dl className="spec-list">

@@ -1,0 +1,232 @@
+/* تم التعديل من عبير: نوحد شكل لوحه اسيل مع هويه الموقع بدون تغيير قرارات المراجعه او طلبات API. */
+.admin-review-aseel {
+  position: relative;
+  min-width: 0;
+}
+.admin-review-aseel > h2 {
+  font:
+    600 28px Cairo,
+    sans-serif;
+  margin: 20px 0 10px;
+}
+.admin-review-aseel .page-intro {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 2;
+}
+.admin-review-aseel button {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fffdf8;
+  color: #343b2e;
+  padding: 11px 20px;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.admin-review-aseel button:hover {
+  box-shadow: 0 7px 20px #303b2514;
+  transform: translateY(-2px);
+}
+.admin-review-aseel button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.admin-review-aseel .admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 30px 0;
+}
+.admin-review-aseel .admin-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 20px;
+  min-height: 145px;
+  padding: 22px;
+  background: #fffdf7;
+  box-shadow: 0 7px 24px #3034220a;
+  border-radius: 22px;
+  text-align: start;
+}
+.admin-review-aseel .admin-stat span {
+  font-size: 12px;
+  color: #757963;
+}
+.admin-review-aseel .admin-stat strong {
+  font-size: 34px;
+  line-height: 1;
+  color: #303b2c;
+}
+.admin-review-aseel .admin-stat-pending {
+  background: #2b3328;
+}
+.admin-review-aseel .admin-stat-pending span,
+.admin-review-aseel .admin-stat-pending strong {
+  color: #fff6dc;
+}
+.admin-review-aseel .admin-tabs {
+  display: flex;
+  gap: 8px;
+  background: #eeece0;
+  padding: 7px;
+  border-radius: 18px;
+  width: fit-content;
+  margin: 20px 0;
+}
+.admin-review-aseel .admin-tabs button {
+  border: 0;
+  background: transparent;
+}
+.admin-review-aseel .admin-tabs [aria-selected="true"] {
+  background: #2b3328;
+  color: #fff6dc;
+}
+.admin-review-aseel .review-card,
+.admin-review-aseel .review-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 22px;
+  align-items: center;
+  background: #fffdf7;
+  border: 1px solid var(--line);
+  padding: 22px;
+  border-radius: 23px;
+  margin: 18px 0;
+  box-shadow: 0 7px 24px #30342209;
+}
+.admin-review-aseel .listing-info p {
+  font-size: 13px;
+  line-height: 2;
+  color: var(--muted);
+  white-space: pre-line;
+}
+.admin-review-aseel .listing-info h3 {
+  font:
+    600 21px Cairo,
+    sans-serif;
+}
+.admin-review-aseel .review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.admin-review-aseel .listing-photo {
+  width: 100%;
+  height: 165px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+.admin-review-aseel .review-card > button,
+.admin-review-aseel .review-decisions {
+  grid-column: 1/-1;
+  justify-self: start;
+}
+.admin-review-aseel .review-decisions {
+  display: flex;
+  gap: 10px;
+}
+.admin-review-aseel .listing-status {
+  color: #957139;
+  background: #eee8d8;
+  padding: 5px 12px;
+  border-radius: 25px;
+  width: fit-content;
+}
+.admin-review-aseel .admin-auctions {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.admin-review-aseel .admin-auctions article {
+  background: #fffdf7;
+  border: 1px solid var(--line);
+  padding: 22px;
+  border-radius: 22px;
+}
+.admin-review-aseel .review-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: #171d18a6;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+.admin-review-aseel .review-modal {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid #d6c8a3;
+  border-radius: 26px;
+  padding: 30px;
+  background: #fffdf7;
+  box-shadow: 0 25px 100px #0004;
+}
+.admin-review-aseel .review-modal p {
+  font-size: 13px;
+  line-height: 2;
+}
+.admin-review-aseel .review-modal textarea {
+  display: block;
+  width: 100%;
+  margin-block: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+}
+.admin-review-aseel .review-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+.admin-review-aseel .primary {
+  background: #2b3328;
+  color: #fff6dc;
+}
+.admin-review-aseel .admin-back {
+  margin-bottom: 10px;
+}
+@media (max-width: 700px) {
+  .admin-review-aseel .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-review-aseel .review-card,
+  .admin-review-aseel .review-detail {
+    grid-template-columns: 1fr;
+  }
+  .admin-review-aseel .review-images {
+    grid-row: 1;
+  }
+  .admin-review-aseel .admin-auctions {
+    grid-template-columns: 1fr;
+  }
+  .admin-review-aseel .admin-tabs {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .admin-review-aseel .admin-tabs button {
+    flex: 1;
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-review-aseel button {
+    transition: none;
+  }
+}
+
+/* تم التعديل من عبير: نخلي عنوان الاداره مره وحده ونبقي عنوان الصفحه للقارئ الصوتي. */
+.account-page-admin .account-main > .account-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

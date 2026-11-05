@@ -8,9 +8,9 @@ export default function CreateListing({ workspace }) {
     <AccountLayout
       workspace={workspace}
       active="listings"
-      eyebrow="ابدأ حكاية جديدة"
-      title="اعرض أصلك"
-      description="أربع خطوات بسيطة، وإعلانك يوصل للمراجعة."
+      eyebrow={"ابدأ حكاية جديدة"}
+      title={"اعرض أصلك"}
+      description={"أربع خطوات بسيطة، وإعلانك يوصل للمراجعة"}
     >
       <ResourceState workspace={workspace}>
         {workspace.user && <ListingEditor workspace={workspace} />}

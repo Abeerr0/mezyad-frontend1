@@ -2,7 +2,6 @@ import "./account-components.css";
 import { Avatar } from "./Avatar";
 import React, { useState } from "react";
 import { Auctioneer, Icon } from "./components";
-
 export const listingLabels = {
   PENDING_REVIEW: "قيد المراجعة",
   APPROVED: "معتمد",
@@ -36,11 +35,11 @@ export function AccountLayout({
     return (
       <section className="container access-gate">
         <Auctioneer small character="collector" motion="inspect" />
-        <p className="eyebrow">مجلسك له مكان</p>
-        <h1>سجّل دخولك، وكمّل.</h1>
+        <p className="eyebrow">مزادك له مكان</p>
+        <h1>سجّل دخولك، وكمّل</h1>
         <p>
           {workspace.notice ||
-            "إعلاناتك وبياناتك تخصك. ادخل لحسابك عشان تقدر تشوفها."}
+            "إعلاناتك وبياناتك تخصك ادخل لحسابك عشان تقدر تشوفها"}
         </p>
         <a
           className="button dark"
@@ -63,14 +62,20 @@ export function AccountLayout({
             <small>{workspace.demo ? "حساب تجربة" : "عضو مزياد"}</small>
           </div>
         </div>
-        <nav aria-label="صفحات حسابي">
-          {[
-            ["activity", "نشاطي", "gavel"],
-            // تم التعديل من عبير: نضيف رابط المتابعه للمجموعه الخامسه بدون تغيير صفحات الحساب.
-            ["my-auctions", "مزاداتي ومشاركاتي", "flag"],
-            ["listings", "إعلاناتي", "image"],
-            ["profile", "الملف الشخصي", "user"],
-          ].map(([page, label, icon]) => (
+        <nav aria-label={"صفحات حسابي"}>
+          {(workspace.user.role === "ADMIN"
+            ? [
+                ["admin", "لوحة الإدارة", "shield"],
+                ["profile", "الملف الشخصي", "user"],
+              ]
+            : [
+                ["activity", "نشاطي", "gavel"],
+                // تم التعديل من عبير: نضيف رابط المتابعه للمجموعه الخامسه بدون تغيير صفحات الحساب.
+                ["my-auctions", "مزاداتي ومشاركاتي", "flag"],
+                ["listings", "إعلاناتي", "image"],
+                ["profile", "الملف الشخصي", "user"],
+              ]
+          ).map(([page, label, icon]) => (
             <a
               key={page}
               href={"#/" + page}
@@ -86,13 +91,13 @@ export function AccountLayout({
         <div className="sidebar-tip">
           <Auctioneer small character="collector" motion="inspect" />
           <p>
-            كل أصل له حكاية.
+            كل أصل له حكاية
             <br />
-            خلّ التفاصيل تحكي عن أصلك.
+            خلّ التفاصيل تحكي عن أصلك
           </p>
         </div>
         <button className="logout-button" disabled={exiting} onClick={exit}>
-          {exiting ? "جاري الخروج…" : "تسجيل الخروج"}{" "}
+          {exiting ? "جاري الخروج" : "تسجيل الخروج"}{" "}
           <Icon name="arrow" size={16} />
         </button>
         {exitError && (
@@ -119,13 +124,12 @@ export function AccountLayout({
     </div>
   );
 }
-
 export function ResourceState({ workspace, children }) {
   if (workspace.loading)
     return (
       <div className="account-loading" role="status">
         <span className="loading-ring" />
-        جاري تجهيز بياناتك…
+        جاري تجهيز بياناتك
       </div>
     );
   if (workspace.error)
@@ -176,14 +180,13 @@ export function PasswordField({
     </label>
   );
 }
-
 export function AuthLayout({ register, children }) {
   return (
     <section className="auth-layout">
       <aside className="auth-art">
         <img
-          src="/images/porsche-carrera-gt.jpg"
-          alt="بورش كلاسيكية بلون فضي"
+          src="/images/catalog/landcruiser-field.jpg"
+          alt={"لاندكروزر كلاسيكي بتصوير حقيقي"}
         />
         <div className="auth-art-shade" />
         <div className="auth-art-top">
@@ -192,27 +195,27 @@ export function AuthLayout({ register, children }) {
         </div>
         <div className="auth-art-copy">
           <p className="eyebrow">
-            {register ? "بداية تستحق" : "رجعت، ونوّر المجلس"}
+            {register ? "بداية تستحق" : "رجعت، ونوّر المزاد"}
           </p>
           <h2>
-            أصول استثنائية.
+            أصول استثنائية
             <br />
-            <em>ومكانك بينها.</em>
+            <em>ومكانك بينها</em>
           </h2>
           <p>
-            حساب واحد تبيع فيه، وتزايد منه.
+            حساب واحد تبيع فيه، وتزايد منه
             <br />
-            كل خطوة واضحة، وكل قرار لك.
+            كل خطوة واضحة، وكل قرار لك
           </p>
         </div>
         <div className="auth-art-bottom">
-          <span>مزياد · للقيمة عنوان</span>
-          <span>للقيمة أهلها.</span>
+          <span>مزياد للقيمة عنوان</span>
+          <span>للقيمة أهلها</span>
         </div>
       </aside>
       <div className="auth-form-panel">
         <a className="back-link" href="#/">
-          <Icon size={17} /> الرجوع للمجلس
+          <Icon size={17} /> الرجوع للمزاد
         </a>
         {children}
       </div>

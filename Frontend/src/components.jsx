@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-
 export function Icon({ name = "arrow", size = 20, ...props }) {
   const paths = {
     arrow: "M19 12H5m6-6-6 6 6 6",
@@ -205,11 +204,10 @@ export function Auctioneer({
     </svg>
   );
 }
-
 export const money = (value) =>
-  new Intl.NumberFormat("ar-SA", { maximumFractionDigits: 2 }).format(
-    Number(value || 0),
-  );
+  new Intl.NumberFormat("ar-SA", {
+    maximumFractionDigits: 2,
+  }).format(Number(value || 0));
 export const dateText = (value) =>
   new Intl.DateTimeFormat("ar-SA", {
     dateStyle: "medium",
@@ -221,7 +219,6 @@ export const statusLabels = {
   SCHEDULED: "قريبًا",
   CLOSED: "منتهٍ",
 };
-
 export function AuctionCard({ auction, onOpen }) {
   // تم التعديل من عبير: نتنقل بين صور الاصل على البطاقه بدون فتح التفاصيل.
   const photos = [
@@ -246,7 +243,6 @@ export function AuctionCard({ auction, onOpen }) {
     const t = setInterval(() => setPhoto((n) => (n + 1) % photos.length), 2200);
     return () => clearInterval(t);
   }, [hovering, photos.length]);
-
   return (
     <article
       className="auction-card"
@@ -281,7 +277,7 @@ export function AuctionCard({ auction, onOpen }) {
         </span>
       </button>
       {photos.length > 1 && (
-        <div className="card-gallery" aria-label="صور المزاد">
+        <div className="card-gallery" aria-label={"صور المزاد"}>
           {photos.map((p, i) => (
             <button
               key={p}
@@ -299,7 +295,7 @@ export function AuctionCard({ auction, onOpen }) {
       <div className="card-price">
         <span>{auction.bid_count ? "أعلى عرض حالي" : "سعر البداية"}</span>
         <strong>
-          {money(auction.current_price)} <small>ر.س</small>
+          {money(auction.current_price)} <small>ريال</small>
         </strong>
       </div>
       <div className="card-bottom">
@@ -322,13 +318,12 @@ export function AuctionCard({ auction, onOpen }) {
     </article>
   );
 }
-
 export function StatePanel({ loading, error, onRetry }) {
   if (loading)
     return (
       <div
         className="skeleton-grid"
-        aria-label="جاري تحميل المزادات"
+        aria-label={"جاري تحميل المزادات"}
         role="status"
       >
         {[1, 2, 3].map((n) => (
@@ -385,7 +380,7 @@ export function Modal({ title, children, onClose }) {
       <button
         className="icon-button modal-close"
         onClick={onClose}
-        aria-label="إغلاق"
+        aria-label={"إغلاق"}
       >
         <Icon name="close" />
       </button>

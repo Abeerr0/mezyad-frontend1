@@ -52,7 +52,9 @@ export default function ListingEditor({ workspace, existing }) {
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [files]);
   useEffect(() => {
-    stepRef.current?.focus({ preventScroll: true });
+    stepRef.current?.focus({
+      preventScroll: true,
+    });
   }, [step]);
   function chooseFiles(chosen) {
     const next = [...files, ...chosen];
@@ -80,19 +82,19 @@ export default function ListingEditor({ workspace, existing }) {
     };
   }
   function checkStep() {
-    if (step === 0 && !category) return "اختر تصنيف الأصل عشان نكمل.";
+    if (step === 0 && !category) return "اختر تصنيف الأصل عشان نكمل";
     if (step === 1) {
       const issue = categoryIssue(schema, details);
       if (issue) return issue;
       if (!title.trim() || Array.from(title.trim()).length > 240)
-        return "اكتب عنوان واضح، بحد أقصى 240 حرف.";
+        return "اكتب عنوان واضح، بحد أقصى 240 حرف";
       if (!description.trim() || description.length > 20000)
-        return "اكتب وصف الأصل، بحد أقصى 20,000 حرف.";
+        return "اكتب وصف الأصل، بحد أقصى 20,000 حرف";
       const filled = specs.filter((s) => s.name.trim() || s.value.trim());
       if (filled.some((s) => !s.name.trim() || !s.value.trim()))
-        return "كل مواصفة تحتاج اسم وقيمة، أو احذف السطر الفاضي.";
+        return "كل مواصفة تحتاج اسم وقيمة، أو احذف السطر الفاضي";
       if (new Set(filled.map((s) => s.name.trim())).size !== filled.length)
-        return "اسم المواصفة مكرر. خلّ لكل مواصفة اسم مختلف.";
+        return "اسم المواصفة مكرر خلّ لكل مواصفة اسم مختلف";
     }
     if (step === 2) return validateImages(files, !existing);
     return "";
@@ -107,7 +109,14 @@ export default function ListingEditor({ workspace, existing }) {
   }
   function changeSpec(index, field, value) {
     setSpecs((old) =>
-      old.map((row, n) => (n === index ? { ...row, [field]: value } : row)),
+      old.map((row, n) =>
+        n === index
+          ? {
+              ...row,
+              [field]: value,
+            }
+          : row,
+      ),
     );
   }
   async function submit(event) {
@@ -131,7 +140,7 @@ export default function ListingEditor({ workspace, existing }) {
         existing,
       );
       setSaved(result);
-      notify("إعلانك جاهز للمراجعة.");
+      notify("إعلانك جاهز للمراجعة");
       if (existing)
         location.hash =
           "/listings?item=" + encodeURIComponent(result.id) + "&saved=1";
@@ -149,13 +158,13 @@ export default function ListingEditor({ workspace, existing }) {
           <Icon name="check" size={36} />
         </div>
         <p className="eyebrow">وصلت حكاية أصلك</p>
-        <h2>{existing ? "تمت إعادة الإرسال." : "إعلانك جاهز للمراجعة."}</h2>
+        <h2>{existing ? "تمت إعادة الإرسال" : "إعلانك جاهز للمراجعة"}</h2>
         <p>
           {workspace.demo
-            ? "إعلان التجربة جاهز. حالته الآن قيد المراجعة."
-            : "حُفظ إعلانك وصوره بحالة قيد المراجعة. تقدر تتابع القرار من إعلاناتك."}
+            ? "إعلان التجربة جاهز حالته الآن قيد المراجعة"
+            : "حُفظ إعلانك وصوره بحالة قيد المراجعة تقدر تتابع القرار من إعلاناتك"}
         </p>
-        <p>الخطوة الجاية: بعد الاعتماد تقدر تجهّز المزاد.</p>
+        <p>الخطوة الجاية: بعد الاعتماد تقدر تجهّز المزاد</p>
         <a
           className="button dark"
           href={"#/listings?item=" + encodeURIComponent(saved.id)}
@@ -167,7 +176,7 @@ export default function ListingEditor({ workspace, existing }) {
   return (
     <div className="editor-layout">
       <section className="paper-card editor-card">
-        <ol className="editor-steps" aria-label="خطوات الإعلان">
+        <ol className="editor-steps" aria-label={"خطوات الإعلان"}>
           {["التصنيف", "التفاصيل", "الصور", "المراجعة"].map((label, n) => (
             <li
               key={label}
@@ -183,8 +192,7 @@ export default function ListingEditor({ workspace, existing }) {
           <div className="rejection-note">
             <strong>خلّنا نعدّل الملاحظات</strong>
             <p>
-              {existing.review_reason ||
-                "راجع تفاصيل إعلانك قبل إعادة الإرسال."}
+              {existing.review_reason || "راجع تفاصيل إعلانك قبل إعادة الإرسال"}
             </p>
           </div>
         )}
@@ -195,7 +203,7 @@ export default function ListingEditor({ workspace, existing }) {
                 <>
                   <p className="eyebrow">01 / البداية</p>
                   <h2>وش الأصل اللي عندك؟</h2>
-                  <p>اختر تصنيف يناسبه، وبعدها نحكي تفاصيله.</p>
+                  <p>اختر تصنيف يناسبه، وبعدها نحكي تفاصيله</p>
                   <div className="category-choices">
                     {workspace.categories.map((c, index) => (
                       <button
@@ -233,8 +241,8 @@ export default function ListingEditor({ workspace, existing }) {
                   </div>
                   {!workspace.categories.length && (
                     <p role="alert">
-                      ما فيه تصنيفات متاحة حاليًا. حدّث بيانات الحساب وحاول مرة
-                      ثانية.
+                      ما فيه تصنيفات متاحة حاليًا حدّث بيانات الحساب وحاول مرة
+                      ثانية
                     </p>
                   )}
                 </>
@@ -242,11 +250,11 @@ export default function ListingEditor({ workspace, existing }) {
               {step === 1 && (
                 <>
                   <p className="eyebrow">02 / الحكاية</p>
-                  <h2>التفاصيل تصنع الفرق.</h2>
+                  <h2>التفاصيل تصنع الفرق</h2>
                   <p>
                     {existing
-                      ? "التصنيف ثابت بعد الرفض. تقدر تعدّل العنوان والوصف والمواصفات."
-                      : "وصف واضح يساعد المهتمين يفهمون قيمة أصلك."}
+                      ? "التصنيف ثابت بعد الرفض تقدر تعدّل العنوان والوصف والمواصفات"
+                      : "وصف واضح يساعد المهتمين يفهمون قيمة أصلك"}
                   </p>
                   <span className="pill">
                     {categoryLabels[category?.name] || category?.name}
@@ -327,7 +335,9 @@ export default function ListingEditor({ workspace, existing }) {
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       maxLength={20000}
-                      placeholder="اذكر حالة الأصل، تفاصيله، وأي معلومات مهمة للمشتري…"
+                      placeholder={
+                        "اذكر حالة الأصل، تفاصيله، وأي معلومات مهمة للمشتري"
+                      }
                     />
                   </label>
                   <div className="section-heading">
@@ -338,7 +348,13 @@ export default function ListingEditor({ workspace, existing }) {
                       type="button"
                       className="text-link"
                       onClick={() =>
-                        setSpecs([...specs, { name: "", value: "" }])
+                        setSpecs([
+                          ...specs,
+                          {
+                            name: "",
+                            value: "",
+                          },
+                        ])
                       }
                     >
                       <Icon name="plus" size={16} /> إضافة مواصفة
@@ -397,11 +413,11 @@ export default function ListingEditor({ workspace, existing }) {
               {step === 2 && (
                 <>
                   <p className="eyebrow">03 / الصورة تحكي</p>
-                  <h2>خلّ أصلك واضح.</h2>
+                  <h2>خلّ أصلك واضح</h2>
                   <p>
                     {existing
-                      ? "اترك الصور الحالية أو ارفع مجموعة جديدة تستبدلها بالكامل عند الحفظ."
-                      : "أضف من صورة إلى 6 صور واضحة للأصل نفسه."}
+                      ? "اترك الصور الحالية أو ارفع مجموعة جديدة تستبدلها بالكامل عند الحفظ"
+                      : "أضف من صورة إلى 6 صور واضحة للأصل نفسه"}
                   </p>
                   <div
                     className="upload-drop"
@@ -413,7 +429,7 @@ export default function ListingEditor({ workspace, existing }) {
                   >
                     <Icon name="image" size={38} />
                     <h3>اسحب صورك هنا</h3>
-                    <p>JPG، PNG، WebP · حتى 5 MiB للصورة</p>
+                    <p>JPG، PNG، WebP حتى 5 MiB للصورة</p>
                     <button
                       type="button"
                       className="button outline"
@@ -427,7 +443,7 @@ export default function ListingEditor({ workspace, existing }) {
                       type="file"
                       multiple
                       accept="image/jpeg,image/png,image/webp"
-                      aria-label="صور الإعلان"
+                      aria-label={"صور الإعلان"}
                       onChange={(e) => {
                         chooseFiles(Array.from(e.target.files));
                         e.target.value = "";
@@ -473,7 +489,7 @@ export default function ListingEditor({ workspace, existing }) {
                 <>
                   <p className="eyebrow">04 / نظرة أخيرة</p>
                   <h2>كل شيء على ما يرام؟</h2>
-                  <p>راجع التفاصيل قبل ما ترسل إعلانك للمشرف.</p>
+                  <p>راجع التفاصيل قبل ما ترسل إعلانك للمشرف</p>
                   <article className="review-listing">
                     {shownImages[0] && <img src={shownImages[0]} alt={title} />}
                     <div>
@@ -497,8 +513,8 @@ export default function ListingEditor({ workspace, existing }) {
                     ))}
                   </dl>
                   <p className="field-hint">
-                    عدد الصور: {shownImages.length}. بعد الإرسال يصير الإعلان
-                    قيد المراجعة.
+                    عدد الصور: {shownImages.length} بعد الإرسال يصير الإعلان قيد
+                    المراجعة
                   </p>
                   <label className="checkbox-label">
                     <input
@@ -506,7 +522,7 @@ export default function ListingEditor({ workspace, existing }) {
                       checked={confirmed}
                       onChange={(e) => setConfirmed(e.target.checked)}
                     />
-                    راجعت تفاصيل الأصل وصوره، وجاهز أرسله للمراجعة.
+                    راجعت تفاصيل الأصل وصوره، وجاهز أرسله للمراجعة
                   </label>
                 </>
               )}
@@ -527,7 +543,7 @@ export default function ListingEditor({ workspace, existing }) {
                   disabled={!confirmed || busy}
                 >
                   {busy
-                    ? "جاري الإرسال…"
+                    ? "جاري الإرسال"
                     : existing
                       ? "إعادة الإرسال للمراجعة"
                       : "إرسال للمراجعة"}
@@ -569,27 +585,27 @@ export default function ListingEditor({ workspace, existing }) {
           <h3>
             {
               [
-                "خلّنا نعرف أصلك.",
-                "كل تفصيلة تفرق.",
-                "الصورة أول انطباع.",
-                "وصلنا للخطوة الأخيرة.",
+                "خلّنا نعرف أصلك",
+                "كل تفصيلة تفرق",
+                "الصورة أول انطباع",
+                "وصلنا للخطوة الأخيرة",
               ][step]
             }
           </h3>
           <p>
             {
               [
-                "اختر التصنيف الأقرب لأصلك، عشان يوصل للمهتمين فيه.",
-                "اذكر المعلومات المهمة بوضوح. الوصف الدقيق يختصر أسئلة كثير.",
-                "إضاءة واضحة، زوايا مختلفة، وصور للأصل نفسه. أول صورة بتظهر في البطاقة.",
-                "الإرسال للمراجعة ما ينشر مزاد. بعد الاعتماد، أنت تحدد شروطه وموعده.",
+                "اختر التصنيف الأقرب لأصلك، عشان يوصل للمهتمين فيه",
+                "اذكر المعلومات المهمة بوضوح الوصف الدقيق يختصر أسئلة كثير",
+                "إضاءة واضحة، زوايا مختلفة، وصور للأصل نفسه أول صورة بتظهر في البطاقة",
+                "الإرسال للمراجعة ما ينشر مزاد بعد الاعتماد، أنت تحدد شروطه وموعده",
               ][step]
             }
           </p>
         </div>
         <p className="field-hint">
-          التغييرات ما تنحفظ إلا بعد تأكيد الإرسال. إذا طلعت قبلها، تحتاج تعبّي
-          النموذج من جديد.
+          التغييرات ما تنحفظ إلا بعد تأكيد الإرسال إذا طلعت قبلها، تحتاج تعبّي
+          النموذج من جديد
         </p>
       </aside>
     </div>

@@ -18,7 +18,7 @@ export default function Home({
         <div className="hero-image">
           <img
             src="/images/home-interior.jpg"
-            alt="عمارة سعودية معاصرة وسط التكوينات الصخرية"
+            alt={"عمارة سعودية معاصرة وسط التكوينات الصخرية"}
             fetchpriority="high"
           />
         </div>
@@ -26,17 +26,17 @@ export default function Home({
           <div className="hero-copy">
             <p className="eyebrow light">
               <span />
-              مَجلس الأصول المميزة
+              مزاد الأصول المميزة
             </p>
             <h1>
-              أصول تستحق.
+              أصول تستحق
               <br />
-              ومنافسة <em>تليق بها.</em>
+              ومنافسة <em>تليق بها</em>
             </h1>
             <p className="hero-description">
-              من سيارة لها حكاية، إلى أصل يحمل قيمة.
+              من سيارة لها حكاية، إلى أصل يحمل قيمة
               <br />
-              اكتشف المزادات، واقرأ التفاصيل، وخذ قرارك بثقة.
+              اكتشف المزادات، واقرأ التفاصيل، وخذ قرارك بثقة
             </p>
             <div className="hero-actions">
               <a className="button gold" href="#/auctions">
@@ -54,9 +54,9 @@ export default function Home({
           <div className="hero-caption">
             <span className="caption-line" />
             <span>
-              قيمة تُرى.
+              قيمة تُرى
               <br />
-              وتفاصيل تُحكى.
+              وتفاصيل تُحكى
             </span>
             <span className="vertical-label">THE MEZYAD COLLECTION</span>
           </div>
@@ -70,7 +70,7 @@ export default function Home({
         </button>
       </section>
 
-      <section className="principles-strip" aria-label="مزايا التجربة">
+      <section className="principles-strip" aria-label={"مزايا التجربة"}>
         <div className="container">
           <span>
             <Icon name="image" />
@@ -93,9 +93,9 @@ export default function Home({
       <section className="section container" id="featured">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">اختيارات من المَجلس</p>
+            <p className="eyebrow">اختيارات من المزاد</p>
             <h2>
-              المنافسة بدأت<span className="gold-dot">.</span>
+              المنافسة بدأت<span className="gold-dot"></span>
             </h2>
           </div>
           <a className="text-link" href="#/auctions">
@@ -113,10 +113,8 @@ export default function Home({
         ) : (
           <div className="state-panel">
             <Icon name="clock" size={30} />
-            <h3>المجلس ينتظر بدايات جديدة</h3>
-            <p>
-              ما فيه مزادات عامة نشطة حاليًا. تقدر تشوف المجدولة أو المنتهية.
-            </p>
+            <h3>المزاد ينتظر بدايات جديدة</h3>
+            <p>ما فيه مزادات عامة نشطة حاليًا تقدر تشوف المجدولة أو المنتهية</p>
             <a href="#/auctions" className="button outline">
               تصفح كل الحالات <Icon />
             </a>
@@ -129,10 +127,27 @@ export default function Home({
         {/* تم التعديل من عبير: الاطار اكبر والنص بمكان مستقل والرموز موزعه حول المنحنى. */}
         <div className="category-portrait-wrap">
           <figure className="category-portrait">
-            <img src="/images/riyadh-architecture.webp" alt="عمارة الرياض ونخلة، بعدسة يوسف بوزوينة" loading="lazy" />
-            <figcaption><span>الرياض</span><small>أصالة نعيشها. وقيمة نختارها.</small></figcaption>
+            <img
+              src="/images/riyadh-architecture.webp"
+              alt={"عمارة الرياض ونخلة، بعدسة يوسف بوزوينة"}
+              loading="lazy"
+            />
+            <figcaption>
+              <span>الرياض</span>
+              <small>أصالة نعيشها وقيمة نختارها</small>
+            </figcaption>
           </figure>
-          <div className="portrait-symbols" aria-hidden="true"><span><Icon name="image" size={30} /></span><span><Icon name="flag" size={30} /></span><span><Icon name="gavel" size={30} /></span></div>
+          <div className="portrait-symbols" aria-hidden="true">
+            <span>
+              <Icon name="image" size={30} />
+            </span>
+            <span>
+              <Icon name="flag" size={30} />
+            </span>
+            <span>
+              <Icon name="gavel" size={30} />
+            </span>
+          </div>
         </div>
         <div className="container category-layout">
           <div>
@@ -145,7 +160,7 @@ export default function Home({
             <p>
               اختر عالمك، وخلّي
               <br />
-              التفاصيل تكمل الحكاية.
+              التفاصيل تكمل الحكاية
             </p>
           </div>
           <div className="category-links">
@@ -168,18 +183,18 @@ export default function Home({
           <div className="art-ring" />
           <span className="art-star">𓃗</span>
           <Auctioneer character="auctioneer" motion="gavel" />
-          <span className="art-stamp">حياك في المَجلس</span>
+          <span className="art-stamp">مزادك ينتظرك</span>
         </div>
         <div className="journey-copy">
           <p className="eyebrow">من أول نظرة، إلى آخر عرض</p>
           <h2>
-            كل خطوة واضحة.
+            كل خطوة واضحة
             <br />
-            وكل قرار <em>لك.</em>
+            وكل قرار <em>لك</em>
           </h2>
           <p>
-            تصفح الأصل، افهم شروط المزاد، وراجع عرضك قبل تأكيده. والباقي تتابعه
-            من مكان واحد.
+            تصفح الأصل، افهم شروط المزاد، وراجع عرضك قبل تأكيده والباقي تتابعه
+            من مكان واحد
           </p>
           <ol className="mini-steps">
             <li>
@@ -203,11 +218,10 @@ export default function Home({
           <Icon name="lock" size={30} />
         </span>
         <div>
-          <p className="eyebrow">دعوة خاصة، ومجلس خاص</p>
+          <p className="eyebrow">دعوة خاصة، ومزاد خاص</p>
           <h2>معك رمز مزاد؟</h2>
           <p>
-            المزادات الخاصة ما تظهر في التصفح العام. الدخول لها يبدأ برمزك
-            وحسابك.
+            المزادات الخاصة ما تظهر في التصفح العام الدخول لها يبدأ برمزك وحسابك
           </p>
         </div>
         <button className="button outline" onClick={() => onFeature("private")}>

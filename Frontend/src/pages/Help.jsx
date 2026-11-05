@@ -31,20 +31,20 @@ export default function Help({ topic = "" }) {
         <h1>
           وش ودّك <em>تعرف؟</em>
         </h1>
-        <p>جمعنا لك إجابات واضحة، من أول إعلان إلى آخر عرض.</p>
+        <p>جمعنا لك إجابات واضحة، من أول إعلان إلى آخر عرض</p>
         <label className="search-input help-search">
           <Icon name="search" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="اكتب سؤالك أو كلمة تدور عليها"
-            aria-label="البحث في الأسئلة الشائعة"
+            placeholder={"اكتب سؤالك أو كلمة تدور عليها"}
+            aria-label={"البحث في الأسئلة الشائعة"}
           />
           {search && (
             <button
               className="icon-button"
               onClick={() => setSearch("")}
-              aria-label="مسح البحث"
+              aria-label={"مسح البحث"}
             >
               <Icon name="close" size={16} />
             </button>
@@ -52,7 +52,7 @@ export default function Help({ topic = "" }) {
         </label>
       </section>
       <div className="help-layout">
-        <nav className="help-categories" aria-label="تصنيفات المساعدة">
+        <nav className="help-categories" aria-label={"تصنيفات المساعدة"}>
           {groups.map(([value, label]) => (
             <a
               key={value}
@@ -64,7 +64,7 @@ export default function Help({ topic = "" }) {
             </a>
           ))}
         </nav>
-        <section className="faq-list" aria-label="الأسئلة والأجوبة">
+        <section className="faq-list" aria-label={"الأسئلة والأجوبة"}>
           <p className="faq-count" aria-live="polite">
             {filtered.length} إجابات قد تساعدك
           </p>
@@ -89,7 +89,7 @@ export default function Help({ topic = "" }) {
             <div className="state-panel">
               <Icon name="search" size={30} />
               <h2>ما لقينا إجابة بهالكلمات</h2>
-              <p>جرّب كلمة أبسط أو ارجع لكل الأسئلة.</p>
+              <p>جرّب كلمة أبسط أو ارجع لكل الأسئلة</p>
               <button
                 className="button outline"
                 onClick={() => {
@@ -106,8 +106,8 @@ export default function Help({ topic = "" }) {
       <section className="help-bottom">
         <div>
           <p className="eyebrow">أحيانًا، الشرح بالصورة أوضح</p>
-          <h2>خلّينا نوريك الرحلة.</h2>
-          <p>دليل قصير يشرح لك خطوات البيع والمزايدة، بدون تعقيد.</p>
+          <h2>خلّينا نوريك الرحلة</h2>
+          <p>دليل قصير يشرح لك خطوات البيع والمزايدة، بدون تعقيد</p>
           <a className="button dark" href="#/guide">
             كيف يعمل مزياد <Icon />
           </a>

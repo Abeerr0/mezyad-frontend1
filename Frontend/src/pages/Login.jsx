@@ -1,6 +1,6 @@
 import PasswordReset from "../PasswordReset";
 import { notify } from "../InteractionUI";
-import { GoogleAccess } from "../AccountVerification";
+import { GoogleAccess, SignupVerification } from "../AccountVerification";
 import React, { useState } from "react";
 import { AuthLayout, PasswordField } from "../account-components";
 import { Icon } from "../components";
@@ -11,6 +11,7 @@ export default function Login({ workspace, params }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const next = params.get("next");
   // تم التعديل من عبير: نرجع المستخدم لصفحه المزاد اللي طلبها بعد تسجيل الدخول.
   const destination =
@@ -26,11 +27,12 @@ export default function Login({ workspace, params }) {
     setBusy(true);
     setError("");
     try {
-      await workspace.login(email.trim().toLowerCase(), password);
-      notify("حياك في مجلسك.");
+      const user = await workspace.login(email.trim().toLowerCase(), password);
+      notify("حياك في مزادك");
       setPassword("");
-      location.hash = destination;
+      location.hash = user?.role === "ADMIN" ? "/admin" : destination;
     } catch (err) {
+      if (err.code === "EMAIL_NOT_VERIFIED") setVerifying(true);
       setError(err.message);
     } finally {
       setBusy(false);
@@ -38,12 +40,28 @@ export default function Login({ workspace, params }) {
   }
   return (
     <AuthLayout>
+      {verifying && (
+        <SignupVerification
+          email={email.trim().toLowerCase()}
+          demo={workspace.demo}
+          onClose={() => setVerifying(false)}
+          onComplete={async () => {
+            const user = await workspace.login(
+              email.trim().toLowerCase(),
+              password,
+            );
+            setVerifying(false);
+            setPassword("");
+            location.hash = user?.role === "ADMIN" ? "/admin" : destination;
+          }}
+        />
+      )}
       <p className="eyebrow">حياك من جديد</p>
       <h1>
-        المجلس <em>مجلسك.</em>
+        المزاد <em>مزادك</em>
       </h1>
-      <GoogleAccess />
-      <p className="form-intro">ادخل لحسابك، وتابع اللي يهمك.</p>
+      {import.meta.env.VITE_GOOGLE_START_PATH && <GoogleAccess />}
+      <p className="form-intro">ادخل لحسابك، وتابع اللي يهمك</p>
       {workspace.notice && (
         <p role="status" className="inline-notice">
           {workspace.notice}
@@ -64,14 +82,15 @@ export default function Login({ workspace, params }) {
             <div className="auth-demo">
               <span className="pill">تجربة الموقع</span>
               <p>
-                اكتشف خطوات البيع والمزايدة بحساب تجربة. عملياتك هنا ما تنحفظ
-                بحساب فعلي.
+                اكتشف خطوات البيع والمزايدة بحساب تجربة عملياتك هنا ما تنحفظ
+                بحساب فعلي
               </p>
               <button
                 className="button dark"
                 onClick={() => {
                   workspace.enterPreview();
-                  location.hash = destination;
+                  location.hash =
+                    user?.role === "ADMIN" ? "/admin" : destination;
                 }}
               >
                 ابدأ التجربة <Icon />
@@ -99,7 +118,7 @@ export default function Login({ workspace, params }) {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <button className="button dark full" type="submit">
-                {busy ? "جاري الدخول…" : "تسجيل الدخول"}
+                {busy ? "جاري الدخول" : "تسجيل الدخول"}
                 <Icon />
               </button>
             </fieldset>
@@ -112,7 +131,6 @@ export default function Login({ workspace, params }) {
           <p className="auth-switch">
             أول مرة هنا؟ <a href="#/register">أنشئ حسابك</a>
           </p>
-          <PasswordReset demo={workspace.demo} initialEmail={email} />
         </>
       )}
     </AuthLayout>

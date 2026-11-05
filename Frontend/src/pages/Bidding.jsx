@@ -20,7 +20,10 @@ import {
 
 // تم التعديل من عبير: نفس العرض يحتفظ برقم طلبه اذا انقطع الاتصال عشان ما ينحفظ مرتين.
 export default function Bidding({ market, id }) {
-  const state = useAuction(market, id, { bids: true, commitment: true });
+  const state = useAuction(market, id, {
+    bids: true,
+    commitment: true,
+  });
   const key = "mezyad-bid-attempt:" + market.userId + ":" + id;
   const [attempt, setAttempt] = useState(() => {
     if (market.demo) return null;
@@ -61,7 +64,7 @@ export default function Bidding({ market, id }) {
           sessionStorage.setItem(key, JSON.stringify(value));
         } catch {
           throw new Error(
-            "التخزين غير متاح. فعله عشان نحفظ رقم العرض قبل ارساله.",
+            "التخزين غير متاح فعله عشان نحفظ رقم العرض قبل ارساله",
           );
         }
       } else {
@@ -82,9 +85,9 @@ export default function Bidding({ market, id }) {
     const value = cents(amount);
     if (value === null || value < minimum || value <= 0) {
       setError(
-        "راجع المبلغ. أقل عرض الآن " +
+        "راجع المبلغ أقل عرض الآن " +
           money(minimum / 100) +
-          " ر.س، وبمنزلتين عشريتين كحد أقصى.",
+          " رس، وبمنزلتين عشريتين كحد أقصى",
       );
       return;
     }
@@ -94,7 +97,7 @@ export default function Bidding({ market, id }) {
     if (sending.current) return;
     if (!retry && (!allowed || cents(amount) < minimum)) {
       setReview(false);
-      setError("تغير السعر. راجع الحد الجديد قبل التأكيد.");
+      setError("تغير السعر راجع الحد الجديد قبل التأكيد");
       return;
     }
     sending.current = true;
@@ -112,7 +115,7 @@ export default function Bidding({ market, id }) {
       const result = await market.bid(id, current.amount, current.requestId);
       remember(null);
       setSuccess(result);
-      notify(market.demo ? "تم قبول العرض التجريبي." : "تم قبول عرضك.");
+      notify(market.demo ? "تم قبول العرض التجريبي" : "تم قبول عرضك");
       setReview(false);
       setAmount("");
       state.reload();
@@ -124,7 +127,7 @@ export default function Bidding({ market, id }) {
           remember(null);
         } catch {
           setError(
-            "تعذر حفظ حالة الطلب في المتصفح. راجع سجل العروض قبل المحاولة.",
+            "تعذر حفظ حالة الطلب في المتصفح راجع سجل العروض قبل المحاولة",
           );
         }
       }
@@ -136,9 +139,9 @@ export default function Bidding({ market, id }) {
   return (
     <AuctionLayout
       market={market}
-      title="ارفع عرضك، عن قناعة."
-      eyebrow="خطوة محسوبة"
-      description="خذ قرارك على بيّنة. راجع آخر سعر ومبلغ عرضك قبل التأكيد."
+      title={"ارفع عرضك، عن قناعة"}
+      eyebrow={"خطوة محسوبة"}
+      description={"خذ قرارك على بيّنة راجع آخر سعر ومبلغ عرضك قبل التأكيد"}
     >
       <SignInGate market={market}>
         <AuctionState state={state}>
@@ -153,36 +156,36 @@ export default function Bidding({ market, id }) {
                   </span>
                   <p>السعر الحالي</p>
                   <div className="live-price">
-                    {money(a.current_price)} <small>ر.س</small>
+                    {money(a.current_price)} <small>ريال</small>
                   </div>
                   <div className="bid-metrics">
                     <div>
                       <small>أقل عرض متاح</small>
                       <strong>
-                        {minimum !== null ? money(minimum / 100) : "—"} ر.س
+                        {minimum !== null ? money(minimum / 100) : "—"} ريال
                       </strong>
                     </div>
                     <div>
                       <small>أقل زيادة</small>
-                      <strong>{money(a.minimum_increment)} ر.س</strong>
+                      <strong>{money(a.minimum_increment)} ريال</strong>
                     </div>
                   </div>
                   {market.demo && (
                     <p className="demo-bid-note">
-                      عرض تجريبي — ما يدخل في مزاد فعلي.
+                      عرض تجريبي — ما يدخل في مزاد فعلي
                     </p>
                   )}
                   {owner ? (
                     <p className="inline-notice">
-                      هذا أصلك. المالك ما يقدر يزايد عليه.
+                      هذا أصلك المالك ما يقدر يزايد عليه
                     </p>
                   ) : displayStatus(a) !== "ACTIVE" ? (
                     <p className="inline-notice">
-                      المزاد مو مفتوح الآن. راجع التفاصيل أو النتيجة.
+                      المزاد مو مفتوح الآن راجع التفاصيل أو النتيجة
                     </p>
                   ) : !bankReady ? (
                     <div className="inline-notice">
-                      <p>تحتاج التزام بنكي ناجح لهذا المزاد قبل تقديم العرض.</p>
+                      <p>تحتاج التزام بنكي ناجح لهذا المزاد قبل تقديم العرض</p>
                       <a
                         className="button outline"
                         href={auctionLink("commitment", id)}
@@ -193,10 +196,10 @@ export default function Bidding({ market, id }) {
                   ) : null}
                   {attempt ? (
                     <div className="attempt-notice">
-                      <h3>عندك طلب يحتاج تحقق.</h3>
+                      <h3>عندك طلب يحتاج تحقق</h3>
                       <p>
-                        المبلغ: {money(attempt.amount)} ر.س. راجع السجل أول.
-                        إعادة المحاولة تستخدم نفس رقم الطلب لمنع التكرار.
+                        المبلغ: {money(attempt.amount)} ريال راجع السجل أول
+                        إعادة المحاولة تستخدم نفس رقم الطلب لمنع التكرار
                       </p>
                       <div className="form-actions">
                         <button
@@ -221,7 +224,7 @@ export default function Bidding({ market, id }) {
                             remember(null);
                             setError("");
                           } catch {
-                            setError("تعذر تحديث التخزين.");
+                            setError("تعذر تحديث التخزين");
                           }
                         }}
                       >
@@ -262,12 +265,13 @@ export default function Bidding({ market, id }) {
                       </button>
                       {review ? (
                         <div className="bid-confirmation">
-                          <h3>تأكد قبل ما ترفع يدك.</h3>
+                          <h3>تأكد قبل ما ترفع يدك</h3>
                           <p>
-                            بتقدم عرض بقيمة <strong>{money(amount)} ر.س</strong>{" "}
-                            على «{a.title}».
+                            بتقدم عرض بقيمة{" "}
+                            <strong>{money(amount)} ريال</strong> على «{a.title}
+                            »
                           </p>
-                          <p>تأكد من مبلغك؛ ما تقدر تلغي العرض بعد قبوله.</p>
+                          <p>تأكد من مبلغك؛ ما تقدر تلغي العرض بعد قبوله</p>
                           <div className="form-actions">
                             <button
                               type="button"
@@ -275,7 +279,7 @@ export default function Bidding({ market, id }) {
                               disabled={!allowed || busy}
                               onClick={() => send()}
                             >
-                              {busy ? "ننتظر التأكيد…" : "تأكيد العرض"}{" "}
+                              {busy ? "ننتظر التأكيد" : "تأكيد العرض"}{" "}
                               <Icon name="gavel" />
                             </button>
                             <button
@@ -308,19 +312,19 @@ export default function Bidding({ market, id }) {
                       <Icon name="check" />
                       <h3>
                         {market.demo
-                          ? "تم قبول عرضك في التجربة."
-                          : "وصل تأكيد قبول عرضك."}
+                          ? "تم قبول عرضك في التجربة"
+                          : "وصل تأكيد قبول عرضك"}
                       </h3>
                       <p>
-                        {money(success.amount)} ر.س — تابع المنافسة، والنتيجة
-                        تظهر بعد إغلاق المزاد.
+                        {money(success.amount)} ريال — تابع المنافسة، والنتيجة
+                        تظهر بعد إغلاق المزاد
                       </p>
                       <a href={auctionLink("my-auctions", id)}>تابع مزاداتك</a>
                     </div>
                   )}
                 </section>
                 <section className="paper-card">
-                  <p className="eyebrow">حركة المجلس</p>
+                  <p className="eyebrow">حركة المزاد</p>
                   <h2>آخر العروض</h2>
                   <BidRows rows={state.bids?.slice(0, 5)} />
                   <a

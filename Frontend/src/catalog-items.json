@@ -1,0 +1,57 @@
+[
+  {
+    "id": "preview-camel",
+    "title": "قعود شقح طيب للمقنا",
+    "category_id": "camels",
+    "category_name": "Camels",
+    "image_url": "/images/catalog/camel-field.jpg",
+    "starting_price": "6500",
+    "minimum_increment": "250",
+    "status": "ACTIVE",
+    "description": "السلام عليكم هذا قعود شقح طيب من حلالنا وموجود حول الرياض\nاللي له نظر يجي يشوفه على الطبيعه ويتاكد من سنه ومشيه قبل يسوم\nالسوم عن طريق المزاد والمعاينه للجاد والله يكتب اللي فيه الخير"
+  },
+  {
+    "id": "preview-camel-white",
+    "title": "ذلول وضحا للركوب",
+    "category_id": "camels",
+    "category_name": "Camels",
+    "image_url": "/images/catalog/camel-dunes.jpg",
+    "starting_price": "11000",
+    "minimum_increment": "500",
+    "status": "SCHEDULED",
+    "description": "حيا الله راعي النظر ذلول وضحا عليها شدادها وموضحه بالصور\nاللي يبيها للركوب يجي يجربها ويعاينها بنفسه قبل يدخل بالسوم\nموجوده عند اهلها والمعاينه بموعد والصامل ما نختلف معه"
+  },
+  {
+    "id": "preview-landcruiser",
+    "title": "لاندكروزر كلاسيكي ابيض",
+    "category_id": "cars",
+    "category_name": "Rare Vehicles",
+    "image_url": "/images/catalog/landcruiser-field.jpg",
+    "starting_price": "42000",
+    "minimum_increment": "500",
+    "status": "ACTIVE",
+    "description": "لاندكروزر قديم ابيض لمحبي الكلاسيك والبر\nالصور توضح حاله البدي والواجهه والاثار الموجوده عليه\nالسياره تحتاج معاينه وفحص كامل قبل المزايده ولا نعتمد وصف الصور بديل عن الفحص\nالمعاينه بموعد والتسليم بعد استكمال الاجراءات"
+  },
+  {
+    "id": "preview-car",
+    "title": "بي ام دبليو كوبيه برتقاليه",
+    "category_id": "cars",
+    "category_name": "Rare Vehicles",
+    "image_url": "/images/catalog/classic-field.jpg",
+    "starting_price": "125000",
+    "minimum_increment": "1000",
+    "status": "CLOSED",
+    "description": "كوبيه بي ام دبليو باللون البرتقالي والجنوط مثل الموضح بالصوره\nالاعلان للسياره البرتقاليه فقط والسيارات اللي حولها مو ضمن العرض\nالفحص على المشتري وتفاصيل الممشى والصيانه تتاكد وقت المعاينه\nانتهى وقت المزاد وتقدر تراجع سجل العروض والنتيجه"
+  },
+  {
+    "id": "preview-bag",
+    "title": "شنطه جلديه عنابيه بيد قصيره",
+    "category_id": "bags",
+    "category_name": "Luxury Handbags",
+    "image_url": "/images/catalog/bag-leather.jpg",
+    "starting_price": "1200",
+    "minimum_increment": "50",
+    "status": "ACTIVE",
+    "description": "شنطه جلد بلون عنابي مع يد قصيره وتفاصيل ذهبيه\nالتصوير للشنطه المعروضه ويوضح شكل الجلد والقفل\nتقدر تعاينها وتتأكد من المقاس والبطانه والاكسسوارات قبل المزايده\nالتسليم بموعد متفق عليه بعد اكتمال الاجراءات"
+  }
+]

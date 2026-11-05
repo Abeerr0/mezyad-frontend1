@@ -3,7 +3,11 @@ import { Modal, Icon } from "./components";
 
 // تم التعديل من عبير: تنبيهات خفيفه للعمليات بدون ما نغير ردود الباك.
 export function notify(message) {
-  window.dispatchEvent(new CustomEvent("mezyad-notice", { detail: message }));
+  window.dispatchEvent(
+    new CustomEvent("mezyad-notice", {
+      detail: message,
+    }),
+  );
 }
 export function Notices() {
   const [message, setMessage] = useState("");
@@ -27,7 +31,7 @@ export function Notices() {
         <span>{message}</span>
         <button
           className="icon-button"
-          aria-label="إغلاق التنبيه"
+          aria-label={"إغلاق التنبيه"}
           onClick={() => setMessage("")}
         >
           <Icon name="close" />
@@ -62,9 +66,7 @@ export function EmailAccess({ demo }) {
   function send(e) {
     e.preventDefault();
     if (!demo) {
-      setError(
-        "الدخول برمز البريد غير متاح حاليًا. استخدم بريدك وكلمة المرور.",
-      );
+      setError("الدخول برمز البريد غير متاح حاليًا استخدم بريدك وكلمة المرور");
       return;
     }
     setError("");
@@ -77,7 +79,7 @@ export function EmailAccess({ demo }) {
   function verify(e) {
     e.preventDefault();
     if (!/^\d{6}$/.test(code)) {
-      setError("اكتب الرمز المكوّن من 6 أرقام.");
+      setError("اكتب الرمز المكوّن من 6 أرقام");
       return;
     }
     setStage("checking");
@@ -86,7 +88,7 @@ export function EmailAccess({ demo }) {
       if (code === "123456") setStage("success");
       else {
         setStage("code");
-        setError("الرمز مو صحيح. راجعه وحاول مرة ثانية.");
+        setError("الرمز مو صحيح راجعه وحاول مرة ثانية");
       }
     }, 1000);
   }
@@ -102,7 +104,7 @@ export function EmailAccess({ demo }) {
       {open && (
         <Modal
           title={
-            stage === "success" ? "تم التحقق من الرمز" : "خطوة وتوصل لمجلسك"
+            stage === "success" ? "تم التحقق من الرمز" : "خطوة وتوصل لمزادك"
           }
           onClose={close}
         >
@@ -112,7 +114,7 @@ export function EmailAccess({ demo }) {
             </div>
             {demo && (
               <p className="field-hint">
-                تجربة الواجهة فقط — ما ينرسل بريد ولا ينفتح حساب. رمز التجربة:{" "}
+                تجربة الواجهة فقط — ما ينرسل بريد ولا ينفتح حساب رمز التجربة:{" "}
                 <bdi>123456</bdi>
               </p>
             )}
@@ -120,22 +122,20 @@ export function EmailAccess({ demo }) {
               <div role="status" className="ui-wait">
                 <span className="ui-loader" />
                 <p>
-                  {stage === "sending"
-                    ? "نجهّز خطوة التحقق…"
-                    : "نتحقق من الرمز…"}
+                  {stage === "sending" ? "نجهّز خطوة التحقق" : "نتحقق من الرمز"}
                 </p>
               </div>
             ) : stage === "success" ? (
               <div className="success-box">
-                <h3>كل شيء واضح.</h3>
-                <p>اكتملت تجربة التحقق. تقدر ترجع وتكمل تسجيل الدخول.</p>
+                <h3>كل شيء واضح</h3>
+                <p>اكتملت تجربة التحقق تقدر ترجع وتكمل تسجيل الدخول</p>
                 <button className="button dark" onClick={close}>
                   رجوع للدخول <Icon />
                 </button>
               </div>
             ) : stage === "email" ? (
               <form onSubmit={send} className="form-stack">
-                <p>اكتب بريدك عشان تكمل بخطوة التحقق.</p>
+                <p>اكتب بريدك عشان تكمل بخطوة التحقق</p>
                 <label className="field">
                   البريد الإلكتروني
                   <input
@@ -215,9 +215,9 @@ export function InvitationTicket({ code, title }) {
   async function copy() {
     try {
       await navigator.clipboard.writeText(code);
-      notify("تم نسخ رمز الدعوة.");
+      notify("تم نسخ رمز الدعوة");
     } catch {
-      setError("تعذّر النسخ التلقائي. حدد الرمز وانسخه من الحقل.");
+      setError("تعذّر النسخ التلقائي حدد الرمز وانسخه من الحقل");
     }
   }
   async function share() {
@@ -241,7 +241,7 @@ export function InvitationTicket({ code, title }) {
       c.font = "58px NotoSansArabic, sans-serif";
       c.fillText("مزياد", 500, 160);
       c.font = "42px NotoSansArabic, sans-serif";
-      c.fillText("دعوة لمجلس خاص", 500, 300);
+      c.fillText("دعوة لمزاد خاص", 500, 300);
       c.font = "28px NotoSansArabic, sans-serif";
       const chars = Array.from(title || "مزاد خاص");
       for (let i = 0; i < Math.min(chars.length, 96); i += 24)
@@ -259,7 +259,7 @@ export function InvitationTicket({ code, title }) {
       c.fillText(code, 500, 920);
       c.direction = "rtl";
       c.font = "25px NotoSansArabic, sans-serif";
-      c.fillText("احتفظ بالدعوة، وادخل بحسابك في مزياد.", 500, 1110);
+      c.fillText("احتفظ بالدعوة، وادخل بحسابك في مزياد", 500, 1110);
       const blob = await new Promise((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );
@@ -267,8 +267,15 @@ export function InvitationTicket({ code, title }) {
       const file = new File([blob], "mezyad-invitation.png", {
         type: "image/png",
       });
-      if (navigator.canShare?.({ files: [file] }))
-        await navigator.share({ files: [file], title: "دعوة مزياد" });
+      if (
+        navigator.canShare?.({
+          files: [file],
+        })
+      )
+        await navigator.share({
+          files: [file],
+          title: "دعوة مزياد",
+        });
       else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -276,11 +283,11 @@ export function InvitationTicket({ code, title }) {
         a.download = file.name;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-        notify("تم تجهيز صورة الدعوة للتحميل.");
+        notify("تم تجهيز صورة الدعوة للتحميل");
       }
     } catch (e) {
       if (e.name !== "AbortError")
-        setError("تعذّر تجهيز الصورة. تقدر تنسخ الرمز وتشاركه.");
+        setError("تعذّر تجهيز الصورة تقدر تنسخ الرمز وتشاركه");
     } finally {
       setBusy(false);
     }
@@ -295,7 +302,7 @@ export function InvitationTicket({ code, title }) {
           MEZYAD <Icon name="gavel" />
         </header>
         <p className="eyebrow">دعوة خاصة</p>
-        <h3>مجلس يجمع أهل القيمة.</h3>
+        <h3>مزاد يجمع أهل القيمة</h3>
         <p>{title}</p>
         <div className="ticket-stub">
           <label className="field">
@@ -307,7 +314,7 @@ export function InvitationTicket({ code, title }) {
               onFocus={(e) => e.target.select()}
             />
           </label>
-          <small>الدخول بحسابك، والدعوة لك.</small>
+          <small>الدخول بحسابك، والدعوة لك</small>
         </div>
       </div>
       <div className="form-actions">
@@ -317,7 +324,7 @@ export function InvitationTicket({ code, title }) {
           onClick={share}
           disabled={busy}
         >
-          {busy ? "نجهّز دعوتك…" : "مشاركة صورة الدعوة"} <Icon name="image" />
+          {busy ? "نجهّز دعوتك" : "مشاركة صورة الدعوة"} <Icon name="image" />
         </button>
         <button type="button" className="button outline" onClick={copy}>
           نسخ الرمز <Icon />

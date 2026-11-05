@@ -16,19 +16,19 @@ export default function Guide({ onFeature }) {
           <div>
             <p className="eyebrow">حياك، خلّينا نوضحها</p>
             <h1>
-              المزاد مو معقّد.
+              المزاد مو معقّد
               <br />
-              <em>نمشيها سوا.</em>
+              <em>نمشيها سوا</em>
             </h1>
             <p>
-              من عرض الأصل إلى إعلان النتيجة، لكل خطوة مكانها.
+              من عرض الأصل إلى إعلان النتيجة، لكل خطوة مكانها
               <br />
-              حساب واحد يكفيك للبيع والمزايدة.
+              حساب واحد يكفيك للبيع والمزايدة
             </p>
             <div
               className="segment"
               role="group"
-              aria-label="اختيار رحلة الاستخدام"
+              aria-label={"اختيار رحلة الاستخدام"}
             >
               <button
                 aria-pressed={role === "bidder"}
@@ -50,7 +50,7 @@ export default function Guide({ onFeature }) {
               character={role === "bidder" ? "collector" : "auctioneer"}
               motion={role === "bidder" ? "bid" : "inspect"}
             />
-            <span className="speech-bubble">كل خطوة، ولها حكاية.</span>
+            <span className="speech-bubble">كل خطوة، ولها حكاية</span>
           </div>
         </section>
         <section
@@ -81,8 +81,8 @@ export default function Guide({ onFeature }) {
               <Icon name="globe" size={32} />
               <h3>المزاد العام</h3>
               <p>
-                يظهر في الاستكشاف للجميع. تقدر تقرأ التفاصيل، وتحتاج حسابًا
-                واستيفاء شروط المشاركة قبل تقديم العرض.
+                يظهر في الاستكشاف للجميع تقدر تقرأ التفاصيل، وتحتاج حسابًا
+                واستيفاء شروط المشاركة قبل تقديم العرض
               </p>
               <a className="text-link" href="#/auctions">
                 استكشف المزادات <Icon />
@@ -92,8 +92,8 @@ export default function Guide({ onFeature }) {
               <Icon name="lock" size={30} />
               <h3>المزاد الخاص</h3>
               <p>
-                ما يظهر بالقائمة العامة. البائع يشارك الرمز مع المدعوين، ويُتحقق
-                منه بعد الدخول قبل عرض التفاصيل المحمية.
+                ما يظهر بالقائمة العامة البائع يشارك الرمز مع المدعوين، ويُتحقق
+                منه بعد الدخول قبل عرض التفاصيل المحمية
               </p>
               <button
                 className="text-link"
@@ -109,9 +109,9 @@ export default function Guide({ onFeature }) {
           <div>
             <h2>خطوة تسبق المنافسة</h2>
             <p>
-              قبل ما تقدّم عرضك، أكمل الالتزام البنكي الخاص بالمزاد. تقدر تتابع
-              حالته من حسابك، وتبدأ المزايدة بعد تأكيده. الالتزام ما يعني دفع
-              قيمة الأصل.
+              قبل ما تقدّم عرضك، أكمل الالتزام البنكي الخاص بالمزاد تقدر تتابع
+              حالته من حسابك، وتبدأ المزايدة بعد تأكيده الالتزام ما يعني دفع
+              قيمة الأصل
             </p>
             <a href="#/help?topic=bank" className="text-link">
               اقرأ عن الالتزام <Icon size={18} />
@@ -121,17 +121,17 @@ export default function Guide({ onFeature }) {
         <section className="brand-editorial">
           <img
             src="/images/riyadh-architecture.webp"
-            alt="عمارة حديثة ونخلة في الرياض"
+            alt={"عمارة حديثة ونخلة في الرياض"}
             loading="lazy"
           />
           <div>
-            <p className="eyebrow">من هنا، ولأهل القيمة.</p>
+            <p className="eyebrow">من هنا، ولأهل القيمة</p>
             <h2>
-              نظرة أبعد.
+              نظرة أبعد
               <br />
-              <em>واختيار له معنى.</em>
+              <em>واختيار له معنى</em>
             </h2>
-            <p>خذ وقتك مع التفاصيل، وخلّ اختيارك يعكس ذوقك.</p>
+            <p>خذ وقتك مع التفاصيل، وخلّ اختيارك يعكس ذوقك</p>
           </div>
         </section>
         <section className="guide-cta">

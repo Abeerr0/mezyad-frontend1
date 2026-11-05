@@ -1,9 +1,3 @@
-import { profile } from "./profile.js";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import "./config.js";
-import { emailAuth } from "./email-auth.js";
-import { bankRoutes } from "./bank.js";
 import express from "express";
 import cors from "cors";
 import bcrypt from "bcryptjs";
@@ -14,20 +8,23 @@ import { validMoney, toCents } from "./money.js";
 import { listings, withImages, withListingImages } from "./listings.js";
 import { imageLink, serveImage } from "./uploads.js";
 import { attemptLimit } from "./limits.js";
+import { startCommitment } from "./bank.js";
+// هنا نستخدم دوال ميسر لفحص المفتاح وجلب العملية وفحص الحجز وإلغائه
+import {
+  moyasarReady,
+  getPayment,
+  voidPayment,
+  checkPayment,
+} from "./moyasar.js";
 import { auctionStatus, resultFor, participationFor } from "./auctions.js";
-
+// نستخدم دالة رمز التحقق وارساله
+//داله تحقق الايميل
+import { saveAndSendCode } from "./email.js";
 export const app = express();
 app.use(
   cors({ origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173" }),
 );
 app.use(express.json({ limit: "100kb" }));
-// تم التعديل من عبير: نفس مسارات الربط تعمل بالعنوان الموحد وبالعنوان القديم.
-app.use("/api/v1/auth", emailAuth);
-app.use("/auth", emailAuth);
-app.use("/api/v1", profile);
-app.use(profile);
-app.use("/api/v1", bankRoutes);
-app.use(bankRoutes);
 const err = (res, status, code, message) =>
   res.status(status).json({ error: { code, message } });
 const validUuid = (x) =>
@@ -130,19 +127,388 @@ async function closeIfEnded(id) {
   } catch (e) {
     await client.query("ROLLBACK");
     throw e;
-  } finally {
+    } finally {
     client.release();
+  }
+  // هنا نبدأ فك حجوزات غير الفائزين بعد حفظ نتيجة المزاد
+  releaseLosingHolds(id).catch((e) =>
+    console.error("Release holds failed", e.message),
+  );
+}
+// دالة releasePayment لفك حجز المبلغ في ميسر وترجع هل نجح الإلغاء أو لا
+// هنا نطلب فك الحجز من ميسر ونرجع هل نجح أو لا
+async function releasePayment(paymentId) {
+  // هنا نحاول نلغي الحجز وإذا حصل خطأ نروح إلى catch
+  try {
+    // هنا نرسل رقم العملية إلى دالة الإلغاء الموجودة في moyasar.js
+    const result = await voidPayment(paymentId);
+
+    // هنا نرجع true إذا ميسر أكدت إلغاء نفس العملية
+    if (
+      result.status === 200 &&
+      result.body?.status === "voided" &&
+      String(result.body?.id).toLowerCase() === paymentId.toLowerCase()
+    ) {
+      return true;
+    }
+
+    // هنا نطبع تعثر الإلغاء في التيرمنال ونرجع false
+    console.error("Moyasar void failed", paymentId, result.status);
+    return false;
+  } catch (e) {
+    // هنا نستقبل خطأ الاتصال ونرجع false عشان ما نوقف إغلاق المزاد
+    console.error("Moyasar void error", paymentId, e.message);
+    return false;
+  }
+}
+// دالة releaseLosingHolds لفك حجوزات غير الفائزين بعد إغلاق المزاد
+async function releaseLosingHolds(auctionId) {
+  // هنا نوقف إذا مفتاح ميسر التجريبي مو جاهز
+  if (!moyasarReady()) return;
+
+  try {
+    // هنا نجيب حجوزات المزاد المقفل اللي ما انفكت ونستثني الفائز
+    const holds = await query(
+      "SELECT c.id,c.user_id,c.sandbox_reference,c.max_amount FROM bid_commitments c " +
+        "JOIN auctions a ON a.id=c.auction_id " +
+        "JOIN auction_results r ON r.auction_id=a.id " +
+        "LEFT JOIN bids w ON w.id=r.winner_bid_id AND w.auction_id=a.id " +
+        "WHERE c.auction_id=$1 AND a.status='CLOSED' AND c.status='SUCCESS' " +
+        "AND c.max_amount IS NOT NULL AND c.released_at IS NULL " +
+        "AND (w.bidder_id IS NULL OR c.user_id<>w.bidder_id)",
+      [auctionId],
+    );
+
+    // هنا نفحص كل حجز لحاله
+    for (const hold of holds.rows) {
+      // هنا نتجاوز الحجز إذا رقم عملية ميسر مو صحيح
+      if (!validUuid(hold.sandbox_reference)) continue;
+
+      try {
+        // هنا نجيب حالة العملية من ميسر قبل محاولة فكها
+        const found = await getPayment(hold.sandbox_reference);
+        if (found.status !== 200 || !found.body) {
+          console.error("Moyasar payment fetch failed", hold.sandbox_reference);
+          continue;
+        }
+        const payment = found.body;
+        const metadata = payment.metadata || {};
+
+        // هنا نتأكد أن العملية تخص نفس المزاد والمستخدم والمبلغ
+        if (
+          String(payment.id).toLowerCase() !==
+            hold.sandbox_reference.toLowerCase() ||
+          String(metadata.auction_id).toLowerCase() !==
+            auctionId.toLowerCase() ||
+          String(metadata.user_id).toLowerCase() !==
+            hold.user_id.toLowerCase() ||
+          payment.currency !== "SAR" ||
+          payment.amount !== toCents(hold.max_amount)
+        ) {
+          console.error("Moyasar payment mismatch", hold.sandbox_reference);
+          continue;
+        }
+
+        // هنا نفك الحجز باستخدام الدالة اللي أضفناها قبل
+        if (payment.status === "authorized") {
+          const released = await releasePayment(hold.sandbox_reference);
+          if (!released) continue;
+        } else if (payment.status !== "voided") {
+          // هنا نترك الحالات الثانية للمراجعة وما نسجلها كمفكوكة
+          console.error("Moyasar hold not voidable", hold.sandbox_reference);
+          continue;
+        }
+
+        // هنا نحفظ وقت الفك بعد ما تأكدنا أن العملية انفكت في ميسر
+        await query(
+          "UPDATE bid_commitments SET released_at=now() " +
+            "WHERE id=$1 AND sandbox_reference=$2 AND released_at IS NULL",
+          [hold.id, hold.sandbox_reference],
+        );
+      } catch (e) {
+        // هنا نسجل التعثر ونكمل باقي الحجوزات
+        console.error("Moyasar hold release failed", e.message);
+      }
+    }
+  } catch (e) {
+    // هنا نسجل الخطأ بدون ما نغير نتيجة إغلاق المزاد
+    console.error("Release holds failed", e.message);
+  }
+}
+//داله createCommitment التأكد من حجز مبلغ موجود في ميسر
+// هنا نستقبل رقم عملية ميسر ونفحص الحجز قبل حفظ الالتزام
+async function createCommitment(req, res, next) {
+  let c;
+  try {
+    // هنا ناخذ رقم العملية ونتأكد من صيغة رقم المزاد ورقم العملية
+    const data = req.body || {};
+    const paymentId = data.paymentId;
+    if (!validUuid(req.params.id) || !validUuid(paymentId))
+      return err(
+        res,
+        400,
+        "INVALID_INPUT",
+        "Valid auction and paymentId required",
+      );
+    // هنا نجيب المزاد ونفحص صلاحية المستخدم مثل المسار الموجود
+    const a = await auction(req.params.id);
+    if (!a || !(await accessible(a, req.user)))
+      return err(res, 404, "NOT_FOUND", "Auction not found");
+    if (a.seller_id === req.user.id)
+      return err(res, 403, "OWNER", "Cannot commit to own auction");
+    // هنا نوقف الطلب إذا مفتاح ميسر التجريبي مو جاهز
+    if (!moyasarReady())
+      return err(
+        res,
+        503,
+        "BANK_SANDBOX_UNAVAILABLE",
+        "Moyasar test key is not configured",
+      );
+    // هنا نجيب العملية من ميسر ونتعامل مع تعذر الاتصال
+    const found = await getPayment(paymentId).catch(() => null);
+    if (!found || (found.status !== 200 && found.status !== 404))
+      return err(
+        res,
+        503,
+        "BANK_SANDBOX_UNAVAILABLE",
+        "Could not fetch the Moyasar payment",
+      );
+    if (found.status === 404)
+      return err(res, 404, "PAYMENT_NOT_FOUND", "Moyasar payment not found");
+    const payment = found.body;
+    if (
+      !payment ||
+      String(payment.id).toLowerCase() !== paymentId.toLowerCase()
+    )
+      return err(
+        res,
+        503,
+        "BANK_SANDBOX_UNAVAILABLE",
+        "Moyasar returned an invalid payment",
+      );
+    // هنا نقفل صف المزاد لين نخلص عشان المزايدة والإغلاق ما يتعارضون مع الحفظ
+    c = await pool.connect();
+    await c.query("BEGIN");
+    const locked = await c.query(
+      "SELECT * FROM auctions WHERE id=$1 FOR UPDATE",
+      [a.id],
+    );
+    if (!locked.rowCount) {
+      await c.query("ROLLBACK");
+      return err(res, 404, "NOT_FOUND", "Auction not found");
+    }
+    const current = locked.rows[0];
+
+    // هنا نجيب الالتزام السابق عشان نحافظ على الحجز الناجح الموجود
+    const previous = await c.query(
+      "SELECT id,status,sandbox_reference,max_amount,released_at,created_at FROM bid_commitments WHERE auction_id=$1 AND user_id=$2",
+      [a.id, req.user.id],
+    );
+    const old = previous.rows[0];
+    const active =
+      old &&
+      old.status === "SUCCESS" &&
+      old.max_amount !== null &&
+      old.released_at === null &&
+      validUuid(old.sandbox_reference);
+    const samePayment =
+      active && old.sandbox_reference.toLowerCase() === paymentId.toLowerCase();
+
+    // هنا نحسب أقل مبلغ مسموح للمزايدة حسب آخر سعر
+    const bids = await c.query(
+      "SELECT 1 FROM bids WHERE auction_id=$1 LIMIT 1",
+      [a.id],
+    );
+    const minimumCents = bids.rowCount
+      ? toCents(current.current_price) + toCents(current.minimum_increment)
+      : toCents(current.starting_price);
+
+    // هنا إذا نفس الحجز محفوظ من قبل نفحصه بدون رفع الحد المطلوب عليه
+    let result = checkPayment(payment, {
+      auctionId: a.id,
+      userId: req.user.id,
+      minimumCents: samePayment ? 1 : minimumCents,
+    });
+
+    // هنا نرفض العملية اللي تخص حساب أو مزاد ثاني بدون إلغاء حجزها
+    if (result === "PAYMENT_MISMATCH") {
+      await c.query("ROLLBACK");
+      return err(
+        res,
+        403,
+        result,
+        "Payment does not belong to this auction and user",
+      );
+    }
+    // هنا نجيب الوقت بعد القفل ونحسب صلاحية الحجز من وقت إنشاء العملية
+    const clock = await c.query("SELECT clock_timestamp() AS current_time");
+    const now = new Date(clock.rows[0].current_time).getTime();
+    const endTime = new Date(current.end_time).getTime();
+    const paymentTime = new Date(payment.created_at).getTime();
+    // هنا نستخدم ١٣ يوم للحجز ونترك هامش يوم قبل مدة ١٤ يوم
+    const holdEnd = paymentTime + 13 * 24 * 60 * 60 * 1000;
+    if (result === "OK") {
+      if (current.status === "CLOSED" || endTime <= now)
+        result = "AUCTION_NOT_ACTIVE";
+      else if (
+        !Number.isFinite(paymentTime) ||
+        paymentTime > now ||
+        holdEnd <= now
+      )
+        result = "HOLD_EXPIRED";
+      else if (endTime > holdEnd) result = "AUCTION_TOO_LONG_FOR_HOLD";
+      else if (payment.amount > 99999999999999) result = "COMMITMENT_TOO_LARGE";
+      else if (active && !samePayment) result = "COMMITMENT_ALREADY_EXISTS";
+    }
+    if (result !== "OK") {
+      await c.query("ROLLBACK");
+      // هنا نحفظ رفض العملية بدون تغيير التزام ناجح سابق
+      if (result === "COMMITMENT_DECLINED") {
+        await c.query(
+          "INSERT INTO bid_commitments(auction_id,user_id,status,sandbox_reference) VALUES($1,$2,'FAILED',$3) " +
+            "ON CONFLICT(auction_id,user_id) DO UPDATE SET status='FAILED',sandbox_reference=EXCLUDED.sandbox_reference,max_amount=NULL,released_at=NULL,created_at=now() " +
+            "WHERE bid_commitments.status <> 'SUCCESS'",
+          [a.id, req.user.id, paymentId.toLowerCase()],
+        );
+      }
+      // هنا نفك الحجز الجديد المرفوض ونحافظ على الحجز المسجل من قبل
+      if (payment.status === "authorized" && !samePayment) {
+        const released = await voidPayment(paymentId).catch(() => null);
+        if (released?.status !== 200 || released.body?.status !== "voided")
+          return err(
+            res,
+            503,
+            "HOLD_RELEASE_FAILED",
+            "Commitment was rejected; hold release could not be confirmed",
+          );
+      }
+      // هنا نرجع سبب رفض العملية
+      return err(res, 409, result, "Payment cannot be used as a commitment");
+    }
+    // هنا نرجع الحجز الموجود إذا المستخدم أرسل نفس رقم العملية مرة ثانية
+    if (samePayment) {
+      await c.query("COMMIT");
+      return res.status(201).json({ data: old });
+    }
+
+    // هنا نحول المبلغ من هللات إلى ريال ونحفظ الالتزام الناجح
+    const maxAmount = (payment.amount / 100).toFixed(2);
+    const saved = await c.query(
+      "INSERT INTO bid_commitments(auction_id,user_id,status,sandbox_reference,max_amount) VALUES($1,$2,'SUCCESS',$3,$4) " +
+        "ON CONFLICT(auction_id,user_id) DO UPDATE SET status='SUCCESS',sandbox_reference=EXCLUDED.sandbox_reference,max_amount=EXCLUDED.max_amount,released_at=NULL,created_at=now() " +
+        "RETURNING id,status,sandbox_reference,max_amount,released_at,created_at",
+      [a.id, req.user.id, paymentId.toLowerCase(), maxAmount],
+    );
+    await c.query("COMMIT");
+    res.status(201).json({ data: saved.rows[0] });
+  } catch (e) {
+    // هنا نتراجع إذا صار خطأ ونمرره لمعالج الأخطاء الموجود
+    if (c) await c.query("ROLLBACK").catch(() => {});
+    if (e.code === "23505")
+      return err(res, 409, "PAYMENT_ALREADY_USED", "Payment already used");
+    next(e);
+  } finally {
+    // هنا نرجع اتصال قاعدة البيانات بعد ما نخلص
+    c?.release();
   }
 }
 app.get("/health", (_req, res) => res.json({ data: { status: "ok" } }));
+const accounts = express.Router();
+app.use("/auth", accounts);
+app.use("/api/v1/auth", accounts);
 // استقبال طلب إنشاء حساب جديد
 // نستخدم async عشان نقدر نستخدم await لانتظار نتيجة عملية، مثل حفظ الحساب في قاعدة البيانات.
 //عندما يصل طلب POST لمسار تسجيل الحساب، نفّذ التعليمات الموجودة داخل هذه الدالة
 // هذا الرمز يعني او || إذا كان الاسم ليس نصًا، أو كان فارغًا بعد إزالة المسافات من الأطراف، نرفض الطلب.
-const accounts = express.Router();
-app.use("/auth", accounts);
-app.use("/api/v1/auth", accounts);
-app.post("/auth/login", async (req, res, next) => {
+accounts.post("/register", async (req, res, next) => {
+  try {
+    // نتحقق من بيانات الحساب قبل ما نحفظه.
+    const data = req.body || {};
+    const name = data.name;
+    const email = data.email;
+    const password = data.password;
+    if (
+      //اول شي الاسم لازم يتحقق انو سترينق يعني حروف
+      typeof name !== "string" ||
+      //يتحقق هل الاسم فارغ ولا مكنوب فيه مسافات فقط
+      !name.trim() ||
+      // نرفض الاسم إذا تجاوز طوله 160 بعد إزالة المسافات من بدايته ونهايته، لأن هذا هو الحد المحدد له في قاعدة البيانات.
+      name.trim().length > 160 ||
+      //نوع الايميل المدخل يكون سترينق حروف فقط
+      typeof email !== "string" ||
+      // نرفض الإيميل إذا تجاوز طوله 254، وهو الحد الموجود في قاعدة البيانات
+      email.trim().toLowerCase().length > 254 ||
+      // نتحقق من شكل الإيميل: علامة @ واحدة، وجزء قبلها وبعدها ونقطة، وبدون مسافات
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      //. نوع الباس لازم يكون نص ويحتوي ارقام وحروف ورموز وعلامه التعجب تعني انو يتحقق ان القيمه مو نص
+      typeof password !== "string" ||
+      //طول الباسوورد يكون ٨ او اكثر
+      password.length < 8 ||
+      // نرفض كلمة المرور إذا تجاوز حجمها 72 بايت، وهو حد bcrypt
+      Buffer.byteLength(password, "utf8") > 72
+    )
+      //داله err تجهز رد الخطا وارساله  return تنهي طلب تنفيذ الداله بعد الاستدعاء
+      return err(
+        //رد اللي يوفره express نمرره للداله عشان تقدر ترد للمستخدم
+        res,
+        // رقم حاله http تعني خطا من المستخدم بسبب بيانات غير صحيحه
+        400,
+        // رمز الخطا اللي يظهر اللي معتمدينه بالمشروع الفرق بينه وبين ٤٠٠ ان هذا يرسل داخل بيانات الرد لتوضيح نوع الخطأ للتطبيق لكن. ٤٠٠ نتوضح نوع الخطا
+        "INVALID_INPUT",
+        //
+        "Valid name, email and password (8+ chars) required",
+      );
+    const hash = await bcrypt.hash(password, 12);
+    // الحساب العام يطلع USER؛ ما ناخذ صلاحية الأدمن من الطلب.
+    const r = await query(
+      "INSERT INTO users(name,email,password_hash) VALUES($1,$2,$3) RETURNING id,name,email,role",
+      [name.trim(), email.trim().toLowerCase(), hash],
+    );
+    // ناخذ بيانات الحساب الجديد
+    //إرسال رمز التحقق بعد إنشاء حساب جديد
+    // ناخذ بيانات الحساب الجديد اللي رجعت من قاعدة البيانات
+    const user = r.rows[0];
+
+    // نحفظ بصمة الرمز ونحاول نرسله للايميل
+    // نحفظ بصمة الرمز ونحاول نرسله ونحفظ نتيجة الارسال
+    const emailSent = await saveAndSendCode(user);
+
+    // نرجع بيانات الحساب وحالة التحقق والارسال
+    // نرجع 201 يعني الحساب انحفظ ونرسل الرد بصيغة json
+    res.status(201).json({
+      // نحط بيانات الرد داخل data
+      data: {
+        // معرف الحساب
+        id: user.id,
+        // اسم المستخدم
+        name: user.name,
+        // ايميل المستخدم
+        email: user.email,
+        // صلاحية الحساب مستخدم او ادمن
+        role: user.role,
+
+        // ايميل الحساب الجديد ما تأكد للحين
+        // نوضح ان الايميل للحين مو مؤكد
+        emailVerified: false,
+
+        // نتيجة محاولة ارسال الرمز
+        // نرجع نتيجة محاولة ارسال الرمز
+        emailSent: emailSent,
+      },
+      // نهاية ارسال الرد
+    });
+    // إذا كان رمز الخطأ 23505، نرسل رد 409 ورسالة أن الإيميل مسجل مسبقًا.
+    // الدالة err تجهز رد الخطأ وترسله.
+    // return تنهي معالجة طلب التسجيل الحالي، ويظل الباك إند شغالًا.
+    // إذا صار خطأ غير تكرار الإيميل، مثل فشل الاتصال بقاعدة البيانات،
+    // نستخدم next(e) لتمريره إلى الجزء المسؤول عن إرسال رد يوضح الخطأ.
+  } catch (e) {
+    if (e.code === "23505")
+      return err(res, 409, "DUPLICATE_EMAIL", "Email already registered");
+    next(e);
+  }
+});
+accounts.post("/login", async (req, res, next) => {
   try {
     // ياخذ بيانات الطلب وإذا ما وصلت بيانات يستخدم كائن فارغ.
     const data = req.body || {};
@@ -176,6 +542,7 @@ app.post("/auth/login", async (req, res, next) => {
       );
     }
     //     rيبحث  في جدول المستخدمين عن االحساب باستخدام الايميمل ويحفظ نتيجه البحث في r
+    // هنا نطابق كلمة المرور مع البصمة المحفوظة.
     const r = await query("SELECT * FROM users WHERE email=$1", [
       //نشيل المسافات من اطرف الايميمل ويحول حروفه الى سمول احرف صغيره يعني
       email.trim().toLowerCase(),
@@ -187,54 +554,23 @@ app.post("/auth/login", async (req, res, next) => {
       !(await bcrypt.compare(password, r.rows[0].password_hash))
     )
       return err(res, 401, "INVALID_CREDENTIALS", "Invalid credentials");
-    const token = newToken(),
-      u = r.rows[0];
-    await query(
-      "INSERT INTO user_sessions(user_id,token_hash,expires_at) VALUES($1,$2,now()+interval '7 days')",
-      [u.id, hashToken(token)],
-    );
-    res.json({
-      data: {
-        token,
-        user: { id: u.id, name: u.name, email: u.email, role: u.role },
-      },
-    });
-  } catch (e) {
-    next(e);
-  }
-});
-// نتحقق من الجلسة قبل إرجاع بيانات المستخدم.
-app.get("/auth/me", auth, (req, res) => {
-  // نرسل بيانات المستخدم التي جهزتها دالة auth.
-  res.json({ data: { user: req.user } });
-});
-accounts.post("/login", async (req, res, next) => {
-  try {
-    const { email, password } = req.body || {};
-    if (
-      typeof email !== "string" ||
-      !email.trim() ||
-      email.trim().toLowerCase().length > 254 ||
-      typeof password !== "string" ||
-      password.length === 0 ||
-      Buffer.byteLength(password, "utf8") > 72
-    ) {
+    //يمنع تسجيل الدخول لين المستخدم يأكد إيميله برمز التحقق
+    // نرفض الدخول اذا ايميل الحساب ما تأكد
+    // نرفض تسجيل الدخول اذا المستخدم ما اكد ايميله
+    if (!r.rows[0].email_verified_at) {
+      // نرجع خطا ونوقف طلب تسجيل الدخول
       return err(
+        // نمرر الرد لدالة الخطا
         res,
-        400,
-        "INVALID_INPUT",
-        "Valid email and password required",
+        // رقم الحالة يعني الدخول ممنوع
+        403,
+        // رمز الخطا اللي يظهر للفرونت
+        "EMAIL_NOT_VERIFIED",
+        // رسالة تطلب تأكيد الايميل قبل الدخول
+        "Verify your email before signing in",
       );
+      // نهاية فحص تأكيد الايميل
     }
-    // هنا نطابق كلمة المرور مع البصمة المحفوظة.
-    const r = await query("SELECT * FROM users WHERE email=$1", [
-      email.trim().toLowerCase(),
-    ]);
-    if (
-      !r.rowCount ||
-      !(await bcrypt.compare(password, r.rows[0].password_hash))
-    )
-      return err(res, 401, "INVALID_CREDENTIALS", "Invalid credentials");
     const token = newToken(),
       u = r.rows[0];
     // نخزن بصمة الجلسة بدل الرمز نفسه.
@@ -252,15 +588,191 @@ accounts.post("/login", async (req, res, next) => {
     next(e);
   }
 });
-app.post("/auth/logout", auth, async (req, res, next) => {
-  try {
-    await query("DELETE FROM user_sessions WHERE token_hash=$1", [
-      hashToken(req.token),
-    ]);
-    res.json({ data: { signedOut: true } });
-  } catch (e) {
-    next(e);
-  }
+// نستقبل طلب تأكيد الايميل بالرمز اللي وصل للمستخدم.
+accounts.post(
+  "/verify-email",
+  // نحد الطلبات المتكررة خلال مدة عشان نقلل تخمين الرمز.
+  // نحد محاولات الطلب عشان نقلل تخمين الرمز.
+  attemptLimit({
+    // نميز المحاولات باستخدام عنوان الشبكة والايميل مع بعض.
+    key: (req) =>
+      "verify:" +
+      req.ip +
+      ":" +
+      String(req.body?.email || "")
+        .trim()
+        .toLowerCase(),
+  }),
+  // نستقبل الطلب ونستخدم await لانتظار الاستعلامات.
+  async (req, res, next) => {
+    try {
+      // ناخذ الايميل والرمز من بيانات الطلب.
+      // ناخذ بيانات الطلب، وإذا ما وصلت نستخدم كائن فارغ.
+      const data = req.body || {};
+      // ناخذ الايميل من بيانات الطلب.
+      const email = data.email;
+      // ناخذ رمز التحقق اللي كتبه المستخدم.
+      const code = data.code;
+      // نرفض الطلب إذا تحقق أي شرط من شروط البيانات الغلط.
+      if (
+        // نتأكد من صيغة الايميل والرمز، ونرفض البيانات غير الصحيحة.
+        // الايميل لازم يكون نص.
+        typeof email !== "string" ||
+        // نرفض الايميل إذا تجاوز حد قاعدة البيانات.
+        email.trim().length > 254 ||
+        // نتأكد من صيغة الايميل بعد إزالة المسافات من الأطراف.
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
+        // رمز التحقق لازم يكون نص.
+        typeof code !== "string" ||
+        // الرمز لازم يكون ٦ أرقام بالضبط.
+        !/^\d{6}$/.test(code)
+      )
+        // نرجع خطأ 400 ونوقف الطلب إذا البيانات غير صحيحة.
+        return err(
+          res,
+          400,
+          "INVALID_INPUT",
+          "Valid email and 6-digit code required",
+        );
+      // نبحث عن الحساب ونتأكد أنه موجود وايميله ما تأكد من قبل.
+      // نبحث عن الحساب بالايميل ونجيب معرفه وحالة تأكيده.
+      const userResult = await query(
+        "SELECT id, email_verified_at FROM users WHERE email=$1",
+        // ننظف الايميل ونمرره مكان $1 في الاستعلام.
+        [email.trim().toLowerCase()],
+      );
+      // إذا ما لقينا الحساب نرفض الرمز.
+      if (!userResult.rowCount)
+        return err(res, 400, "INVALID_CODE", "Invalid or expired code");
+      // ناخذ بيانات الحساب من أول صف في النتيجة.
+      const user = userResult.rows[0];
+      // نوقف الطلب إذا ايميل الحساب مؤكد من قبل.
+      if (user.email_verified_at)
+        return err(res, 409, "ALREADY_VERIFIED", "Email already verified");
+      // نفحص صلاحية الرمز وحد المحاولات، ونحسب المحاولة ونجيب البصمة.
+      // نزيد المحاولات ونجيب بصمة الرمز في نفس الاستعلام.
+      // يتم التحديث إذا الرمز ما انتهى وقته والمحاولات أقل من ٥.
+      const codeResult = await query(
+        "UPDATE users SET email_code_attempts=email_code_attempts+1 " +
+          "WHERE id=$1 AND email_verified_at IS NULL " +
+          "AND email_code_hash IS NOT NULL " +
+          "AND email_code_expires_at>now() AND email_code_attempts<5 " +
+          "RETURNING email_code_hash",
+        // نمرر معرف الحساب مكان $1.
+        [user.id],
+      );
+      // نرفض إذا الاستعلام ما رجع بصمة الرمز.
+      if (!codeResult.rowCount)
+        return err(res, 400, "INVALID_CODE", "Invalid or expired code");
+      // نقارن الرمز اللي كتبه المستخدم بالبصمة، ونرفضه إذا ما تطابق.
+      // ناخذ بصمة الرمز المحفوظة في قاعدة البيانات.
+      const codeHash = codeResult.rows[0].email_code_hash;
+      // نقارن الرمز اللي كتبه المستخدم بالبصمة باستخدام bcrypt.
+      const validCode = await bcrypt.compare(code, codeHash);
+      // إذا الرمز ما يطابق البصمة نرفضه ونوقف الطلب.
+      if (!validCode)
+        return err(res, 400, "INVALID_CODE", "Invalid or expired code");
+      // نأكد ايميل الحساب ونمسح البصمة وصلاحيتها ونصفر المحاولات.
+      // يتم التأكيد إذا نفس البصمة ما زالت محفوظة والرمز ما انتهى.
+      // نحفظ وقت تأكيد الايميل ونمسح البصمة ووقت الصلاحية ونصفر المحاولات.
+      const verified = await query(
+        "UPDATE users SET email_verified_at=now(), email_code_hash=NULL, " +
+          "email_code_expires_at=NULL, email_code_attempts=0 " +
+          "WHERE id=$1 AND email_verified_at IS NULL " +
+          // نتأكد أن البصمة ما تغيرت وأن الرمز ما انتهى وقته.
+          "AND email_code_hash=$2 AND email_code_expires_at>now() RETURNING id",
+        [user.id, codeHash],
+      );
+      // إذا ما تأكد أي حساب نرفض الرمز ونوقف الطلب.
+      if (!verified.rowCount)
+        return err(res, 400, "INVALID_CODE", "Invalid or expired code");
+      // نرسل للواجهة أن الايميل تأكد بنجاح.
+      res.json({ data: { emailVerified: true } });
+      // إذا حصل خطأ نستقبله في e.
+    } catch (e) {
+      // نمرر الخطأ لمعالج الأخطاء الموجود في الباك.
+      next(e);
+    }
+  },
+);
+// نستقبل طلب إعادة إرسال رمز التحقق للايميل.
+accounts.post(
+  "/resend-code",
+  // نسمح بثلاثة طلبات لكل ايميل خلال عشر دقايق عشان نحد كثرة الإرسال.
+  attemptLimit({
+    max: 3,
+    windowMs: 10 * 60 * 1000,
+    key: (req) =>
+      "resend:" +
+      String(req.body?.email || "")
+        .trim()
+        .toLowerCase(),
+  }),
+  async (req, res, next) => {
+    try {
+      // ناخذ الايميل من بيانات الطلب.
+      const data = req.body || {};
+      const email = data.email;
+      // نتأكد من صيغة الايميل ونرفض البيانات غير الصحيحة.
+      if (
+        typeof email !== "string" ||
+        email.trim().length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      )
+        return err(res, 400, "INVALID_INPUT", "Valid email required");
+      // نبحث عن الحساب ونجيب الايميل وحالة تأكيده.
+      const userResult = await query(
+        "SELECT id, email, email_verified_at FROM users WHERE email=$1",
+        [email.trim().toLowerCase()],
+      );
+      const user = userResult.rows[0];
+      // نرسل رمز جديد فقط إذا الحساب موجود وايميله ما تأكد.
+      if (user && !user.email_verified_at) {
+        // نسجل وقت الطلب إذا مرّت دقيقة على الإرسال السابق أو ما سبق أرسلنا.
+        // التحديث في قاعدة البيانات يمنع قبول طلبين متزامنين لنفس الحساب.
+        const ready = await query(
+          "UPDATE users SET email_code_sent_at=now() " +
+            "WHERE id=$1 AND email_verified_at IS NULL " +
+            "AND (email_code_sent_at IS NULL " +
+            "OR email_code_sent_at<=now()-interval '60 seconds') RETURNING id",
+          [user.id],
+        );
+        // إذا ما تم تحديث الحساب نوقف الطلب ونطلب الانتظار دقيقة.
+        //ready.rowCount هو عدد الصفوف اللي حدّثها الاستعلام إذا كان صفر، يتحقق الشرط ونرجع الخطأ
+        if (!ready.rowCount)
+          return err(
+            res,
+            429,
+            "TOO_SOON",
+            "Wait one minute before requesting a new code",
+          );
+        // نولد رمز جديد ونحفظ بصمته ونصفر محاولاته ونحاول نرسله.
+        const emailSent = await saveAndSendCode(user);
+        if (!emailSent)
+          return err(
+            res,
+            502,
+            "EMAIL_SEND_FAILED",
+            "Could not send the code. Try again later",
+          );
+      }
+      // نرجع رسالة عامة عشان ما نكشف إذا الايميل مسجل أو مؤكد.
+      res.json({
+        data: {
+          message:
+            "If the account exists and is not verified, a new code was sent",
+        },
+      });
+    } catch (e) {
+      // نمرر أي خطأ غير متوقع لمعالج الأخطاء الموجود في الباك.
+      next(e);
+    }
+  },
+);
+// نتحقق من الجلسة قبل إرجاع بيانات المستخدم.
+app.get("/auth/me", auth, (req, res) => {
+  // نرسل بيانات المستخدم التي جهزتها دالة auth.
+  res.json({ data: { user: req.user } });
 });
 app.get("/categories", async (_req, res, next) => {
   try {
@@ -970,11 +1482,11 @@ api.get("/auctions/:id", async (req, res, next) => {
     next(e);
   }
 });
-
+// هنا نستخدم نفس الدالة لمسار الالتزام الموجود
+app.post("/auctions/:id/commitment", auth, createCommitment);
 api.post(
   // المشارك يدخل برمز المزاد فقط.
-  // تم التعديل من عبير: ندعم الرابط القديم ونفس تحقق الرمز بدون كشف المزاد الخاص.
-  ["/auctions/access", "/auctions/:id/access"],
+  "/auctions/access",
   auth,
   attemptLimit({
     // نحسب محاولات إدخال الرمز لكل مشارك حسب حسابه.
@@ -984,35 +1496,32 @@ api.post(
     try {
       // نحفظ هنا معرّف المزاد بعد ما نلقاه برمز الدخول.
       let auctionId;
-        // نأخذ رمز الدخول من بيانات الطلب.
-        const accessCode = req.body?.accessCode;
+      // نأخذ رمز الدخول من بيانات الطلب.
+      const accessCode = req.body?.accessCode;
 
-        // نرفض الرمز إذا ما كان نص أو كان طوله غير 24 حرف.
-        if (typeof accessCode !== "string" || accessCode.length !== 24) {
-          return err(res, 403, "INVALID_CODE", "Invalid access code");
-        }
+      // نرفض الرمز إذا ما كان نص أو كان طوله غير 24 حرف.
+      if (typeof accessCode !== "string" || accessCode.length !== 24) {
+        return err(res, 403, "INVALID_CODE", "Invalid access code");
+      }
 
-        // نحسب بصمة الرمز بنفس الطريقة اللي استخدمناها وقت إنشاء المزاد.
-        const codeLookup = hashToken("auction:" + accessCode);
+      // نحسب بصمة الرمز بنفس الطريقة اللي استخدمناها وقت إنشاء المزاد.
+      const codeLookup = hashToken("auction:" + accessCode);
 
-        // نطلب من قاعدة البيانات معرّف المزاد الخاص اللي بصمته تطابق بصمة الرمز.
-        const result = await query(
-          "SELECT id FROM auctions WHERE visibility = 'PRIVATE' AND access_code_lookup = $1",
-          // $1 يأخذ قيمة البصمة اللي حسبناها.
-          [codeLookup],
-        );
+      // نطلب من قاعدة البيانات معرّف المزاد الخاص اللي بصمته تطابق بصمة الرمز.
+      const result = await query(
+        "SELECT id FROM auctions WHERE visibility = 'PRIVATE' AND access_code_lookup = $1",
+        // $1 يأخذ قيمة البصمة اللي حسبناها.
+        [codeLookup],
+      );
 
-        // إذا ما لقينا مزاد بنفس البصمة، نرفض الدخول.
-        if (result.rows.length === 0) {
-          return err(res, 403, "INVALID_CODE", "Invalid access code");
-        }
+      // إذا ما لقينا مزاد بنفس البصمة، نرفض الدخول.
+      if (result.rows.length === 0) {
+        return err(res, 403, "INVALID_CODE", "Invalid access code");
+      }
 
-        // نأخذ معرّف المزاد من الصف اللي رجع لنا.
-        auctionId = result.rows[0].id;
-      
+      // نأخذ معرّف المزاد من الصف اللي رجع لنا.
+      auctionId = result.rows[0].id;
 
-      // تم التعديل من عبير: الرابط القديم لازم يطابق المزاد اللي رجع من الرمز.
-      if (req.params.id && req.params.id !== auctionId) return err(res,403,"INVALID_CODE","Invalid access code");
       // نجيب بيانات المزاد بمعرّفه عشان نكمل التحقق قبل ما نسمح بالدخول.
       const a = await auction(auctionId);
       if (!a || a.visibility !== "PRIVATE")
@@ -1035,9 +1544,35 @@ api.post(
     }
   },
 );
-
-
-
+// هنا نستخدم دالة فحص حجز ميسر لمسار الالتزام
+api.post("/auctions/:id/commitment", auth, createCommitment);
+app.get("/auctions/:id/commitment", auth, async (req, res, next) => {
+  try {
+    const r = await query(
+      "SELECT id,status,sandbox_reference,max_amount,released_at,created_at FROM bid_commitments WHERE auction_id=$1 AND user_id=$2",
+      [req.params.id, req.user.id],
+    );
+    if (!r.rowCount) return err(res, 404, "NOT_FOUND", "No commitment");
+    res.json({ data: r.rows[0] });
+  } catch (e) {
+    next(e);
+  }
+});
+api.get("/auctions/:id/commitment", auth, async (req, res, next) => {
+  try {
+    const a = await auction(req.params.id);
+    if (!a || !(await accessible(a, req.user)))
+      return err(res, 404, "NOT_FOUND", "Auction not found");
+    const r = await query(
+      "SELECT id,status,sandbox_reference,created_at FROM bid_commitments WHERE auction_id=$1 AND user_id=$2",
+      [req.params.id, req.user.id],
+    );
+    if (!r.rowCount) return err(res, 404, "NOT_FOUND", "No commitment");
+    res.json({ data: r.rows[0] });
+  } catch (e) {
+    next(e);
+  }
+});
 app.post("/auctions/:id/bids", auth, async (req, res, next) => {
   const { amount, requestId } = req.body || {};
   if (!validMoney(amount) || !validUuid(requestId) || !validUuid(req.params.id))
@@ -1086,20 +1621,97 @@ app.post("/auctions/:id/bids", auth, async (req, res, next) => {
         "Bid request already processed",
       );
     }
-    // تم التعديل من عبير: الالتزام الموثق من ميسر شرط للمزايده.
-    // تم التعديل من عبير: نرفض الالتزام المنتهي او المرجع غير الموثق.
-    {
+    // BE-14 | نفحص الالتزام البنكي فقط إذا فعّلنا الإعداد.
+    if (process.env.REQUIRE_BANK_COMMITMENT === "true") {
+      // هنا نجيب حجز ميسر الناجح اللي ما انلغى
       const commitment = await c.query(
-        "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS' AND provider='MOYASAR' AND payment_id IS NOT NULL AND expires_at>clock_timestamp()",
+        "SELECT max_amount,sandbox_reference FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS' AND max_amount IS NOT NULL AND released_at IS NULL",
         [a.id, req.user.id],
       );
-      if (!commitment.rowCount) {
+      // هنا نرفض إذا ما فيه حجز أو رقم عمليته مو صحيح
+      if (
+        !commitment.rowCount ||
+        !validUuid(commitment.rows[0].sandbox_reference)
+      ) {
         await c.query("ROLLBACK");
         return err(
           res,
           403,
           "COMMITMENT_REQUIRED",
           "Verified commitment required",
+        );
+      }
+      const hold = commitment.rows[0];
+      // هنا نرفض العرض إذا تجاوز المبلغ المحجوز
+      if (toCents(amount) > toCents(hold.max_amount)) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          409,
+          "BID_ABOVE_COMMITMENT",
+          "Bid is above your commitment limit",
+        );
+      }
+      // هنا نوقف الطلب إذا مفتاح ميسر التجريبي مو جاهز
+      if (!moyasarReady()) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          503,
+          "BANK_SANDBOX_UNAVAILABLE",
+          "Moyasar test key is not configured",
+        );
+      }
+      // هنا نسأل ميسر عن حالة الحجز وقت المزايدة
+      const found = await getPayment(hold.sandbox_reference).catch(() => null);
+      if (!found || (found.status !== 200 && found.status !== 404)) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          503,
+          "BANK_SANDBOX_UNAVAILABLE",
+          "Could not fetch the Moyasar payment",
+        );
+      }
+      const payment = found.body;
+      const result = checkPayment(payment, {
+        auctionId: a.id,
+        userId: req.user.id,
+        minimumCents: toCents(amount),
+      });
+      // هنا نتأكد أن الحجز ما زال صالح وبياناته تطابق الالتزام المحفوظ
+      if (
+        found.status === 404 ||
+        result !== "OK" ||
+        String(payment.id).toLowerCase() !==
+          hold.sandbox_reference.toLowerCase() ||
+        payment.amount !== toCents(hold.max_amount)
+      ) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          403,
+          "COMMITMENT_REQUIRED",
+          "Active Moyasar commitment required",
+        );
+      }
+      // هنا نفحص تاريخ الحجز ونتأكد أن صلاحيته تغطي نهاية المزاد
+      const time = await c.query("SELECT clock_timestamp() AS current_time");
+      const currentTime = new Date(time.rows[0].current_time).getTime();
+      const paymentTime = new Date(payment.created_at).getTime();
+      const holdEnd = paymentTime + 13 * 24 * 60 * 60 * 1000;
+      if (
+        !Number.isFinite(paymentTime) ||
+        paymentTime > currentTime ||
+        holdEnd <= currentTime ||
+        new Date(a.end_time).getTime() > holdEnd
+      ) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          403,
+          "COMMITMENT_REQUIRED",
+          "Commitment does not cover the auction period",
         );
       }
     }
@@ -1201,19 +1813,103 @@ api.post("/auctions/:id/bids", auth, async (req, res, next) => {
         "Bid request already processed",
       );
     }
-        // تم التعديل من عبير: الالتزام الموثق من ميسر شرط للمزايده.
-    {
+    // BE-14 | نفحص الالتزام البنكي فقط إذا فعّلنا الإعداد.
+    if (process.env.REQUIRE_BANK_COMMITMENT === "true") {
+      // هنا نجيب حجز ميسر الناجح اللي ما انلغى
       const commitment = await c.query(
-        "SELECT 1 FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS' AND provider='MOYASAR' AND payment_id IS NOT NULL AND expires_at>clock_timestamp()",
+        "SELECT max_amount,sandbox_reference FROM bid_commitments WHERE auction_id=$1 AND user_id=$2 AND status='SUCCESS' AND max_amount IS NOT NULL AND released_at IS NULL",
         [a.id, req.user.id],
       );
-      if (!commitment.rowCount) {
+
+      // هنا نرفض إذا ما فيه حجز أو رقم عمليته مو صحيح
+      if (
+        !commitment.rowCount ||
+        !validUuid(commitment.rows[0].sandbox_reference)
+      ) {
         await c.query("ROLLBACK");
         return err(
           res,
           403,
           "COMMITMENT_REQUIRED",
           "Verified commitment required",
+        );
+      }
+      const hold = commitment.rows[0];
+
+      // هنا نرفض العرض إذا تجاوز المبلغ المحجوز
+      if (toCents(amount) > toCents(hold.max_amount)) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          409,
+          "BID_ABOVE_COMMITMENT",
+          "Bid is above your commitment limit",
+        );
+      }
+
+      // هنا نوقف الطلب إذا مفتاح ميسر التجريبي مو جاهز
+      if (!moyasarReady()) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          503,
+          "BANK_SANDBOX_UNAVAILABLE",
+          "Moyasar test key is not configured",
+        );
+      }
+
+      // هنا نسأل ميسر عن حالة الحجز وقت المزايدة
+      const found = await getPayment(hold.sandbox_reference).catch(() => null);
+      if (!found || (found.status !== 200 && found.status !== 404)) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          503,
+          "BANK_SANDBOX_UNAVAILABLE",
+          "Could not fetch the Moyasar payment",
+        );
+      }
+      const payment = found.body;
+      const result = checkPayment(payment, {
+        auctionId: a.id,
+        userId: req.user.id,
+        minimumCents: toCents(amount),
+      });
+
+      // هنا نتأكد أن الحجز ما زال صالح وبياناته تطابق الالتزام المحفوظ
+      if (
+        found.status === 404 ||
+        result !== "OK" ||
+        String(payment.id).toLowerCase() !==
+          hold.sandbox_reference.toLowerCase() ||
+        payment.amount !== toCents(hold.max_amount)
+      ) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          403,
+          "COMMITMENT_REQUIRED",
+          "Active Moyasar commitment required",
+        );
+      }
+
+      // هنا نفحص تاريخ الحجز ونتأكد أن صلاحيته تغطي نهاية المزاد
+      const time = await c.query("SELECT clock_timestamp() AS current_time");
+      const currentTime = new Date(time.rows[0].current_time).getTime();
+      const paymentTime = new Date(payment.created_at).getTime();
+      const holdEnd = paymentTime + 13 * 24 * 60 * 60 * 1000;
+      if (
+        !Number.isFinite(paymentTime) ||
+        paymentTime > currentTime ||
+        holdEnd <= currentTime ||
+        new Date(a.end_time).getTime() > holdEnd
+      ) {
+        await c.query("ROLLBACK");
+        return err(
+          res,
+          403,
+          "COMMITMENT_REQUIRED",
+          "Commitment does not cover the auction period",
         );
       }
     }
@@ -1362,9 +2058,6 @@ api.get("/me/auctions", auth, async (req, res, next) => {
     next(e);
   }
 });
-// تم التعديل من عبير: نقدم ملفات الواجهه المبنيه من نفس عنوان API بدون تغيير التصميم.
-const frontendDirectory=fileURLToPath(new URL("../../Frontend/dist/",import.meta.url));
-if (existsSync(frontendDirectory+"index.html")) app.use(express.static(frontendDirectory));
 app.use((_req, res) => err(res, 404, "NOT_FOUND", "Route not found"));
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
@@ -1385,10 +2078,6 @@ app.use((error, req, res, next) => {
   if (error.code === "22021" || error.code === "22P05") {
     return err(res, 400, "INVALID_INPUT", "Invalid characters in request");
   }
-  // تم التعديل من عبير: نرجع اخطاء البريد وميسر للواجهه بدون تفاصيل المفاتيح.
-  if (error.apiCode && Number.isInteger(error.status)) return err(res,error.status,error.apiCode,error.message);
   console.error("API error", error.code || "INTERNAL_ERROR");
   err(res, 500, "INTERNAL_ERROR", "Unexpected server error");
 });
-
-

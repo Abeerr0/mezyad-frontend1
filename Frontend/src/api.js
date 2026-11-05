@@ -2,49 +2,66 @@ export const API = (import.meta.env.VITE_API_URL || "/api/v1").replace(
   /\/+$/,
   "",
 );
-
 const messages = {
-  CURRENT_PASSWORD_INCORRECT: "كلمة المرور الحالية غير صحيحة.",
+  EMAIL_NOT_VERIFIED: "أكد بريدك الإلكتروني عشان تكمل الدخول",
+  ALREADY_VERIFIED: "بريدك مؤكد تقدر تسجل دخولك",
+  TOO_SOON: "انتظر دقيقة قبل طلب رمز جديد",
+  EMAIL_SEND_FAILED: "تعذر إرسال الرمز حاول بعد شوي",
+  COMMITMENT_TOO_LOW: "مبلغ التأمين أقل من الحد المطلوب",
+  BID_ABOVE_COMMITMENT: "عرضك تجاوز مبلغ التأمين اللي حجزته",
+  PAYMENT_NOT_COMPLETED: "كمل التحقق من البطاقة ثم ارجع للمزاد",
+  COMMITMENT_DECLINED: "البنك رفض العملية جرب بطاقة ثانية",
+  MANUAL_PAYMENT_REQUIRED: "المطلوب حجز مبلغ وليس خصم مباشر",
+  COMMITMENT_EXPIRES_TOO_SOON: "مدة الحجز ما تغطي وقت المزاد",
+  PAYMENT_NOT_USABLE: "العملية ما تصلح لتأكيد المشاركة",
+  WRONG_CURRENCY: "لازم تكون العملية بالريال السعودي",
+  CURRENT_PASSWORD_INCORRECT: "كلمة المرور الحالية غير صحيحة",
   PASSWORD_VERIFICATION_EXPIRED:
-    "انتهى التحقق. اكتب كلمة المرور الحالية من جديد.",
-  PASSWORD_UNCHANGED: "اختر كلمة مرور تختلف عن الحالية.",
-  EMAIL_UNAVAILABLE: "تعذّر إرسال البريد. حاول لاحقًا.",
-  INVALID_CODE: "الرمز غير صحيح أو انتهت صلاحيته. اطلب رمز جديد.",
-  TOO_MANY_REQUESTS: "طلبات كثيرة خلال وقت قصير. انتظر شوي وحاول.",
+    "انتهى التحقق اكتب كلمة المرور الحالية من جديد",
+  PASSWORD_UNCHANGED: "اختر كلمة مرور تختلف عن الحالية",
+  EMAIL_UNAVAILABLE: "تعذّر إرسال البريد حاول لاحقًا",
+  INVALID_CODE: "الرمز غير صحيح أو انتهت صلاحيته اطلب رمز جديد",
+  TOO_MANY_REQUESTS: "طلبات كثيرة خلال وقت قصير انتظر شوي وحاول",
   BANK_SANDBOX_UNAVAILABLE:
-    "خدمة التحقق من الالتزام غير متاحة حاليًا. حاول لاحقًا.",
-  PAYMENT_MISMATCH: "بيانات العملية ما تطابق طلب الالتزام.",
-  PAYMENT_NOT_FOUND: "ما لقينا العملية. تحقق من حالة طلبك.",
-  DUPLICATE_EMAIL: "هالبريد مسجل من قبل. جرّب تسجيل الدخول.",
-  INVALID_CREDENTIALS: "البريد أو كلمة المرور مو صحيحة.",
-  UNAUTHORIZED: "انتهت جلستك. سجل دخولك من جديد.",
-  FORBIDDEN: "حسابك ما عنده صلاحية لهالطلب.",
-  INVALID_INPUT: "راجع الحقول المطلوبة وحاول من جديد.",
-  INVALID_IMAGE: "راجع عدد الصور ونوعها وحجمها.",
-  PAYLOAD_TOO_LARGE: "حجم الصور أكبر من المسموح.",
-  INVALID_CATEGORY: "التصنيف غير متاح أو ما تقدر تغيره بعد الرفض.",
-  INVALID_STATE: "حالة الإعلان تغيرت. ارجع لإعلاناتك وحدّثها.",
-  NOT_APPROVED: "لازم يكون الإعلان لك ومعتمد قبل إنشاء المزاد.",
-  DUPLICATE_AUCTION: "هالإعلان له مزاد بالفعل. راجع نشاطك.",
-  NOT_FOUND: "البيانات المطلوبة مو متاحة.",
-  RATE_LIMITED: "طلبات كثيرة خلال وقت قصير. انتظر شوي وحاول.",
+    "خدمة التحقق من الالتزام غير متاحة حاليًا حاول لاحقًا",
+  PAYMENT_MISMATCH: "بيانات العملية ما تطابق طلب الالتزام",
+  PAYMENT_NOT_FOUND: "ما لقينا العملية تحقق من حالة طلبك",
+  DUPLICATE_EMAIL: "هالبريد مسجل من قبل جرّب تسجيل الدخول",
+  INVALID_CREDENTIALS: "البريد أو كلمة المرور مو صحيحة",
+  UNAUTHORIZED: "انتهت جلستك سجل دخولك من جديد",
+  FORBIDDEN: "حسابك ما عنده صلاحية لهالطلب",
+  INVALID_INPUT: "راجع الحقول المطلوبة وحاول من جديد",
+  INVALID_IMAGE: "راجع عدد الصور ونوعها وحجمها",
+  PAYLOAD_TOO_LARGE: "حجم الصور أكبر من المسموح",
+  INVALID_CATEGORY: "التصنيف غير متاح أو ما تقدر تغيره بعد الرفض",
+  INVALID_STATE: "حالة الإعلان تغيرت ارجع لإعلاناتك وحدّثها",
+  NOT_APPROVED: "لازم يكون الإعلان لك ومعتمد قبل إنشاء المزاد",
+  DUPLICATE_AUCTION: "هالإعلان له مزاد بالفعل راجع نشاطك",
+  NOT_FOUND: "البيانات المطلوبة مو متاحة",
+  RATE_LIMITED: "طلبات كثيرة خلال وقت قصير انتظر شوي وحاول",
 };
 
 // تم التعديل من عبير: نوحد اتصال API ونفرق بين رفض الطلب وعدم معرفه اذا انحفظ.
 export async function request(
   path,
-  { token, method = "GET", body, signal } = {},
+  { token, method = "GET", body, signal, base = API } = {},
 ) {
   let response;
   let result;
   try {
-    response = await fetch(API + path, {
+    response = await fetch(base + path, {
       method,
       signal,
       headers: {
-        ...(token ? { Authorization: "Bearer " + token } : {}),
+        ...(token
+          ? {
+              Authorization: "Bearer " + token,
+            }
+          : {}),
         ...(body && !(body instanceof FormData)
-          ? { "Content-Type": "application/json" }
+          ? {
+              "Content-Type": "application/json",
+            }
           : {}),
       },
       body:
@@ -59,8 +76,8 @@ export async function request(
     if (cause.name === "AbortError") throw cause;
     const error = new Error(
       method === "GET"
-        ? "تعذّر الاتصال. تحقق من اتصالك وحاول مرة ثانية."
-        : "انقطع الاتصال وما تأكدنا من حفظ الطلب. تحقق من حسابك قبل إعادة الإرسال.",
+        ? "تعذّر الاتصال تحقق من اتصالك وحاول مرة ثانية"
+        : "انقطع الاتصال وما تأكدنا من حفظ الطلب تحقق من حسابك قبل إعادة الإرسال",
     );
     error.uncertain = method !== "GET";
     throw error;
@@ -69,8 +86,8 @@ export async function request(
     const error = new Error(
       messages[result.error?.code] ||
         (response.status >= 500
-          ? "ما اكتمل طلبك. تحقق من حالته قبل المحاولة مرة ثانية."
-          : "ما اكتمل الطلب. راجع البيانات وحاول مرة ثانية."),
+          ? "ما اكتمل طلبك تحقق من حالته قبل المحاولة مرة ثانية"
+          : "ما اكتمل الطلب راجع البيانات وحاول مرة ثانية"),
     );
     error.code = result.error?.code;
     error.status = response.status;
@@ -78,9 +95,7 @@ export async function request(
     throw error;
   }
   if (result.data === undefined) {
-    const error = new Error(
-      "وصل رد غير متوقع. تحقق من حسابك قبل إعادة الإرسال.",
-    );
+    const error = new Error("وصل رد غير متوقع تحقق من حسابك قبل إعادة الإرسال");
     error.uncertain = method !== "GET";
     throw error;
   }
@@ -104,7 +119,6 @@ export function imageUrl(value) {
     return "";
   }
 }
-
 export function validEmail(value) {
   return (
     value.trim().length <= 254 &&
@@ -123,17 +137,16 @@ export function validAmount(value) {
     Number(value) <= 999999999999.99
   );
 }
-
 export function validateImages(files, required = true) {
   if ((required && files.length === 0) || files.length > 6)
-    return "اختر من صورة إلى 6 صور للإعلان.";
+    return "اختر من صورة إلى 6 صور للإعلان";
   if (
     files.some(
       (file) => !["image/jpeg", "image/png", "image/webp"].includes(file.type),
     )
   )
-    return "الصور المسموحة JPG أو PNG أو WebP فقط.";
+    return "الصور المسموحة JPG أو PNG أو WebP فقط";
   if (files.some((file) => file.size > 5 * 1024 * 1024))
-    return "كل صورة لازم يكون حجمها 5 MiB أو أقل.";
+    return "كل صورة لازم يكون حجمها 5 MiB أو أقل";
   return "";
 }

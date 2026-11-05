@@ -13,7 +13,7 @@ export default function PrivateAccess({ market }) {
     event.preventDefault();
     if (sending.current) return;
     if (!code.trim()) {
-      setError("اكتب رمز الدخول أول.");
+      setError("اكتب رمز الدخول أول");
       return;
     }
     sending.current = true;
@@ -32,9 +32,9 @@ export default function PrivateAccess({ market }) {
   return (
     <AuctionLayout
       market={market}
-      title="دعوتك للمجلس الخاص."
-      eyebrow="رمز واحد، ومجلس يجمعكم"
-      description="الرمز من صاحب المزاد، والدخول بحسابك أنت."
+      title={"دعوتك للمزاد الخاص"}
+      eyebrow={"رمز واحد، ومزاد يجمعكم"}
+      description={"الرمز من صاحب المزاد، والدخول بحسابك أنت"}
     >
       <SignInGate market={market}>
         <div className="private-entry">
@@ -44,16 +44,15 @@ export default function PrivateAccess({ market }) {
             <h2>
               بعض الأصول،
               <br />
-              لها مجلس خاص.
+              لها مزاد خاص
             </h2>
-            <p>خصوصية الدخول ما تغيّر شروط المنافسة العادلة.</p>
+            <p>خصوصية الدخول ما تغيّر شروط المنافسة العادلة</p>
           </div>
           <form className="paper-card" onSubmit={submit}>
-            <p className="eyebrow">حياك في المجلس</p>
+            <p className="eyebrow">حياك في المزاد</p>
             <h2>معك الدعوة؟</h2>
             <p>
-              أدخل الرمز اللي وصلك من البائع، وبنفتح لك تفاصيل المزاد بعد
-              التحقق.
+              أدخل الرمز اللي وصلك من البائع، وبنفتح لك تفاصيل المزاد بعد التحقق
             </p>
             <label className="field">
               <span>رمز الدخول</span>
@@ -65,7 +64,7 @@ export default function PrivateAccess({ market }) {
                 onChange={(e) => setCode(e.target.value)}
                 disabled={busy}
                 required
-                placeholder="رمز المزاد"
+                placeholder={"رمز المزاد"}
               />
             </label>
             {market.demo && (
@@ -79,10 +78,10 @@ export default function PrivateAccess({ market }) {
               </p>
             )}
             <button className="button dark full" disabled={busy}>
-              {busy ? "نتحقق من دعوتك…" : "افتح المجلس"} <Icon />
+              {busy ? "نتحقق من دعوتك" : "افتح المزاد"} <Icon />
             </button>
             <p className="field-hint">
-              الرمز ما يمنح موافقة بنك، وما يسمح لك بالمزايدة على مزادك.
+              الرمز ما يمنح موافقة بنك، وما يسمح لك بالمزايدة على مزادك
             </p>
             <a className="text-link" href="#/auctions">
               تصفح المزادات العامة <Icon />

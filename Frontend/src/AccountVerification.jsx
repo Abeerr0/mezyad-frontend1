@@ -4,8 +4,8 @@ import { request } from "./api";
 
 // تم التعديل من عبير: الربط الحقيقي يحتاج مسارات تحقق، وما نستخدم رمز الواجهه لانشاء حساب فعلي.
 export const signupPaths = {
-  start: import.meta.env.VITE_SIGNUP_REQUEST_PATH || "/auth/signup/request",
-  complete: import.meta.env.VITE_SIGNUP_COMPLETE_PATH || "/auth/signup/complete",
+  start: import.meta.env.VITE_SIGNUP_REQUEST_PATH || "/auth/register",
+  complete: import.meta.env.VITE_SIGNUP_COMPLETE_PATH || "/auth/verify-email",
 };
 export function signupReady() {
   return Object.values(signupPaths).every(
@@ -17,9 +17,7 @@ export function GoogleAccess() {
   function start() {
     const path = import.meta.env.VITE_GOOGLE_START_PATH;
     if (!path || !path.startsWith("/") || path.startsWith("//")) {
-      setError(
-        "الدخول بحساب Google غير متاح حاليًا. استخدم بريدك وكلمة المرور.",
-      );
+      setError("الدخول بحساب Google غير متاح حاليًا استخدم بريدك وكلمة المرور");
       return;
     }
     location.assign(path);
@@ -46,7 +44,7 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [success, setSuccess] = useState(false),
-    [seconds, setSeconds] = useState(30);
+    [seconds, setSeconds] = useState(60);
   const working = useRef(false),
     timer = useRef(),
     controller = useRef();
@@ -66,7 +64,7 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
     e.preventDefault();
     if (working.current) return;
     if (!/^\d{6}$/.test(code)) {
-      setError("اكتب الرمز المكوّن من 6 أرقام.");
+      setError("اكتب الرمز المكوّن من 6 أرقام");
       return;
     }
     working.current = true;
@@ -79,16 +77,19 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
           timer.current = setTimeout(r, 700);
         });
         if (code !== "123456")
-          throw new Error("الرمز مو صحيح. راجعه وحاول من جديد.");
+          throw new Error("الرمز مو صحيح راجعه وحاول من جديد");
       } else {
         const result = await request(signupPaths.complete, {
           method: "POST",
-          body: { email, code },
+          body: {
+            email,
+            code,
+          },
           signal: controller.current.signal,
         });
-        if (!result?.id)
+        if (result?.emailVerified !== true)
           throw new Error(
-            "ما اكتمل إنشاء الحساب. جرّب تسجيل الدخول قبل إعادة المحاولة.",
+            "ما اكتمل إنشاء الحساب جرّب تسجيل الدخول قبل إعادة المحاولة",
           );
       }
       setSuccess(true);
@@ -113,11 +114,14 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
     setError("");
     try {
       if (!demo)
-        await request(signupPaths.start, {
+        await request("/auth/resend-code", {
           method: "POST",
-          body: { email, resend: true },
+          body: {
+            email,
+            resend: true,
+          },
         });
-      setSeconds(30);
+      setSeconds(60);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -127,7 +131,7 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
   }
   return (
     <Modal
-      title={success ? "حياك في مزياد!" : "باقي خطوة لمجلسك."}
+      title={success ? "حياك في مزياد!" : "باقي خطوة لمزادك"}
       onClose={onClose}
     >
       <div className="signup-verify">
@@ -136,8 +140,8 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
             <div className="welcome-check">
               <Icon name="check" size={50} />
             </div>
-            <h3>تم التحقق من الرمز.</h3>
-            <p>نجهّز لك مجلسك…</p>
+            <h3>تم التحقق من الرمز</h3>
+            <p>نجهّز لك مزادك</p>
             <span aria-hidden="true">✦ ✧ ✦</span>
           </div>
         ) : (
@@ -147,13 +151,13 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
             </div>
             <p>
               {demo
-                ? "أدخل الرمز لإكمال تجربة إنشاء الحساب."
-                : "أدخل رمز التحقق اللي وصلك لإكمال إنشاء حسابك."}
+                ? "أدخل الرمز لإكمال تجربة إنشاء الحساب"
+                : "أدخل رمز التحقق اللي وصلك لإكمال إنشاء حسابك"}
             </p>
             <bdi>{email.replace(/^(.)(.*)(@.*)$/, "$1••••$3")}</bdi>
             {demo && (
               <p className="field-hint">
-                رمز نسخة التجربة: 123456. ما ينشئ حساب فعلي.
+                رمز نسخة التجربة: 123456 ما ينشئ حساب فعلي
               </p>
             )}
             <label className="field">
@@ -180,7 +184,7 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
               {busy ? (
                 <>
                   <span className="ui-loader" />
-                  نتحقق من الرمز…
+                  نتحقق من الرمز
                 </>
               ) : (
                 "تأكيد وإنشاء الحساب"
@@ -202,4 +206,3 @@ export function SignupVerification({ email, demo, onComplete, onClose }) {
     </Modal>
   );
 }
-

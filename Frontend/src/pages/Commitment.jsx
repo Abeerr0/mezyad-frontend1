@@ -16,7 +16,9 @@ import {
 
 // تم التعديل من عبير: نطلب الالتزام من الباك ولا نعرض نجاح بنكي من بيانات المعاينه.
 export default function Commitment({ market, id }) {
-  const state = useAuction(market, id, { commitment: true });
+  const state = useAuction(market, id, {
+    commitment: true,
+  });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const sending = useRef(false);
@@ -29,13 +31,7 @@ export default function Commitment({ market, id }) {
     setMessage("");
     try {
       // تم التعديل من عبير: نربط زر الالتزام بنفس صفحه الدفع المعتمده بدون تغيير تصميمها.
-      const result = await market.commit(id);
-      if (result.status !== "SUCCESS") {
-        location.hash = "/payment?id=" + encodeURIComponent(id);
-        return;
-      }
-      state.reload();
-      setMessage("تم إرسال طلبك. تابع حالة الالتزام هنا.");
+      location.hash = "/payment?id=" + encodeURIComponent(id);
     } catch (err) {
       setMessage(err.message);
     } finally {
@@ -46,9 +42,9 @@ export default function Commitment({ market, id }) {
   return (
     <AuctionLayout
       market={market}
-      title="منافسة لها التزام."
-      eyebrow="قبل العرض"
-      description="شوف حالة التزامك لهذا المزاد، وخلك على بينة بكل خطوة."
+      title={"منافسة لها التزام"}
+      eyebrow={"قبل العرض"}
+      description={"شوف حالة التزامك لهذا المزاد، وخلك على بينة بكل خطوة"}
     >
       <SignInGate market={market}>
         <AuctionState state={state}>
@@ -61,31 +57,31 @@ export default function Commitment({ market, id }) {
                   <div className="bank-emblem">
                     <Icon name="shield" size={45} />
                   </div>
-                  <h2>{approved ? "التزامك موثّق." : "نبدأ من التحقق."}</h2>
+                  <h2>{approved ? "التزامك موثّق" : "نبدأ من التحقق"}</h2>
                   <p>
-                    التزامك يخص هذا المزاد. بعد تأكيده تقدر تقدّم عرضك وتدخل
-                    المنافسة.
+                    التزامك يخص هذا المزاد بعد تأكيده تقدر تقدّم عرضك وتدخل
+                    المنافسة
                   </p>
                   <ol className="bank-steps">
                     <li>
                       <b>01</b>
                       <div>
                         <h3>اطلب الالتزام</h3>
-                        <p>ابدأ طلب الالتزام الخاص بهذا المزاد.</p>
+                        <p>ابدأ طلب الالتزام الخاص بهذا المزاد</p>
                       </div>
                     </li>
                     <li>
                       <b>02</b>
                       <div>
                         <h3>انتظر التحقق</h3>
-                        <p>تابع حالة طلبك إلى أن يصلك التأكيد.</p>
+                        <p>تابع حالة طلبك إلى أن يصلك التأكيد</p>
                       </div>
                     </li>
                     <li>
                       <b>03</b>
                       <div>
                         <h3>ارجع للمزايدة</h3>
-                        <p>بعد التأكيد، قدم عرضك ضمن شروط المزاد.</p>
+                        <p>بعد التأكيد، قدم عرضك ضمن شروط المزاد</p>
                       </div>
                     </li>
                   </ol>
@@ -107,13 +103,13 @@ export default function Commitment({ market, id }) {
                   )}
                   {market.demo && (
                     <p className="inline-notice">
-                      طلب الالتزام غير متاح في نسخة التجربة.
+                      طلب الالتزام غير متاح في نسخة التجربة
                     </p>
                   )}
                   {a.seller_id === market.userId ? (
-                    <p>ما تحتاج التزام كمزايد لأنك صاحب المزاد.</p>
+                    <p>ما تحتاج التزام كمزايد لأنك صاحب المزاد</p>
                   ) : displayStatus(a) === "CLOSED" ? (
-                    <p>انتهى المزاد، وما عاد يقبل التزام جديد.</p>
+                    <p>انتهى المزاد، وما عاد يقبل التزام جديد</p>
                   ) : approved ? (
                     <a
                       className="button dark full"
@@ -127,7 +123,7 @@ export default function Commitment({ market, id }) {
                       onClick={start}
                       disabled={busy || Boolean(state.error)}
                     >
-                      {busy ? "ننتظر الرد…" : "طلب الالتزام"}{" "}
+                      {busy ? "ننتظر الرد" : "طلب الالتزام"}{" "}
                       <Icon name="shield" />
                     </button>
                   )}
@@ -143,7 +139,7 @@ export default function Commitment({ market, id }) {
                     تحقق من حالة البنك
                   </a>
                   <p className="field-hint">
-                    طلب الالتزام ما يعني دفع قيمة الأصل.
+                    طلب الالتزام ما يعني دفع قيمة الأصل
                   </p>
                 </aside>
               </div>
@@ -154,4 +150,3 @@ export default function Commitment({ market, id }) {
     </AuctionLayout>
   );
 }
-

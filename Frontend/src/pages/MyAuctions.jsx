@@ -40,7 +40,10 @@ export default function MyAuctions({ market }) {
             );
           } catch (e) {
             if (controller.signal.aborted) return;
-            details.push({ ...row, detailsError: e.message });
+            details.push({
+              ...row,
+              detailsError: e.message,
+            });
           }
         }
         if (!controller.signal.aborted) setRows(details);
@@ -63,16 +66,16 @@ export default function MyAuctions({ market }) {
     <AccountLayout
       workspace={market.workspace}
       active="my-auctions"
-      eyebrow="مجالس لها مكان عندك"
-      title="مزاداتي ومشاركاتي"
-      description="المزادات اللي أنشأتها أو قدمت فيها عرض مقبول، في مكان واحد."
+      eyebrow={"مزادات لها مكان عندك"}
+      title={"مزاداتي ومشاركاتي"}
+      description={"المزادات اللي أنشأتها أو قدمت فيها عرض مقبول، في مكان واحد"}
     >
       <section className="paper-card">
         <div className="section-heading">
           <h2>وين وصلت المنافسة؟</h2>
           {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
         </div>
-        <div className="auction-tabs" role="group" aria-label="فلترة مزاداتي">
+        <div className="auction-tabs" role="group" aria-label={"فلترة مزاداتي"}>
           {[
             ["ALL", "الكل"],
             ["ACTIVE", "نشطة"],
@@ -89,7 +92,7 @@ export default function MyAuctions({ market }) {
           ))}
         </div>
         {loading ? (
-          <p role="status">نجمع لك مجالسك…</p>
+          <p role="status">نجمع لك مزاداتك</p>
         ) : error ? (
           <p role="alert" className="form-error">
             {error}
@@ -97,8 +100,8 @@ export default function MyAuctions({ market }) {
         ) : !visible.length ? (
           <div className="empty-box">
             <Icon name="gavel" size={38} />
-            <h3>ما فيه مزادات بهالقائمة.</h3>
-            <p>إذا أنشأت مزاد أو انقبل عرضك، تلقاه هنا.</p>
+            <h3>ما فيه مزادات بهالقائمة</h3>
+            <p>إذا أنشأت مزاد أو انقبل عرضك، تلقاه هنا</p>
             <a className="button dark" href="#/auctions">
               استكشف المزادات <Icon />
             </a>
@@ -125,7 +128,7 @@ export default function MyAuctions({ market }) {
                   <h3>{a.title}</h3>
                   {a.detailsError ? (
                     <p role="alert">
-                      تعذر تحديث التفاصيل. افتح المزاد وحاول من جديد.
+                      تعذر تحديث التفاصيل افتح المزاد وحاول من جديد
                     </p>
                   ) : (
                     <>
@@ -135,8 +138,8 @@ export default function MyAuctions({ market }) {
                       </p>
                       {a.participation?.hasBid && (
                         <p>
-                          عروضك: {a.participation.bidCount} · أعلى عرض لك:{" "}
-                          {money(a.participation.highestBid)} ر.س
+                          عروضك: {a.participation.bidCount} أعلى عرض لك:{" "}
+                          {money(a.participation.highestBid)} ريال
                         </p>
                       )}
                     </>

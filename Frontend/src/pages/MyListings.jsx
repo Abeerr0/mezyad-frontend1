@@ -47,23 +47,23 @@ export default function MyListings({ workspace, params }) {
     <AccountLayout
       workspace={workspace}
       active="listings"
-      eyebrow="أصولك، وحكاياتها"
-      title="إعلاناتي"
-      description="شوف حالة كل إعلان، واعرف وش يحتاج منك."
+      eyebrow={"أصولك، وحكاياتها"}
+      title={"إعلاناتي"}
+      description={"شوف حالة كل إعلان، واعرف وش يحتاج منك"}
     >
       <ResourceState workspace={workspace}>
         {params.get("saved") === "1" && (
           <p className="inline-notice" role="status">
             تمت إعادة إرسال إعلانك للمراجعة
-            {workspace.demo ? " في نسخة التجربة" : ""}.
+            {workspace.demo ? " في نسخة التجربة" : ""}
           </p>
         )}
         <div className="listing-toolbar">
           <div className="search-field">
             <Icon name="search" size={18} />
             <input
-              aria-label="البحث في إعلاناتي"
-              placeholder="دور على إعلانك"
+              aria-label={"البحث في إعلاناتي"}
+              placeholder={"دور على إعلانك"}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -73,7 +73,7 @@ export default function MyListings({ workspace, params }) {
           </a>
           {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
         </div>
-        <div className="filter-tabs listing-tabs" aria-label="حالة إعلاناتي">
+        <div className="filter-tabs listing-tabs" aria-label={"حالة إعلاناتي"}>
           {[
             ["", "الكل"],
             ["PENDING_REVIEW", "قيد المراجعة"],
@@ -105,8 +105,8 @@ export default function MyListings({ workspace, params }) {
             </h2>
             <p>
               {workspace.items.length
-                ? "خفف البحث أو غيّر الحالة."
-                : "جهّز صور أصل تفتخر فيه، وخلّنا نشوف تفاصيله."}
+                ? "خفف البحث أو غيّر الحالة"
+                : "جهّز صور أصل تفتخر فيه، وخلّنا نشوف تفاصيله"}
             </p>
             {workspace.items.length ? (
               <button
@@ -161,7 +161,7 @@ export default function MyListings({ workspace, params }) {
                       <strong>ملاحظة المشرف</strong>
                       <p>
                         {record.review_reason ||
-                          "ما وصل سبب الرفض. راجع المشرف قبل التعديل."}
+                          "ما وصل سبب الرفض راجع المشرف قبل التعديل"}
                       </p>
                     </div>
                   )}
@@ -219,8 +219,7 @@ export default function MyListings({ workspace, params }) {
             )}
             {item.status === "APPROVED" && (
               <p className="inline-notice">
-                اعتماد الإعلان ما ينشئ المزاد تلقائيًا. حدد شروطه من إعداد
-                المزاد.
+                اعتماد الإعلان ما ينشئ المزاد تلقائيًا حدد شروطه من إعداد المزاد
               </p>
             )}
             <div className="form-actions">{actions(item)}</div>

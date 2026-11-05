@@ -46,9 +46,9 @@ export default function Browse({
         <div>
           <p className="eyebrow">أصول تختارها على مهل</p>
           <h1>
-            دوّر على <em>الاستثنائي.</em>
+            دوّر على <em>الاستثنائي</em>
           </h1>
-          <p>كل أصل له تفاصيله. تصفح، قارن، وافتح المزاد اللي يهمك.</p>
+          <p>كل أصل له تفاصيله تصفح، قارن، وافتح المزاد اللي يهمك</p>
         </div>
         <span className="heading-mark">
           <Icon name="gavel" size={44} />
@@ -60,14 +60,14 @@ export default function Browse({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث ضمن النتائج المحملة"
-            aria-label="البحث ضمن النتائج المحملة"
+            placeholder={"ابحث ضمن النتائج المحملة"}
+            aria-label={"البحث ضمن النتائج المحملة"}
           />
           {search && (
             <button
               className="icon-button"
               onClick={() => setSearch("")}
-              aria-label="مسح البحث"
+              aria-label={"مسح البحث"}
             >
               <Icon name="close" size={16} />
             </button>
@@ -83,7 +83,7 @@ export default function Browse({
         </label>
       </div>
       <div className="browse-layout">
-        <aside className="filters" aria-label="فلاتر المزادات">
+        <aside className="filters" aria-label={"فلاتر المزادات"}>
           <div className="filter-heading">
             <h2>اختر تفاصيلك</h2>
           </div>
@@ -132,14 +132,14 @@ export default function Browse({
           </fieldset>
           <div className="filter-note">
             <Icon name="shield" />
-            <p>المزادات المعروضة هنا عامة فقط. المزاد الخاص يحتاج رمز وصول.</p>
+            <p>المزادات المعروضة هنا عامة فقط المزاد الخاص يحتاج رمز وصول</p>
           </div>
         </aside>
-        <section className="browse-results" aria-label="نتائج المزادات">
+        <section className="browse-results" aria-label={"نتائج المزادات"}>
           <div className="results-heading">
             <p aria-live="polite">
               {loading ? (
-                "جاري التحميل…"
+                "جاري التحميل"
               ) : error ? (
                 "تعذر تحميل النتائج"
               ) : (
@@ -162,13 +162,13 @@ export default function Browse({
             <div className="state-panel">
               <Icon name="search" size={34} />
               <h3>ما لقينا أصلًا بهالاختيار</h3>
-              <p>جرّب فئة ثانية، أو خفف الفلاتر. يمكن اللي يلفت نظرك قريب.</p>
+              <p>جرّب فئة ثانية، أو خفف الفلاتر يمكن اللي يلفت نظرك قريب</p>
             </div>
           )}
         </section>
       </div>
       <div className="browse-end">
-        <span>اختيار مدروس، يبدأ بتفاصيل واضحة.</span>
+        <span>اختيار مدروس، يبدأ بتفاصيل واضحة</span>
         <a href="#/guide">
           جديدة على المزادات؟ <Icon size={18} />
         </a>

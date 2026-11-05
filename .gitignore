@@ -6,7 +6,6 @@ dist/
 coverage/
 *.log
 .DS_Store
-
-# صور المستخدمين محلية وما تنرفع
 backend/uploads/
 uploads/
+.local-backups/

@@ -35,14 +35,14 @@ export function AuctionState({ state, children }) {
   if (state.loading && !state.auction)
     return (
       <div className="state-panel" role="status">
-        نجهّز لك تفاصيل المجلس…
+        نجهّز لك تفاصيل المزاد
       </div>
     );
   if (!state.auction)
     return (
       <div className="state-panel">
         <Icon name="lock" size={36} />
-        <h2>ما قدرنا نفتح المزاد.</h2>
+        <h2>ما قدرنا نفتح المزاد</h2>
         <p role="alert">{state.error}</p>
         {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
         <a className="text-link" href="#/private-access">
@@ -55,7 +55,7 @@ export function AuctionState({ state, children }) {
       {state.error && (
         <p role="alert" className="form-error">
           {state.error} البيانات الظاهرة من آخر تحديث ناجح؛ تقديم العروض متوقف
-          حتى يرجع الاتصال.
+          حتى يرجع الاتصال
         </p>
       )}
       {children}
@@ -67,8 +67,8 @@ export function SignInGate({ market, children }) {
   return (
     <div className="paper-card access-gate">
       <Icon name="user" size={40} />
-      <h2>مجلسك ينتظرك.</h2>
-      <p>سجّل دخولك عشان تكمل هالخطوة.</p>
+      <h2>مزادك ينتظرك</h2>
+      <p>سجّل دخولك عشان تكمل هالخطوة</p>
       <a
         className="button dark"
         href={"#/login?next=" + encodeURIComponent(location.hash.slice(1))}
@@ -80,7 +80,7 @@ export function SignInGate({ market, children }) {
 }
 export function AuctionNav({ id, current }) {
   return (
-    <nav className="auction-tabs" aria-label="صفحات المزاد">
+    <nav className="auction-tabs" aria-label={"صفحات المزاد"}>
       {[
         ["auction", "التفاصيل"],
         ["commitment", "الالتزام"],
@@ -116,7 +116,7 @@ export function AuctionSummary({ auction }) {
       <div>
         <small>السعر الحالي</small>
         <strong>
-          {money(auction.current_price)} <small>ر.س</small>
+          {money(auction.current_price)} <small>ريال</small>
         </strong>
       </div>
     </div>
@@ -127,8 +127,8 @@ export function BidRows({ rows }) {
     return (
       <div className="empty-box">
         <Icon name="gavel" size={34} />
-        <h3>أول عرض له مكان.</h3>
-        <p>ما فيه عروض في هالصفحة إلى الآن.</p>
+        <h3>أول عرض له مكان</h3>
+        <p>ما فيه عروض في هالصفحة إلى الآن</p>
       </div>
     );
   return (
@@ -149,14 +149,14 @@ export function BidRows({ rows }) {
                 عرض <bdi>{row.id.slice(-6)}</bdi>
               </td>
               <td>
-                {money(row.amount)} <small>ر.س</small>
+                {money(row.amount)} <small>ريال</small>
               </td>
               <td>{dateText(row.created_at)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="field-hint">هوية المزايدين ما تظهر في السجل.</p>
+      <p className="field-hint">هوية المزايدين ما تظهر في السجل</p>
     </div>
   );
 }

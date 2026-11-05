@@ -26,17 +26,17 @@ export default function Register({ workspace }) {
     event.preventDefault();
     if (busy || done || uncertain) return;
     if (!name.trim() || name.trim().length > 160 || !validEmail(email)) {
-      setError("اكتب اسمك وبريد صحيح.");
+      setError("اكتب اسمك وبريد صحيح");
       return;
     }
     if (!workspace.demo && !validPassword(password)) {
       setError(
-        "استخدم 8 أحرف على الأقل. إذا كانت كلمة المرور طويلة جدًا، اختصرها وحاول من جديد.",
+        "استخدم 8 أحرف على الأقل إذا كانت كلمة المرور طويلة جدًا، اختصرها وحاول من جديد",
       );
       return;
     }
     if (!workspace.demo && password !== confirm) {
-      setError("تأكيد كلمة المرور مو مطابق.");
+      setError("تأكيد كلمة المرور مو مطابق");
       return;
     }
     setBusy(true);
@@ -45,9 +45,9 @@ export default function Register({ workspace }) {
       if (!workspace.demo) {
         if (!signupReady())
           throw new Error(
-            "التحقق بالبريد غير متاح حاليًا. حاول إنشاء حسابك لاحقًا.",
+            "التحقق بالبريد غير متاح حاليًا حاول إنشاء حسابك لاحقًا",
           );
-        await request(signupPaths.start, {
+        const registered = await request(signupPaths.start, {
           method: "POST",
           body: {
             name: name.trim(),
@@ -55,6 +55,10 @@ export default function Register({ workspace }) {
             password,
           },
         });
+        if (registered.emailSent === false)
+          setError(
+            "حسابك انحفظ لكن تعذر إرسال الرمز اطلب إرساله من نافذة التحقق",
+          );
       }
       setVerifying(true);
     } catch (err) {
@@ -86,16 +90,16 @@ export default function Register({ workspace }) {
             notify(
               workspace.demo
                 ? "حياك في تجربة مزياد ✦"
-                : "تم إنشاء حسابك بنجاح. حياك في مزياد ✦",
+                : "تم إنشاء حسابك بنجاح حياك في مزياد ✦",
             );
           }}
         />
       )}
       <p className="eyebrow">يا هلا بالبدايات</p>
       <h1>
-        مكانك <em>محفوظ.</em>
+        مكانك <em>محفوظ</em>
       </h1>
-      <p className="form-intro">حساب واحد يجمع أصولك ومشاركاتك.</p>
+      <p className="form-intro">حساب واحد يجمع أصولك ومشاركاتك</p>
       {done ? (
         <div className="success-box">
           <div className="success-seal">
@@ -104,8 +108,8 @@ export default function Register({ workspace }) {
           <h2>{workspace.demo ? "حياك في التجربة!" : "تم إنشاء حسابك!"}</h2>
           <p>
             {workspace.demo
-              ? "حساب التجربة جاهز. تقدر تكتشف الخطوات بدون تنفيذ عمليات فعلية."
-              : "تقدر الآن تسجل دخولك بنفس البريد وكلمة المرور."}
+              ? "حساب التجربة جاهز تقدر تكتشف الخطوات بدون تنفيذ عمليات فعلية"
+              : "تقدر الآن تسجل دخولك بنفس البريد وكلمة المرور"}
           </p>
           <a
             className="button dark full"
@@ -116,14 +120,14 @@ export default function Register({ workspace }) {
             }
           >
             {" "}
-            {workspace.demo ? "ادخل مجلسك" : "تسجيل الدخول"} <Icon />
+            {workspace.demo ? "ادخل مزادك" : "تسجيل الدخول"} <Icon />
           </a>
         </div>
       ) : (
         <>
           {workspace.demo && (
             <p className="inline-notice">
-              أنت في نسخة التجربة. استخدم بيانات تجريبية، وبدون كلمة مرور.
+              أنت في نسخة التجربة استخدم بيانات تجريبية، وبدون كلمة مرور
             </p>
           )}
           <form className="form-stack" onSubmit={submit}>
@@ -135,7 +139,7 @@ export default function Register({ workspace }) {
                   autoComplete="name"
                   required
                   maxLength={160}
-                  placeholder="اسمك اللي نعرفك فيه"
+                  placeholder={"اسمك اللي نعرفك فيه"}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -162,11 +166,11 @@ export default function Register({ workspace }) {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <p className="field-hint">
-                    8 أحرف على الأقل. استخدم كلمة مرور خاصة بحسابك.
+                    8 أحرف على الأقل استخدم كلمة مرور خاصة بحسابك
                   </p>
                   <PasswordField
                     name="confirmPassword"
-                    label="تأكيد كلمة المرور"
+                    label={"تأكيد كلمة المرور"}
                     autoComplete="new-password"
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
@@ -175,7 +179,7 @@ export default function Register({ workspace }) {
               )}
               <button className="button dark full" type="submit">
                 {busy
-                  ? "جاري إنشاء الحساب…"
+                  ? "جاري إنشاء الحساب"
                   : workspace.demo
                     ? "تجربة إنشاء الحساب"
                     : "إنشاء حساب"}{" "}
@@ -196,7 +200,9 @@ export default function Register({ workspace }) {
           </p>
         </>
       )}
-      {!workspace.user && <GoogleAccess />}
+      {!workspace.user && import.meta.env.VITE_GOOGLE_START_PATH && (
+        <GoogleAccess />
+      )}
     </AuthLayout>
   );
 }

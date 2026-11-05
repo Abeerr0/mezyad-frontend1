@@ -1,53 +1,25 @@
 import { useAutoRefresh } from "./useAutoRefresh";
 import { useEffect, useState } from "react";
 import { request } from "./api";
-import { demoCategories } from "./data";
-
+import { demoCategories, demoAuctions } from "./data";
 export const previewUser = {
   id: "preview-user",
   name: "ضيف مزياد",
   email: "guest@example.invalid",
   role: "USER",
 };
-const startingItems = [
-  {
-    id: "own-approved",
-    seller_id: "preview-user",
-    title: "بورش كاريرا GT — 2005",
-    description:
-      "سيارة نادرة بتفاصيل كلاسيكية. راجع الصور والمواصفات قبل تحديد عرضك.",
-    category_id: "cars",
-    categoryFields: { "سنة الصنع": "2005", اللون: "فضي", الممشى: "18,000 كم" },
-    images: ["/images/porsche-carrera-gt.jpg"],
-    status: "APPROVED",
-    created_at: "2026-11-01T10:00:00+03:00",
-  },
-  {
-    id: "own-pending",
-    seller_id: "preview-user",
-    title: "فيلا في حي حطين",
-    description:
-      "فيلا بمساحات واسعة وتشطيب هادئ. مثال لإعلان ينتظر مراجعة المشرف قبل إنشاء المزاد.",
-    category_id: "property",
-    categoryFields: { المدينة: "الرياض", المساحة: "600 م²" },
-    images: ["/images/hittin-villa.jpg"],
-    status: "PENDING_REVIEW",
-    created_at: "2026-11-02T09:00:00+03:00",
-  },
-  {
-    id: "own-rejected",
-    seller_id: "preview-user",
-    title: "لوحة مميزة — ن ج د 1",
-    description: "لوحة مميزة برقم منفرد وحروف تلفت النظر.",
-    category_id: "plates",
-    categoryFields: { الحروف: "ن ج د", الرقم: "1" },
-    images: ["/images/plate-njd1.jpg"],
-    status: "REJECTED",
-    review_reason:
-      "أضف وصف أوضح لحالة اللوحة ومعلومات نقل الملكية، ثم أعد إرسال الإعلان.",
-    created_at: "2026-10-31T15:00:00+03:00",
-  },
-];
+const startingItems = demoAuctions.slice(0, 3).map((item, index) => ({
+  ...item,
+  id: ["own-approved", "own-pending", "own-rejected"][index],
+  seller_id: "preview-user",
+  images: [item.image_url],
+  status: ["APPROVED", "PENDING_REVIEW", "REJECTED"][index],
+  categoryFields: {},
+  review_reason:
+    index === 2
+      ? "وضح تفاصيل الفحص وحاله السياره ثم ارسل الاعلان من جديد"
+      : null,
+}));
 
 // تم التعديل من عبير: نفصل حساب المعاينه وبياناته عن حساب API عشان ما تختلط البيانات.
 export function useWorkspace(demo) {
@@ -85,7 +57,6 @@ export function useWorkspace(demo) {
     setAvatar(value);
     return true;
   }
-
   useEffect(() => {
     setSession(null);
     setNotice("");
@@ -98,7 +69,6 @@ export function useWorkspace(demo) {
       }
     }
   }, [demo]);
-
   function remember(next) {
     setSession(next);
     if (!demo) {
@@ -107,7 +77,7 @@ export function useWorkspace(demo) {
           sessionStorage.setItem("mezyad-api-session", JSON.stringify(next));
         else sessionStorage.removeItem("mezyad-api-session");
       } catch {
-        setNotice("الجلسة شغالة هنا، لكن المتصفح ما حفظها للتحديث القادم.");
+        setNotice("الجلسة شغالة هنا، لكن المتصفح ما حفظها للتحديث القادم");
       }
     }
   }
@@ -115,16 +85,18 @@ export function useWorkspace(demo) {
   // تم التعديل من عبير: كل طلب خاص يمر بالتوكن، واذا انتهت الجلسه نرجع المستخدم للدخول.
   async function call(path, options = {}) {
     try {
-      return await request(path, { ...options, token: session?.token });
+      return await request(path, {
+        ...options,
+        token: session?.token,
+      });
     } catch (err) {
       if (err.status === 401) {
         remember(null);
-        setNotice("انتهت جلستك. سجل دخولك من جديد.");
+        setNotice("انتهت جلستك سجل دخولك من جديد");
       }
       throw err;
     }
   }
-
   useEffect(() => {
     if (!session) {
       setItems([]);
@@ -146,17 +118,22 @@ export function useWorkspace(demo) {
     setLoading(items.length === 0 && auctions.length === 0);
     setError("");
     Promise.all([
-      request("/me/items", { token: session.token, signal: controller.signal }),
+      request("/me/items", {
+        token: session.token,
+        signal: controller.signal,
+      }),
       request("/me/auctions", {
         token: session.token,
         signal: controller.signal,
       }),
-      request("/categories", { signal: controller.signal }),
+      request("/categories", {
+        signal: controller.signal,
+      }),
     ])
       .then(([nextItems, nextAuctions, nextCategories]) => {
         if (![nextItems, nextAuctions, nextCategories].every(Array.isArray))
           throw new Error(
-            "تعذّر تحميل بيانات حسابك. حاول تسجيل الدخول مرة ثانية.",
+            "تعذّر تحميل بيانات حسابك حاول تسجيل الدخول مرة ثانية",
           );
         if (!controller.signal.aborted) {
           setItems(nextItems);
@@ -172,7 +149,7 @@ export function useWorkspace(demo) {
         setError(err.message);
         if (err.status === 401) {
           remember(null);
-          setNotice("انتهت جلستك. سجل دخولك من جديد.");
+          setNotice("انتهت جلستك سجل دخولك من جديد");
         }
       })
       .finally(() => {
@@ -187,44 +164,68 @@ export function useWorkspace(demo) {
     previewItems,
     previewAuctions,
   ]);
-
   function enterPreview(user = demoUser) {
     setDemoUser(user);
-    remember({ user });
+    remember({
+      user,
+    });
     setNotice("");
   }
   async function login(email, password) {
     const result = await request("/auth/login", {
       method: "POST",
-      body: { email, password },
+      body: {
+        email,
+        password,
+      },
     });
     if (!result.token || !result.user?.id)
-      throw new Error("وصل رد دخول غير مكتمل.");
+      throw new Error("وصل رد دخول غير مكتمل");
     remember(result);
     setNotice("");
+    return result.user;
   }
   async function logout() {
-    if (!demo) await call("/auth/logout", { method: "POST" });
+    if (!demo)
+      await call("/auth/logout", {
+        method: "POST",
+      });
     remember(null);
     location.hash = "/login";
   }
   // تم التعديل من عبير: نحفظ الاسم من API ونثبت البريد ونحدث الحساب في كل الصفحات.
   async function updateProfile(name) {
     const user = demo
-      ? { ...session.user, name }
-      : await call("/me/profile", { method: "PATCH", body: { name } });
+      ? {
+          ...session.user,
+          name,
+        }
+      : await call("/me/profile", {
+          method: "PATCH",
+          body: {
+            name,
+          },
+        });
     if (demo) setDemoUser(user);
-    remember({ ...session, user });
+    remember({
+      ...session,
+      user,
+    });
   }
   async function verifyPassword(currentPassword) {
-    if (demo) throw new Error("سجل دخولك بحسابك للتحقق من كلمة المرور.");
+    if (demo) throw new Error("سجل دخولك بحسابك للتحقق من كلمة المرور");
     return call("/me/password/verify", {
       method: "POST",
-      body: { currentPassword },
+      body: {
+        currentPassword,
+      },
     });
   }
   async function changePassword(input) {
-    return call("/me/password", { method: "POST", body: input });
+    return call("/me/password", {
+      method: "POST",
+      body: input,
+    });
   }
 
   // تم التعديل من عبير: المعاينه تحفظ بالذاكره فقط، والربط الحقيقي يرسل نفس حقول الباك.
@@ -259,7 +260,10 @@ export function useWorkspace(demo) {
     files.forEach((file) => form.append("images", file));
     const saved = await call(
       "/items" + (existing ? "/" + encodeURIComponent(existing.id) : ""),
-      { method: existing ? "PATCH" : "POST", body: form },
+      {
+        method: existing ? "PATCH" : "POST",
+        body: form,
+      },
     );
     if (
       !saved?.id ||
@@ -267,7 +271,7 @@ export function useWorkspace(demo) {
       (existing && saved.id !== existing.id)
     ) {
       const err = new Error(
-        "ما تأكدنا من حفظ الإعلان. راجع إعلاناتك قبل إعادة الإرسال.",
+        "ما تأكدنا من حفظ الإعلان راجع إعلاناتك قبل إعادة الإرسال",
       );
       err.uncertain = true;
       throw err;
@@ -283,10 +287,10 @@ export function useWorkspace(demo) {
   async function createAuction(input) {
     if (demo) {
       if (previewAuctions.some((a) => a.item_id === input.itemId))
-        throw new Error("هالإعلان له مزاد بالفعل.");
+        throw new Error("هالإعلان له مزاد بالفعل");
       const item = previewItems.find((i) => i.id === input.itemId);
       if (item?.status !== "APPROVED")
-        throw new Error("الإعلان لازم يكون معتمد.");
+        throw new Error("الإعلان لازم يكون معتمد");
       const result = {
         id: "preview-auction-" + Date.now(),
         item_id: item.id,
@@ -301,16 +305,21 @@ export function useWorkspace(demo) {
         end_time: input.endTime,
         status: new Date(input.startTime) > new Date() ? "SCHEDULED" : "ACTIVE",
         ...(input.visibility === "PRIVATE"
-          ? { accessCode: "PREVIEW-" + Date.now().toString(36).toUpperCase() }
+          ? {
+              accessCode: "PREVIEW-" + Date.now().toString(36).toUpperCase(),
+            }
           : {}),
       };
       setPreviewAuctions((old) => [result, ...old]);
       return result;
     }
-    const result = await call("/auctions", { method: "POST", body: input });
+    const result = await call("/auctions", {
+      method: "POST",
+      body: input,
+    });
     if (!result?.id || result.item_id !== input.itemId) {
       const err = new Error(
-        "ما تأكدنا من إنشاء المزاد. راجع نشاطك قبل إعادة الإرسال.",
+        "ما تأكدنا من إنشاء المزاد راجع نشاطك قبل إعادة الإرسال",
       );
       err.uncertain = true;
       throw err;
@@ -328,12 +337,12 @@ export function useWorkspace(demo) {
     ]);
     return result;
   }
-
   return {
     demo,
     avatar,
     chooseAvatar,
     session,
+    expireSession: () => remember(null),
     user: session?.user,
     items,
     auctions,

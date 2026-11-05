@@ -8,9 +8,8 @@ import {
 } from "node:crypto";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import { resolve, join } from "node:path";
-import { fileURLToPath } from "node:url";
 
-export const uploadDirectory = resolve(process.env.UPLOAD_DIR || fileURLToPath(new URL("../uploads/",import.meta.url)));
+export const uploadDirectory = resolve(process.env.UPLOAD_DIR || "uploads");
 const signingKey = randomBytes(32);
 const imagePath = /^\/uploads\/([a-f0-9-]{36}\.jpg)$/;
 const types = {
@@ -151,4 +150,3 @@ export function serveImage(req, res) {
         .json({ error: { code: "NOT_FOUND", message: "Image not found" } });
   });
 }
-

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { request } from "./api";
+import { request, API } from "./api";
 import { demoAuctions } from "./data";
 
 // تم التعديل من عبير: نولد رقم طلب امن حتى لو المتصفح ما يدعم randomUUID على التشغيل المحلي.
@@ -21,7 +21,7 @@ export function newRequestId() {
 export const auctionLink = (page, id) =>
   "#/" + page + "?id=" + encodeURIComponent(id);
 export const statusLabels = {
-  ACTIVE: "المجلس مفتوح",
+  ACTIVE: "المزاد مفتوح",
   SCHEDULED: "قريب يبدأ",
   CLOSED: "انتهى المزاد",
 };
@@ -37,32 +37,37 @@ export function commitmentLabel(status) {
   return labels[status] || "تحتاج متابعة";
 }
 const messages = {
-  INVALID_CODE: "رمز الدخول مو صحيح. تأكد منه وحاول من جديد.",
-  OWNER: "هذا مزادك. تقدر تتابعه، لكن ما تقدر تشارك فيه كمزايد.",
-  COMMITMENT_REQUIRED: "تحتاج التزام بنكي موثق قبل تقديم العرض.",
+  INVALID_CODE: "رمز الدخول مو صحيح تأكد منه وحاول من جديد",
+  OWNER: "هذا مزادك تقدر تتابعه، لكن ما تقدر تشارك فيه كمزايد",
+  COMMITMENT_REQUIRED: "تحتاج التزام بنكي موثق قبل تقديم العرض",
   BANK_SANDBOX_UNAVAILABLE:
-    "خدمة الالتزام البنكي غير متاحة الآن. ما تم تأكيد التزامك؛ حاول لاحقًا.",
-  BID_TOO_LOW: "وصل عرض أعلى أو المبلغ أقل من المطلوب. راجع آخر سعر.",
-  AUCTION_NOT_ACTIVE: "المزاد مو مفتوح للمزايدة الآن. راجع موعده وحالته.",
-  DUPLICATE_REQUEST: "هذا الطلب تمت معالجته. تحقق من عروضك قبل تقديم عرض جديد.",
-  NOT_FOUND: "المزاد مو متاح. لو كان خاص، ادخل برمزه أول.",
-  INVALID_ID: "رابط المزاد مو صحيح. ارجع لقائمة المزادات.",
+    "خدمة الالتزام البنكي غير متاحة الآن ما تم تأكيد التزامك؛ حاول لاحقًا",
+  BID_TOO_LOW: "وصل عرض أعلى أو المبلغ أقل من المطلوب راجع آخر سعر",
+  AUCTION_NOT_ACTIVE: "المزاد مو مفتوح للمزايدة الآن راجع موعده وحالته",
+  DUPLICATE_REQUEST: "هذا الطلب تمت معالجته تحقق من عروضك قبل تقديم عرض جديد",
+  NOT_FOUND: "المزاد مو متاح لو كان خاص، ادخل برمزه أول",
+  INVALID_ID: "رابط المزاد مو صحيح ارجع لقائمة المزادات",
 };
 
 // تم التعديل من عبير: نوقف الطلب المتاخر ونوضح الخطا بدون افتراض نجاح العمليه.
 export async function marketRequest(path, options = {}) {
   const controller = new AbortController();
   const abort = () => controller.abort();
-  options.signal?.addEventListener("abort", abort, { once: true });
+  options.signal?.addEventListener("abort", abort, {
+    once: true,
+  });
   if (options.signal?.aborted) controller.abort();
   const timer = setTimeout(abort, 12000);
   try {
-    return await request(path, { ...options, signal: controller.signal });
+    return await request(path, {
+      ...options,
+      signal: controller.signal,
+    });
   } catch (error) {
     if (options.signal?.aborted) throw error;
     if (error.name === "AbortError") {
       const timeout = new Error(
-        "تأخر الرد. تحقق من اتصالك ومن حالة طلبك قبل تكراره.",
+        "تأخر الرد تحقق من اتصالك ومن حالة طلبك قبل تكراره",
       );
       timeout.uncertain = options.method === "POST";
       throw timeout;
@@ -100,23 +105,28 @@ export function displayStatus(auction) {
   return auction.status;
 }
 function previewRows(auction) {
-  return Array.from({ length: auction.bid_count || 0 }, (_, n) => ({
-    id: auction.id + "-bid-" + n,
-    amount: (
-      Number(auction.current_price) -
-      n * Number(auction.minimum_increment)
-    ).toFixed(2),
-    created_at: new Date(Date.now() - (n + 1) * 120000).toISOString(),
-    bidder_id: "preview-other",
-  }));
+  return Array.from(
+    {
+      length: auction.bid_count || 0,
+    },
+    (_, n) => ({
+      id: auction.id + "-bid-" + n,
+      amount: (
+        Number(auction.current_price) -
+        n * Number(auction.minimum_increment)
+      ).toFixed(2),
+      created_at: new Date(Date.now() - (n + 1) * 120000).toISOString(),
+      bidder_id: "preview-other",
+    }),
+  );
 }
 const privateExample = {
-  ...demoAuctions[0],
+  ...demoAuctions[2],
   id: "preview-private",
-  title: "مجلس خاص — بورش كلاسيكية",
+  title: "لاندكروزر كلاسيكي مزاد خاص",
   visibility: "PRIVATE",
   bid_count: 0,
-  current_price: "4000000",
+  current_price: "42000",
 };
 
 // تم التعديل من عبير: بيانات التجربه مستقله عن البنك والداتا الحقيقيه وتنمسح مع تحديث الصفحه.
@@ -139,7 +149,11 @@ export function useMarket(workspace) {
     ...records,
     ...workspace.auctions
       .filter((a) => !records.some((r) => r.id === a.id))
-      .map((a) => ({ ...a, seller_id: userId, bids: [] })),
+      .map((a) => ({
+        ...a,
+        seller_id: userId,
+        bids: [],
+      })),
   ];
   function previewAuction(id) {
     const a = all.find((a) => a.id === id);
@@ -176,14 +190,13 @@ export function useMarket(workspace) {
     };
   }
   async function getAuction(id, signal) {
-    if (!id) throw new Error("اختر مزاد من القائمة أول.");
+    if (!id) throw new Error("اختر مزاد من القائمة أول");
     if (workspace.demo) return previewAuction(id);
     const a = await marketRequest("/auctions/" + encodeURIComponent(id), {
       token,
       signal,
     });
-    if (!a?.id || a.id !== id)
-      throw new Error("وصلت تفاصيل غير مكتملة للمزاد.");
+    if (!a?.id || a.id !== id) throw new Error("وصلت تفاصيل غير مكتملة للمزاد");
     return a;
   }
   async function getBids(id, offset = 0, signal) {
@@ -191,9 +204,12 @@ export function useMarket(workspace) {
       return previewAuction(id).bids.slice(offset, offset + 20);
     const rows = await marketRequest(
       "/auctions/" + encodeURIComponent(id) + "/bids?limit=20&offset=" + offset,
-      { token, signal },
+      {
+        token,
+        signal,
+      },
     );
-    if (!Array.isArray(rows)) throw new Error("وصل سجل عروض غير مكتمل.");
+    if (!Array.isArray(rows)) throw new Error("وصل سجل عروض غير مكتمل");
     return rows;
   }
   async function getCommitment(id, signal) {
@@ -201,7 +217,11 @@ export function useMarket(workspace) {
     try {
       return await marketRequest(
         "/auctions/" + encodeURIComponent(id) + "/commitment",
-        { token, signal },
+        {
+          token,
+          signal,
+          base: API.replace(/\/api\/v1$/, ""),
+        },
       );
     } catch (error) {
       if (error.status === 404 && error.code === "NOT_FOUND") return null;
@@ -209,7 +229,7 @@ export function useMarket(workspace) {
     }
   }
   async function enter(code) {
-    if (!userId) throw new Error("سجل دخولك أول.");
+    if (!userId) throw new Error("سجل دخولك أول");
     if (workspace.demo) {
       const own = all.find((a) => a.accessCode === code);
       if (own) throw new Error(messages.OWNER);
@@ -220,19 +240,28 @@ export function useMarket(workspace) {
     const result = await marketRequest("/auctions/access", {
       method: "POST",
       token,
-      body: { accessCode: code },
+      body: {
+        accessCode: code,
+      },
     });
     if (result?.accessGranted !== true || typeof result.auctionId !== "string")
-      throw new Error("ما وصل تأكيد السماح بالدخول.");
+      throw new Error("ما وصل تأكيد السماح بالدخول");
     return result.auctionId;
   }
-  async function commit(id) {
+  async function commit(id, paymentId) {
     if (workspace.demo) throw new Error(messages.BANK_SANDBOX_UNAVAILABLE);
-    // تم التعديل من عبير: ما نعتمد الالتزام من زر او رابط؛ نرجع نفحصه من الباك.
-    return marketRequest("/auctions/" + encodeURIComponent(id) + "/commitment", {
-      method: "POST",
-      token,
-    });
+    // تم التعديل من عبير: نرسل رقم عمليه الدفع لنفس مسار غدي والباك يتحقق من الحجز.
+    if (!paymentId) throw new Error("كمل تأمين المشاركة من صفحة الدفع");
+    return marketRequest(
+      "/auctions/" + encodeURIComponent(id) + "/commitment",
+      {
+        method: "POST",
+        token,
+        body: {
+          paymentId,
+        },
+      },
+    );
   }
   async function bid(id, amount, requestId) {
     if (workspace.demo) {
@@ -266,16 +295,29 @@ export function useMarket(workspace) {
         ),
       );
       setRevision((n) => n + 1);
-      return { bidId: row.id, amount, currentPrice: amount };
+      return {
+        bidId: row.id,
+        amount,
+        currentPrice: amount,
+      };
     }
     const result = await marketRequest(
       "/auctions/" + encodeURIComponent(id) + "/bids",
-      { method: "POST", token, body: { amount: Number(amount), requestId } },
+      {
+        method: "POST",
+        token,
+        body: {
+          amount: Number(amount),
+          requestId,
+        },
+      },
     );
     if (!result?.bidId || cents(result.amount) !== cents(amount))
       throw Object.assign(
-        new Error("ما تأكدنا من حفظ العرض. راجع السجل قبل إرسال عرض جديد."),
-        { uncertain: true },
+        new Error("ما تأكدنا من حفظ العرض راجع السجل قبل إرسال عرض جديد"),
+        {
+          uncertain: true,
+        },
       );
     setRevision((n) => n + 1);
     return result;
@@ -289,8 +331,11 @@ export function useMarket(workspace) {
             a.bids.some((b) => b.bidder_id === userId),
         )
         .map((a) => previewAuction(a.id));
-    const rows = await marketRequest("/me/auctions", { token, signal });
-    if (!Array.isArray(rows)) throw new Error("تعذر قراءة قائمة مزاداتك.");
+    const rows = await marketRequest("/me/auctions", {
+      token,
+      signal,
+    });
+    if (!Array.isArray(rows)) throw new Error("تعذر قراءة قائمة مزاداتك");
     return rows;
   }
   return {
@@ -367,7 +412,11 @@ export function useAuction(
           });
       } catch (error) {
         if (!stopped)
-          setState((old) => ({ ...old, loading: false, error: error.message }));
+          setState((old) => ({
+            ...old,
+            loading: false,
+            error: error.message,
+          }));
       } finally {
         if (!stopped) timer = setTimeout(load, 4000);
       }
@@ -389,6 +438,8 @@ export function useAuction(
     offset,
     refresh,
   ]);
-  return { ...state, reload: () => setRefresh((n) => n + 1) };
+  return {
+    ...state,
+    reload: () => setRefresh((n) => n + 1),
+  };
 }
-

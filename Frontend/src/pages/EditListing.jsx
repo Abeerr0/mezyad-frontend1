@@ -10,9 +10,9 @@ export default function EditListing({ workspace, params }) {
     <AccountLayout
       workspace={workspace}
       active="listings"
-      eyebrow="نعدّلها، ونكمل"
-      title="تعديل الإعلان"
-      description="راجع ملاحظة المشرف، وعدّل إعلانك ثم أعد إرساله."
+      eyebrow={"نعدّلها، ونكمل"}
+      title={"تعديل الإعلان"}
+      description={"راجع ملاحظة المشرف، وعدّل إعلانك ثم أعد إرساله"}
     >
       <ResourceState workspace={workspace}>
         {item?.status === "REJECTED" ? (
@@ -21,7 +21,7 @@ export default function EditListing({ workspace, params }) {
           <div className="paper-card empty-box">
             <Icon name="lock" size={36} />
             <h2>هالإعلان مو متاح للتعديل</h2>
-            <p>التعديل هنا للإعلانات المرفوضة اللي تخص حسابك فقط.</p>
+            <p>التعديل هنا للإعلانات المرفوضة اللي تخص حسابك فقط</p>
             <a className="button dark" href="#/listings">
               العودة لإعلاناتي <Icon />
             </a>

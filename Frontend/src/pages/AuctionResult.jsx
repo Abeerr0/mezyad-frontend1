@@ -10,20 +10,20 @@ export default function AuctionResult({ market, id }) {
     r = a?.result;
   const closed = a && displayStatus(a) === "CLOSED";
   const title = !closed
-    ? "المجلس لسه ما انتهى."
+    ? "المزاد لسه ما انتهى"
     : !r
-      ? "ننتظر اعتماد النتيجة."
+      ? "ننتظر اعتماد النتيجة"
       : !r.winner_bid_id
-        ? "انتهى المجلس بدون عروض."
+        ? "انتهى المزاد بدون عروض"
         : r.isWinner === true
-          ? "مبروك، عرضك هو الأعلى."
-          : "انتهت المنافسة.";
+          ? "مبروك، عرضك هو الأعلى"
+          : "انتهت المنافسة";
   return (
     <AuctionLayout
       market={market}
-      title="وكل مجلس، له ختام."
-      eyebrow="نتيجة المزاد"
-      description="تابع نتيجة مشاركتك بعد إغلاق المزاد."
+      title={"وكل مزاد، له ختام"}
+      eyebrow={"نتيجة المزاد"}
+      description={"تابع نتيجة مشاركتك بعد إغلاق المزاد"}
     >
       <AuctionState state={state}>
         {a && (
@@ -47,24 +47,24 @@ export default function AuctionResult({ market, id }) {
                 <div className="winning-price">
                   <small>العرض الفائز</small>
                   <strong>
-                    {money(r.winning_amount)} <span>ر.س</span>
+                    {money(r.winning_amount)} <span>ريال</span>
                   </strong>
                 </div>
               )}
               {closed && !r && (
                 <p>
-                  انتهاء الموعد ما يكفي لإعلان الفائز. بنعرض النتيجة لما يرجع
-                  سجل الإغلاق.
+                  انتهاء الموعد ما يكفي لإعلان الفائز بنعرض النتيجة لما يرجع سجل
+                  الإغلاق
                 </p>
               )}
               {r?.closed_at && (
                 <p>وقت الإغلاق — الرياض: {dateText(r.closed_at)}</p>
               )}
               {r?.isWinner === false && a.participation?.hasBid && (
-                <p>شاركت بالمجلس، لكن عرضك ما كان العرض الفائز.</p>
+                <p>شاركت بالمزاد، لكن عرضك ما كان العرض الفائز</p>
               )}
               {r?.winner_bid_id && !market.userId && (
-                <p>سجّل دخولك عشان تعرف نتيجة مشاركتك.</p>
+                <p>سجّل دخولك عشان تعرف نتيجة مشاركتك</p>
               )}
               {r?.isWinner && (
                 <a className="pay-trigger" href="#/payment">
@@ -72,8 +72,8 @@ export default function AuctionResult({ market, id }) {
                 </a>
               )}
               <p className="result-footnote">
-                هذي نتيجة المنافسة. الدفع ونقل الملكية ما يتمّون من خلال الموقع
-                حاليًا.
+                هذي نتيجة المنافسة الدفع ونقل الملكية ما يتمّون من خلال الموقع
+                حاليًا
               </p>
               <div className="form-actions">
                 <a
@@ -83,7 +83,7 @@ export default function AuctionResult({ market, id }) {
                   {closed ? "راجع سجل العروض" : "ارجع للمزاد"} <Icon />
                 </a>
                 <a className="button outline" href="#/auctions">
-                  اكتشف مجلس جديد
+                  اكتشف مزاد جديد
                 </a>
               </div>
             </section>

@@ -21,9 +21,9 @@ export default function AuctionDetails({ market, id }) {
   return (
     <AuctionLayout
       market={market}
-      title="كل قيمة، وراها تفاصيل."
-      eyebrow="قبل ما ترفع العرض"
-      description="خذ وقتك مع الأصل، واقرأ شروط المجلس."
+      title={"كل قيمة، وراها تفاصيل"}
+      eyebrow={"قبل ما ترفع العرض"}
+      description={"خذ وقتك مع الأصل، واقرأ شروط المزاد"}
     >
       <AuctionState state={state}>
         {a && (
@@ -43,7 +43,7 @@ export default function AuctionDetails({ market, id }) {
                   ) : (
                     <div className="empty-box">
                       <Icon name="image" size={50} />
-                      <p>ما فيه صور متاحة للأصل.</p>
+                      <p>ما فيه صور متاحة للأصل</p>
                     </div>
                   )}
                   <span className="asset-edition">THE MEZYAD COLLECTION</span>
@@ -65,7 +65,7 @@ export default function AuctionDetails({ market, id }) {
                 <section className="paper-card asset-story">
                   <p className="eyebrow">حكاية الأصل</p>
                   <h2>{a.title}</h2>
-                  <p>{a.description || "ما أضاف البائع وصف إضافي."}</p>
+                  <p>{a.description || "ما أضاف البائع وصف إضافي"}</p>
                   <dl className="spec-list">
                     {Object.entries(
                       a.category_fields || a.categoryFields || {},
@@ -84,8 +84,19 @@ export default function AuctionDetails({ market, id }) {
               </div>
               <aside className="auction-ticket">
                 {/* تم التعديل من عبير: نعرض هويه صاحب الجلسه بدون نسب اسمه او افتاره لبائع ثاني. */}
-                {market.workspace.user && <div className="auction-member"><Avatar value={market.workspace.avatar} name={market.workspace.user.name} /><div><strong>{market.workspace.user.name}</strong><small>{owner ? "هذا مزادك" : "تتصفح بحسابك"}</small></div></div>}
-                <p className="eyebrow">شروط المجلس</p>
+                {market.workspace.user && (
+                  <div className="auction-member">
+                    <Avatar
+                      value={market.workspace.avatar}
+                      name={market.workspace.user.name}
+                    />
+                    <div>
+                      <strong>{market.workspace.user.name}</strong>
+                      <small>{owner ? "هذا مزادك" : "تتصفح بحسابك"}</small>
+                    </div>
+                  </div>
+                )}
+                <p className="eyebrow">شروط المزاد</p>
                 <div className="ticket-price">
                   <small>السعر الحالي</small>
                   <strong>{money(a.current_price)}</strong>
@@ -94,11 +105,11 @@ export default function AuctionDetails({ market, id }) {
                 <dl>
                   <div>
                     <dt>سعر البداية</dt>
-                    <dd>{money(a.starting_price)} ر.س</dd>
+                    <dd>{money(a.starting_price)} ريال</dd>
                   </div>
                   <div>
                     <dt>أقل زيادة</dt>
-                    <dd>{money(a.minimum_increment)} ر.س</dd>
+                    <dd>{money(a.minimum_increment)} ريال</dd>
                   </div>
                   <div>
                     <dt>البداية — الرياض</dt>
@@ -118,11 +129,11 @@ export default function AuctionDetails({ market, id }) {
                   </a>
                 ) : owner ? (
                   <p className="inline-notice">
-                    هذا مزادك. تابع العروض؛ المالك ما يزايد على أصله.
+                    هذا مزادك تابع العروض؛ المالك ما يزايد على أصله
                   </p>
                 ) : status === "SCHEDULED" ? (
                   <p className="inline-notice">
-                    المجلس ما بدأ. ارجع بوقت البداية عشان تقدم عرضك.
+                    المزاد ما بدأ ارجع بوقت البداية عشان تقدم عرضك
                   </p>
                 ) : (
                   <a className="button dark full" href={auctionLink("bid", id)}>
@@ -136,8 +147,8 @@ export default function AuctionDetails({ market, id }) {
                   سجل العروض
                 </a>
                 <p className="field-hint">
-                  السعر يتحدّث تلقائيًا. يتأكد قبول عرضك بعد إرساله وفق آخر سعر
-                  ووقت المزاد.
+                  السعر يتحدّث تلقائيًا يتأكد قبول عرضك بعد إرساله وفق آخر سعر
+                  ووقت المزاد
                 </p>
                 {state.updated && (
                   <small>

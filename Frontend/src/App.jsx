@@ -1,3 +1,4 @@
+import AdminDashboardAseel from "./pages/AdminDashboard-Aseel";
 import { useAutoRefresh } from "./useAutoRefresh";
 import { Avatar } from "./Avatar";
 import BrandScene from "./BrandScene";
@@ -30,8 +31,8 @@ import { useWorkspace } from "./workspace";
 import { API, imageUrl } from "./api";
 import { Icon } from "./components";
 import { categoryLabels, demoAuctions, demoCategories } from "./data";
-
 const pageTitles = {
+  admin: "لوحة الإدارة",
   payment: "مراجعة الدفع",
   auction: "تفاصيل المزاد",
   "private-access": "المزاد الخاص",
@@ -68,7 +69,10 @@ function readRoute() {
   }
   const [path, query] = (location.hash.slice(1) || "/").split("?");
   const name = path.replace(/^\//, "") || "home";
-  return { page: name, params: new URLSearchParams(query || "") };
+  return {
+    page: name,
+    params: new URLSearchParams(query || ""),
+  };
 }
 
 // تم التعديل من عبير: نحفظ مسار الصفحه بالفاصل # عشان الروابط والرجوع تشتغل بدون مكتبه اضافيه.
@@ -78,7 +82,10 @@ export default function App() {
   const demo = location.pathname.endsWith("/PREVIEW.html");
   const workspace = useWorkspace(demo);
   const market = useMarket(workspace);
-  const [catalog, setCatalog] = useState({ auctions: [], categories: [] });
+  const [catalog, setCatalog] = useState({
+    auctions: [],
+    categories: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
@@ -92,7 +99,6 @@ export default function App() {
     route.page === "auctions" ? route.params.get("category") || "" : "";
   const status =
     route.page === "auctions" ? route.params.get("status") || "" : "";
-
   useEffect(() => {
     const onRoute = () => {
       setRoute(readRoute());
@@ -103,8 +109,13 @@ export default function App() {
   }, []);
   useEffect(() => {
     document.title = (pageTitles[route.page] || "غير موجودة") + " | مزياد";
-    window.scrollTo({ top: 0, behavior: "instant" });
-    mainRef.current?.focus({ preventScroll: true });
+    window.scrollTo({
+      top: 0,
+      behavior: "instant",
+    });
+    mainRef.current?.focus({
+      preventScroll: true,
+    });
   }, [route.page]);
   // تم التعديل من عبير: وضع API يقرا بيانات الباك فقط ولا يستبدل الخطا ببيانات تجريبيه.
   useEffect(() => {
@@ -167,8 +178,11 @@ export default function App() {
           });
       } catch (err) {
         if (active && err.name !== "AbortError") {
-          setCatalog({ auctions: [], categories: [] });
-          setError("تعذّر تحميل المزادات الآن. حاول مرة ثانية بعد شوي.");
+          setCatalog({
+            auctions: [],
+            categories: [],
+          });
+          setError("تعذّر تحميل المزادات الآن حاول مرة ثانية بعد شوي");
         }
       } finally {
         if (active) setLoading(false);
@@ -197,7 +211,11 @@ export default function App() {
       return;
     }
     if (type === "account") {
-      location.hash = workspace.user ? "/activity" : "/login";
+      location.hash = workspace.user
+        ? workspace.user.role === "ADMIN"
+          ? "/admin"
+          : "/activity"
+        : "/login";
       return;
     }
   }
@@ -228,7 +246,6 @@ export default function App() {
     onOpen: openAuction,
     onFeature,
   };
-
   return (
     <>
       <a
@@ -244,7 +261,7 @@ export default function App() {
       {/* تم التعديل من عبير: نعرض رساله البراند، والتنبيه المختصر يظهر بملف التجربه فقط. */}
       <div className="preview-bar brand-bar">
         <span>
-          <i /> للقيمة أهلها، وللمنافسة مزياد.
+          <i /> للقيمة أهلها، وللمنافسة مزياد
         </span>
         {demo ? (
           <small>نسخة تجربة — العمليات هنا ما تنفّذ شراء أو بيع</small>
@@ -256,12 +273,12 @@ export default function App() {
       </div>
       <header className="site-header">
         <div className="container header-inner">
-          <a href="#/" className="brand" aria-label="مزياد — الرئيسية">
-            <img src="/images/mezyad-logo.png" alt="Mezyad مزياد" />
+          <a href="#/" className="brand" aria-label={"مزياد — الرئيسية"}>
+            <img src="/images/mezyad-logo.png" alt={"Mezyad مزياد"} />
           </a>
           <nav
             className={"main-nav " + (menu ? "is-open" : "")}
-            aria-label="التنقل الرئيسي"
+            aria-label={"التنقل الرئيسي"}
           >
             {[
               ["home", "/", "الرئيسية"],
@@ -288,7 +305,13 @@ export default function App() {
               ) : (
                 <Icon name="user" size={17} />
               )}
-              <span>{workspace.user ? "مجلسي" : "تسجيل الدخول"}</span>
+              <span>
+                {workspace.user
+                  ? workspace.user.role === "ADMIN"
+                    ? "الإدارة"
+                    : "مزاداتي"
+                  : "تسجيل الدخول"}
+              </span>
             </button>
             {![
               "listings",
@@ -320,6 +343,9 @@ export default function App() {
           key={route.page + "-" + demo + "-" + (route.params.get("id") || "")}
         >
           {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
+          {route.page === "admin" && (
+            <AdminDashboardAseel workspace={workspace} />
+          )}
           {route.page === "payment" && (
             <PaymentPage
               market={market}
@@ -379,13 +405,13 @@ export default function App() {
         {!pageTitles[route.page] && (
           <div className="container state-panel">
             <h1>الصفحة مو هنا</h1>
-            <p>ارجع للمجلس ونبدأ من جديد.</p>
+            <p>ارجع للمزاد ونبدأ من جديد</p>
             <a className="button dark" href="#/">
               الرئيسية <Icon />
             </a>
           </div>
         )}
-        {!["activity", "listings", "profile", "my-auctions"].includes(
+        {!["admin", "activity", "listings", "profile", "my-auctions"].includes(
           route.page,
         ) && <BrandScene page={route.page} />}
       </main>
@@ -393,11 +419,11 @@ export default function App() {
         <div className="container">
           <div className="footer-top">
             <div className="footer-brand">
-              <img src="/images/mezyad-logo.png" alt="مزياد" />
+              <img src="/images/mezyad-logo.png" alt={"مزياد"} />
               <p>
-                أصول لها قيمة.
+                أصول لها قيمة
                 <br />
-                ومجلس يجمعها.
+                ومزاد يجمعها
               </p>
             </div>
             <div>
@@ -417,12 +443,12 @@ export default function App() {
             </div>
             <div className="footer-signature">
               <Icon name="gavel" size={38} />
-              <span>القيمة في التفاصيل.</span>
+              <span>القيمة في التفاصيل</span>
               <small>THE MEZYAD WAY</small>
             </div>
           </div>
           <div className="footer-bottom">
-            <span className="abeer-signature" aria-label="تصميم وتطوير عبير">
+            <span className="abeer-signature" aria-label={"تصميم وتطوير عبير"}>
               <b>
                 A<span>✦</span>
               </b>
@@ -434,7 +460,7 @@ export default function App() {
               <i />
               المملكة العربية السعودية
             </span>
-            <span>للقيمة أهلها.</span>
+            <span>للقيمة أهلها</span>
           </div>
         </div>
       </footer>

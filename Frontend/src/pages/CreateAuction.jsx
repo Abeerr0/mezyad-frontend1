@@ -23,10 +23,10 @@ export default function CreateAuction({ workspace, params }) {
   const duplicate = workspace.auctions.some((a) => a.item_id === itemId);
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   function validate() {
-    if (!item) return "اختر إعلان معتمد يخصك.";
-    if (duplicate) return "هالإعلان له مزاد بالفعل. تقدر تتابعه من نشاطي.";
+    if (!item) return "اختر إعلان معتمد يخصك";
+    if (duplicate) return "هالإعلان له مزاد بالفعل تقدر تتابعه من نشاطي";
     if (!validAmount(startingPrice) || !validAmount(minimumIncrement))
-      return "اكتب مبالغ أكبر من صفر وبمنزلتين عشريتين كحد أقصى.";
+      return "اكتب مبالغ أكبر من صفر وبمنزلتين عشريتين كحد أقصى";
     if (
       !startTime ||
       !endTime ||
@@ -34,9 +34,9 @@ export default function CreateAuction({ workspace, params }) {
       !Number.isFinite(Date.parse(endTime)) ||
       new Date(endTime) <= new Date(startTime)
     )
-      return "النهاية لازم تكون بعد البداية. راجع التاريخ والوقت.";
+      return "النهاية لازم تكون بعد البداية راجع التاريخ والوقت";
     if (new Date(endTime) <= new Date())
-      return "وقت النهاية لازم يكون في المستقبل.";
+      return "وقت النهاية لازم يكون في المستقبل";
     return "";
   }
   async function submit(event) {
@@ -75,18 +75,18 @@ export default function CreateAuction({ workspace, params }) {
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(result.accessCode);
-      setCopyStatus("تم نسخ الرمز.");
+      setCopyStatus("تم نسخ الرمز");
     } catch {
-      setCopyStatus("حدد الرمز من الحقل وانسخه يدويًا.");
+      setCopyStatus("حدد الرمز من الحقل وانسخه يدويًا");
     }
   }
   return (
     <AccountLayout
       workspace={workspace}
       active="listings"
-      eyebrow="بعد الاعتماد، القرار لك"
-      title="جهّز مزادك"
-      description="حدد نوع الدخول وشروط المزاد، وراجعها قبل الإنشاء."
+      eyebrow={"بعد الاعتماد، القرار لك"}
+      title={"جهّز مزادك"}
+      description={"حدد نوع الدخول وشروط المزاد، وراجعها قبل الإنشاء"}
     >
       <ResourceState workspace={workspace}>
         {result ? (
@@ -95,17 +95,17 @@ export default function CreateAuction({ workspace, params }) {
               <Icon name="gavel" size={34} />
             </div>
             <p className="eyebrow">جاهزين للمنافسة</p>
-            <h2>{workspace.demo ? "مزاد التجربة جاهز." : "تم إنشاء مزادك."}</h2>
+            <h2>{workspace.demo ? "مزاد التجربة جاهز" : "تم إنشاء مزادك"}</h2>
             <p>{item?.title}</p>
             <p>
               {result.visibility === "PRIVATE"
-                ? "مزاد خاص، ما يظهر في قائمة المزادات العامة."
-                : "مزاد عام، يقدر الزوار يشوفونه في قائمة المزادات."}
+                ? "مزاد خاص، ما يظهر في قائمة المزادات العامة"
+                : "مزاد عام، يقدر الزوار يشوفونه في قائمة المزادات"}
             </p>
             <p className="field-hint">
               {workspace.demo
-                ? "هذا مزاد تجريبي، وما يُنشر للمستخدمين."
-                : "يبدأ مزادك وينتهي تلقائيًا في المواعيد اللي حددتها."}
+                ? "هذا مزاد تجريبي، وما يُنشر للمستخدمين"
+                : "يبدأ مزادك وينتهي تلقائيًا في المواعيد اللي حددتها"}
             </p>
             {result.visibility === "PRIVATE" &&
               (result.accessCode ? (
@@ -117,8 +117,8 @@ export default function CreateAuction({ workspace, params }) {
                 </>
               ) : (
                 <p role="alert" className="form-error">
-                  تم إنشاء المزاد، لكن الرمز ما وصل. لا تنشئ مزاد ثاني؛ راجع
-                  الفريق.
+                  تم إنشاء المزاد، لكن الرمز ما وصل لا تنشئ مزاد ثاني؛ راجع
+                  الفريق
                 </p>
               ))}
             <a className="button dark" href="#/activity">
@@ -128,10 +128,10 @@ export default function CreateAuction({ workspace, params }) {
         ) : !approved.length ? (
           <div className="paper-card empty-box">
             <Icon name="shield" size={38} />
-            <h2>نحتاج إعلان معتمد أول.</h2>
+            <h2>نحتاج إعلان معتمد أول</h2>
             <p>
-              إذا عندك إعلان قيد المراجعة، انتظر القرار. وإذا ما أرسلت أصل، ابدأ
-              بإعلان جديد.
+              إذا عندك إعلان قيد المراجعة، انتظر القرار وإذا ما أرسلت أصل، ابدأ
+              بإعلان جديد
             </p>
             <a className="button dark" href="#/listings">
               شوف إعلاناتك <Icon />
@@ -181,7 +181,7 @@ export default function CreateAuction({ workspace, params }) {
                     )}
                     {duplicate && (
                       <p role="alert" className="form-error">
-                        هالإعلان له مزاد بالفعل. اختر أصل ثاني.
+                        هالإعلان له مزاد بالفعل اختر أصل ثاني
                       </p>
                     )}
                   </section>
@@ -189,7 +189,7 @@ export default function CreateAuction({ workspace, params }) {
                     <div className="section-heading">
                       <div>
                         <span className="section-number">02</span>
-                        <h2>مين يدخل المجلس؟</h2>
+                        <h2>مين يدخل المزاد؟</h2>
                       </div>
                     </div>
                     <div className="auction-type-choices">
@@ -197,15 +197,15 @@ export default function CreateAuction({ workspace, params }) {
                         [
                           "PUBLIC",
                           "عام",
-                          "المجلس مفتوح",
-                          "يظهر في التصفح العام، والمشاركة حسب شروط المزاد.",
+                          "المزاد مفتوح",
+                          "يظهر في التصفح العام، والمشاركة حسب شروط المزاد",
                           "globe",
                         ],
                         [
                           "PRIVATE",
                           "خاص",
                           "دعوة على ذوقك",
-                          "ما يظهر للعامة. ترسل رمز الدخول للأشخاص اللي تختارهم.",
+                          "ما يظهر للعامة ترسل رمز الدخول للأشخاص اللي تختارهم",
                           "lock",
                         ],
                       ].map(([value, label, title, text, icon]) => (
@@ -238,7 +238,7 @@ export default function CreateAuction({ workspace, params }) {
                     <div className="two-fields">
                       <label className="field">
                         <span>
-                          سعر البداية <small>ر.س</small>
+                          سعر البداية <small>ريال</small>
                         </span>
                         <input
                           inputMode="decimal"
@@ -250,7 +250,7 @@ export default function CreateAuction({ workspace, params }) {
                       </label>
                       <label className="field">
                         <span>
-                          أقل زيادة <small>ر.س</small>
+                          أقل زيادة <small>ريال</small>
                         </span>
                         <input
                           inputMode="decimal"
@@ -280,15 +280,15 @@ export default function CreateAuction({ workspace, params }) {
                       </label>
                     </div>
                     <p className="field-hint">
-                      الأوقات بتوقيت جهازك: <bdi>{zone}</bdi>. نرسلها للخادم
-                      بصيغة UTC.
+                      الأوقات بتوقيت جهازك: <bdi>{zone}</bdi> نرسلها للخادم
+                      بصيغة UTC
                     </p>
                   </section>
                 </>
               ) : (
                 <section className="paper-card auction-confirm">
-                  <p className="eyebrow">قبل ما يبدأ المجلس</p>
-                  <h2>راجع شروط مزادك.</h2>
+                  <p className="eyebrow">قبل ما يبدأ المزاد</p>
+                  <h2>راجع شروط مزادك</h2>
                   <h3>{item?.title}</h3>
                   <dl className="spec-list">
                     <div>
@@ -299,11 +299,11 @@ export default function CreateAuction({ workspace, params }) {
                     </div>
                     <div>
                       <dt>سعر البداية</dt>
-                      <dd>{money(startingPrice)} ر.س</dd>
+                      <dd>{money(startingPrice)} ريال</dd>
                     </div>
                     <div>
                       <dt>أقل زيادة</dt>
-                      <dd>{money(minimumIncrement)} ر.س</dd>
+                      <dd>{money(minimumIncrement)} ريال</dd>
                     </div>
                     <div>
                       <dt>البداية — الرياض</dt>
@@ -316,7 +316,7 @@ export default function CreateAuction({ workspace, params }) {
                   </dl>
                   <p className="inline-notice">
                     راجع السعر والمواعيد قبل التأكيد؛ شروط المزاد ما تتعدل بعد
-                    إنشائه.
+                    إنشائه
                   </p>
                 </section>
               )}
@@ -327,7 +327,7 @@ export default function CreateAuction({ workspace, params }) {
                   type="submit"
                 >
                   {busy
-                    ? "جاري الإنشاء…"
+                    ? "جاري الإنشاء"
                     : reviewing
                       ? "تأكيد إنشاء المزاد"
                       : "مراجعة شروط المزاد"}{" "}

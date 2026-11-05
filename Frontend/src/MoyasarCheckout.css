@@ -1,6 +1,6 @@
 /* تم التعديل من عبير: المحفظه فوق ملخصها والدفع بكرت مستقل وبلون هويه مزياد. */
 .container.payment-page {
-  text-align:start;
+  text-align: start;
   max-width: 1160px;
   padding-block: 36px 90px;
 }
@@ -218,7 +218,24 @@
   }
 }
 
-@media(max-width:760px){.payment-page .payment-heading {display:block;margin-bottom:24px;}.payment-page .payment-safe {margin-top:16px;}.payment-page .payment-heading h1 {font-size:29px;line-height:1.5;}}
+@media (max-width: 760px) {
+  .payment-page .payment-heading {
+    display: block;
+    margin-bottom: 24px;
+  }
+  .payment-page .payment-safe {
+    margin-top: 16px;
+  }
+  .payment-page .payment-heading h1 {
+    font-size: 29px;
+    line-height: 1.5;
+  }
+}
 
 /* تم التعديل من عبير: نوسع حروف عنوان المحفظه عشان العربي يطلع واضح بالجوال. */
-.payment-page .payment-heading h1 {font-family:Cairo,Noto,sans-serif;font-weight:600;letter-spacing:0;line-height:1.6;}
+.payment-page .payment-heading h1 {
+  font-family: Cairo, Noto, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.6;
+}

@@ -13,13 +13,18 @@ import {
 // تم التعديل من عبير: نقسم سجل العروض لصفحات ونحدث اول صفحه بدون كشف هويه المزايدين.
 export default function BidHistory({ market, id }) {
   const [offset, setOffset] = useState(0);
-  const state = useAuction(market, id, { bids: true, offset });
+  const state = useAuction(market, id, {
+    bids: true,
+    offset,
+  });
   return (
     <AuctionLayout
       market={market}
-      title="كل عرض، له أثر."
-      eyebrow="سجل المنافسة"
-      description="العروض المقبولة مرتبة من الأحدث، بدون بيانات المزايدين الشخصية."
+      title={"كل عرض، له أثر"}
+      eyebrow={"سجل المنافسة"}
+      description={
+        "العروض المقبولة مرتبة من الأحدث، بدون بيانات المزايدين الشخصية"
+      }
     >
       <SignInGate market={market}>
         <AuctionState state={state}>
@@ -37,8 +42,8 @@ export default function BidHistory({ market, id }) {
                 </div>
                 {offset > 0 && (
                   <p className="inline-notice">
-                    قد تتحرك الصفحات مع وصول عروض جديدة. استخدم «السابق» للوصول
-                    لأول صفحة ومتابعة الأحدث.
+                    قد تتحرك الصفحات مع وصول عروض جديدة استخدم «السابق» للوصول
+                    لأول صفحة ومتابعة الأحدث
                   </p>
                 )}
                 <BidRows rows={state.bids} />

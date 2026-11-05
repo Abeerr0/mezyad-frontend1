@@ -44,18 +44,18 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
     if (sending.current) return;
     setError("");
     if (!validEmail(email)) {
-      setError("اكتب بريدك بشكل صحيح، مثل name@example.com.");
+      setError("اكتب بريدك بشكل صحيح، مثل name@example.com");
       return;
     }
     if (stage === "code" && !/^\d{6}$/.test(code)) {
-      setError("اكتب رمز التحقق المكوّن من 6 أرقام.");
+      setError("اكتب رمز التحقق المكوّن من 6 أرقام");
       return;
     }
     if (
       stage === "password" &&
       (!validPassword(password) || password !== confirm)
     ) {
-      setError("استخدم 8 أحرف على الأقل، وتأكد إن كلمتي المرور متطابقتين.");
+      setError("استخدم 8 أحرف على الأقل، وتأكد إن كلمتي المرور متطابقتين");
       return;
     }
     sending.current = true;
@@ -71,7 +71,9 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
               clearTimeout(t);
               reject(new DOMException("Aborted", "AbortError"));
             },
-            { once: true },
+            {
+              once: true,
+            },
           );
         });
         if (stage === "email") {
@@ -79,7 +81,7 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
           setSeconds(30);
         } else if (stage === "code") {
           if (code !== "123456")
-            throw new Error("الرمز مو صحيح أو انتهت صلاحيته. حاول من جديد.");
+            throw new Error("الرمز مو صحيح أو انتهت صلاحيته حاول من جديد");
           setStage("password");
         } else {
           setPassword("");
@@ -93,12 +95,14 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
               typeof p === "string" && p.startsWith("/") && !p.startsWith("//"),
           )
         )
-          throw new Error("استعادة كلمة المرور غير متاحة حاليًا. حاول لاحقًا.");
+          throw new Error("استعادة كلمة المرور غير متاحة حاليًا حاول لاحقًا");
         // تم التعديل من عبير: الطلب الاول ما يكشف اذا البريد مسجل، والتاكيد يحتاج رمز استعاده من الباك.
         if (stage === "email") {
           await request(paths.start, {
             method: "POST",
-            body: { email: email.trim().toLowerCase() },
+            body: {
+              email: email.trim().toLowerCase(),
+            },
             signal: controller.current.signal,
           });
           setStage("code");
@@ -106,17 +110,23 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
         } else if (stage === "code") {
           const result = await request(paths.verify, {
             method: "POST",
-            body: { email: email.trim().toLowerCase(), code },
+            body: {
+              email: email.trim().toLowerCase(),
+              code,
+            },
             signal: controller.current.signal,
           });
           if (!result?.resetToken)
-            throw new Error("ما اكتمل التحقق. اطلب رمز جديد.");
+            throw new Error("ما اكتمل التحقق اطلب رمز جديد");
           setToken(result.resetToken);
           setStage("password");
         } else {
           await request(paths.save, {
             method: "POST",
-            body: { resetToken: token, password },
+            body: {
+              resetToken: token,
+              password,
+            },
             signal: controller.current.signal,
           });
           setPassword("");
@@ -148,17 +158,17 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
         <Modal
           title={
             stage === "email"
-              ? "نرجّعك لمجلسك."
+              ? "نرجّعك لمزادك"
               : stage === "code"
-                ? "تأكد من بريدك."
+                ? "تأكد من بريدك"
                 : stage === "password"
-                  ? "بداية جديدة لحسابك."
+                  ? "بداية جديدة لحسابك"
                   : "جاهز ترجع؟"
           }
           onClose={close}
         >
           <div className="reset-flow">
-            <div className="reset-progress" aria-label="خطوات الاستعادة">
+            <div className="reset-progress" aria-label={"خطوات الاستعادة"}>
               {["email", "code", "password"].map((s, i) => (
                 <span key={s} className={s === stage ? "current" : ""}>
                   {i + 1}
@@ -167,8 +177,7 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
             </div>
             {demo && (
               <p className="field-hint">
-                نسخة التجربة: رمز التحقق 123456. ما تتغير كلمة مرور أي حساب
-                فعلي.
+                نسخة التجربة: رمز التحقق 123456 ما تتغير كلمة مرور أي حساب فعلي
               </p>
             )}
             {stage === "done" ? (
@@ -177,12 +186,12 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
                   <Icon name="check" size={30} />
                 </div>
                 <h3>
-                  {demo ? "اكتملت خطوات الاستعادة." : "تم تغيير كلمة المرور."}
+                  {demo ? "اكتملت خطوات الاستعادة" : "تم تغيير كلمة المرور"}
                 </h3>
                 <p>
                   {demo
-                    ? "تقدر ترجع لتجربة الموقع."
-                    : "سجّل دخولك بكلمة المرور الجديدة."}
+                    ? "تقدر ترجع لتجربة الموقع"
+                    : "سجّل دخولك بكلمة المرور الجديدة"}
                 </p>
                 <button className="button dark full" onClick={close}>
                   الرجوع للدخول <Icon />
@@ -193,7 +202,7 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
                 <fieldset disabled={busy}>
                   {stage === "email" ? (
                     <>
-                      <p>اكتب البريد المرتبط بحسابك، وبنساعدك ترجع له.</p>
+                      <p>اكتب البريد المرتبط بحسابك، وبنساعدك ترجع له</p>
                       <label className="field">
                         البريد الإلكتروني
                         <input
@@ -209,14 +218,14 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
                         />
                       </label>
                       <p className="field-hint">
-                        تأكد من كتابة البريد كامل، بما فيه الجزء بعد @.
+                        تأكد من كتابة البريد كامل، بما فيه الجزء بعد @
                       </p>
                     </>
                   ) : stage === "code" ? (
                     <>
                       <p>
                         إذا كان البريد مسجل، بتوصلك رسالة تحقق على{" "}
-                        <bdi>{masked}</bdi>. شيّك على البريد غير المرغوب بعد.
+                        <bdi>{masked}</bdi> شيّك على البريد غير المرغوب بعد
                       </p>
                       <label className="field">
                         رمز التحقق
@@ -261,7 +270,7 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
                     </>
                   ) : (
                     <>
-                      <p>اختر كلمة مرور خاصة بحسابك، من 8 أحرف على الأقل.</p>
+                      <p>اختر كلمة مرور خاصة بحسابك، من 8 أحرف على الأقل</p>
                       <PasswordField
                         autoComplete="new-password"
                         value={password}
@@ -269,7 +278,7 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
                       />
                       <PasswordField
                         name="resetConfirm"
-                        label="تأكيد كلمة المرور"
+                        label={"تأكيد كلمة المرور"}
                         autoComplete="new-password"
                         value={confirm}
                         onChange={(e) => setConfirm(e.target.value)}
@@ -279,7 +288,7 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
                   <button className="button dark full" disabled={busy}>
                     {busy ? (
                       <>
-                        <span className="ui-loader" /> لحظات…
+                        <span className="ui-loader" /> لحظات
                       </>
                     ) : stage === "email" ? (
                       "إرسال رمز التحقق"
@@ -303,4 +312,3 @@ export default function PasswordReset({ demo, initialEmail = "" }) {
     </>
   );
 }
-

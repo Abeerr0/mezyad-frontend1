@@ -31,16 +31,16 @@ export default function Activity({ workspace, onOpen }) {
     <AccountLayout
       workspace={workspace}
       active="activity"
-      eyebrow="حيّاك في مجلسك"
-      title="كل اللي يهمك، هنا."
-      description="تابع إعلاناتك ومزاداتك، واعرف خطوتك الجاية."
+      eyebrow={"حيّاك في مزادك"}
+      title={"كل اللي يهمك، هنا"}
+      description={"تابع إعلاناتك ومزاداتك، واعرف خطوتك الجاية"}
     >
       <ResourceState workspace={workspace}>
         <div className="activity-welcome">
           <div>
-            <span className="eyebrow">مجلسك، على مزاجك</span>
-            <h2>كل قيمة لها خطوتها.</h2>
-            <p>تابع أصولك، وراجع مشاركاتك، وخلك قريب من الفرصة الجاية.</p>
+            <span className="eyebrow">مزادك، على مزاجك</span>
+            <h2>كل قيمة لها خطوتها</h2>
+            <p>تابع أصولك، وراجع مشاركاتك، وخلك قريب من الفرصة الجاية</p>
             <a href="#/auctions" className="button dark">
               استكشف المزادات <Icon name="arrow" />
             </a>
@@ -73,7 +73,7 @@ export default function Activity({ workspace, onOpen }) {
             <Icon name="refresh" />
             <span>
               <strong>عندك إعلان يحتاج تعديل</strong>
-              <small>شوف سبب الرفض، وعدّل التفاصيل ثم أعد إرساله.</small>
+              <small>شوف سبب الرفض، وعدّل التفاصيل ثم أعد إرساله</small>
             </span>
             <Icon />
           </a>
@@ -86,7 +86,7 @@ export default function Activity({ workspace, onOpen }) {
             </div>
             {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
           </div>
-          <div className="filter-tabs" aria-label="فلترة مزاداتي">
+          <div className="filter-tabs" aria-label={"فلترة مزاداتي"}>
             {[
               ["", "الكل"],
               ["ACTIVE", "نشطة"],
@@ -105,11 +105,11 @@ export default function Activity({ workspace, onOpen }) {
           {!shown.length ? (
             <div className="empty-box compact">
               <Icon name="gavel" size={35} />
-              <h3>المجلس ينتظر مشاركتك</h3>
+              <h3>المزاد ينتظر مشاركتك</h3>
               <p>
                 {filter
-                  ? "ما عندك مزادات بهالحالة."
-                  : "إذا أنشأت مزاد أو شاركت فيه، تلقاه هنا."}
+                  ? "ما عندك مزادات بهالحالة"
+                  : "إذا أنشأت مزاد أو شاركت فيه، تلقاه هنا"}
               </p>
               <a className="text-link" href="#/auctions">
                 استكشف المزادات <Icon />
@@ -145,7 +145,7 @@ export default function Activity({ workspace, onOpen }) {
             </div>
           )}
           <p className="field-hint">
-            افتح أي مزاد لمتابعة تفاصيله، وراجع النتيجة بعد الإغلاق.
+            افتح أي مزاد لمتابعة تفاصيله، وراجع النتيجة بعد الإغلاق
           </p>
         </section>
         <section className="paper-card activity-recent">
@@ -159,7 +159,7 @@ export default function Activity({ workspace, onOpen }) {
             </a>
           </div>
           {!items.length ? (
-            <p>ما عندك إعلانات للحين. ابدأ بأول أصل عندك.</p>
+            <p>ما عندك إعلانات للحين ابدأ بأول أصل عندك</p>
           ) : (
             items.slice(0, 3).map((item) => (
               <a

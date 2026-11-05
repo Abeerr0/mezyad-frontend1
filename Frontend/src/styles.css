@@ -4527,86 +4527,442 @@ h2 em {
 }
 
 /* تم التعديل من عبير: نكبر صوره الرياض ونبعد النص عن القص ونوزع الرموز حول الحافه. */
-.category-section { min-height: 650px; padding-block: 100px; }
-.category-layout { padding-left: 37%; gap: 38px; grid-template-columns: minmax(180px,.8fr) minmax(230px,1fr); }
-.category-portrait-wrap { position:absolute; left:0; top:50%; transform:translateY(-50%); width:35%; height:520px; }
-.category-portrait-wrap .category-portrait { position:relative; inset:auto; transform:none; width:100%; height:100%; margin:0; border:7px solid var(--paper,#f7f5ed); border-left:0; border-radius:0 260px 260px 0; opacity:1; overflow:hidden; box-shadow:0 24px 48px #2930241a; }
-.category-portrait-wrap .category-portrait img { width:100%; height:100%; object-fit:cover; object-position:52% center; filter:none; }
-.category-portrait-wrap figcaption { right:auto; left:7%; bottom:36px; width:72%; max-width:290px; padding:16px 20px; border-radius:20px; background:#242a21e8; color:#fff; text-shadow:none; }
-.category-portrait-wrap figcaption span { font:400 38px/1.3 AmiriUI,serif; }
-.category-portrait-wrap figcaption small { display:block; font-size:12px; line-height:1.8; white-space:normal; }
-.portrait-symbols { position:absolute; inset:0; pointer-events:none; color:var(--gold,#a57e43); }
-.portrait-symbols > span { position:absolute; display:grid; place-items:center; width:58px; height:58px; background:#f4f1e9; border:1px solid #ac874c40; border-radius:50%; box-shadow:0 8px 20px #544a2920; animation:portrait-drift 6s ease-in-out infinite; }
-.portrait-symbols > span:nth-child(1) { right:3%; top:2%; transform:rotate(-12deg); }
-.portrait-symbols > span:nth-child(2) { right:-7%; top:44%; animation-delay:-2s; }
-.portrait-symbols > span:nth-child(3) { right:3%; bottom:2%; animation-delay:-4s; }
-@keyframes portrait-drift { 0%,100% { translate:0 0; } 50% { translate:0 -8px; } }
+.category-section {
+  min-height: 650px;
+  padding-block: 100px;
+}
+.category-layout {
+  padding-left: 37%;
+  gap: 38px;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(230px, 1fr);
+}
+.category-portrait-wrap {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 35%;
+  height: 520px;
+}
+.category-portrait-wrap .category-portrait {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 7px solid var(--paper, #f7f5ed);
+  border-left: 0;
+  border-radius: 0 260px 260px 0;
+  opacity: 1;
+  overflow: hidden;
+  box-shadow: 0 24px 48px #2930241a;
+}
+.category-portrait-wrap .category-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 52% center;
+  filter: none;
+}
+.category-portrait-wrap figcaption {
+  right: auto;
+  left: 7%;
+  bottom: 36px;
+  width: 72%;
+  max-width: 290px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: #242a21e8;
+  color: #fff;
+  text-shadow: none;
+}
+.category-portrait-wrap figcaption span {
+  font:
+    400 38px/1.3 AmiriUI,
+    serif;
+}
+.category-portrait-wrap figcaption small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: normal;
+}
+.portrait-symbols {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: var(--gold, #a57e43);
+}
+.portrait-symbols > span {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  background: #f4f1e9;
+  border: 1px solid #ac874c40;
+  border-radius: 50%;
+  box-shadow: 0 8px 20px #544a2920;
+  animation: portrait-drift 6s ease-in-out infinite;
+}
+.portrait-symbols > span:nth-child(1) {
+  right: 3%;
+  top: 2%;
+  transform: rotate(-12deg);
+}
+.portrait-symbols > span:nth-child(2) {
+  right: -7%;
+  top: 44%;
+  animation-delay: -2s;
+}
+.portrait-symbols > span:nth-child(3) {
+  right: 3%;
+  bottom: 2%;
+  animation-delay: -4s;
+}
+@keyframes portrait-drift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
 /* تم التعديل من عبير: نستبدل النجمه الشفافه بحصان من هويه المجلس. */
-.page-heading:after, .comparison-grid article:after, .private-invite:before { content:"𓃗"; font-family:serif; }
-.art-star { font-family:serif; }
+.page-heading:after,
+.comparison-grid article:after,
+.private-invite:before {
+  content: "𓃗";
+  font-family: serif;
+}
+.art-star {
+  font-family: serif;
+}
 /* تم التعديل من عبير: الافتار دائري من نفس لوحه الشخصيات ويحافظ على حجمه بكل الصفحات. */
-.member-avatar { display:inline-block; flex:none; width:44px; height:44px; border-radius:50%; background-image:url('/images/notion/avatars.webp'); background-size:500% 500%; background-repeat:no-repeat; background-color:#293024; box-shadow:0 0 0 2px #d5bd87,0 4px 14px #25271e20; vertical-align:middle; }
-.account-button .member-avatar { width:34px; height:34px; }
-.member-mark > .member-avatar { width:50px; height:50px; padding:0; }
-.profile-banner .member-avatar { width:86px; height:86px; padding:0; }
-.avatar-picker { text-align:center; }
-.avatar-picker h2 { margin-block:8px; }
-.avatar-carousel { display:flex; justify-content:center; align-items:center; gap:35px; margin:30px auto 12px; }
-.avatar-carousel .member-avatar { width:142px; height:142px; box-shadow:0 0 0 6px #e2d6b9,0 18px 30px #25271e25; }
-.avatar-carousel .icon-button { border:1px solid #ac874c60; background:#f3eee2; border-radius:50%; width:45px; height:45px; font-size:23px; transition:transform .2s,box-shadow .2s; }
-.avatar-carousel .icon-button:hover { transform:translateY(-3px); box-shadow:0 7px 16px #25271e20; }
-.avatar-counter { font-size:13px; color:var(--muted,#73776b); }
-.avatar-options { display:flex; flex-wrap:wrap; justify-content:center; gap:13px; max-width:600px; margin:22px auto 28px; }
-.avatar-options button { padding:4px; border:2px solid transparent; border-radius:50%; background:transparent; cursor:pointer; transition:transform .2s,border-color .2s; }
-.avatar-options button[aria-pressed="true"] { border-color:#94713b; transform:scale(1.1); }
-.avatar-options button:hover { transform:translateY(-3px); }
-.avatar-options .member-avatar { width:46px; height:46px; box-shadow:none; }
-.avatar-storage-note { color:var(--muted,#73776b); font-size:12px; margin-top:16px; }
-.auction-member { display:flex; align-items:center; gap:13px; padding-bottom:22px; margin-bottom:22px; border-bottom:1px solid #ac874c40; }
-.auction-member strong,.auction-member small { display:block; }
-.auction-member small { font-size:12px; margin-top:5px; color:var(--muted,#73776b); }
+.member-avatar {
+  display: inline-block;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-image: url("/images/notion/avatars.webp");
+  background-size: 500% 500%;
+  background-repeat: no-repeat;
+  background-color: #293024;
+  box-shadow:
+    0 0 0 2px #d5bd87,
+    0 4px 14px #25271e20;
+  vertical-align: middle;
+}
+.account-button .member-avatar {
+  width: 34px;
+  height: 34px;
+}
+.member-mark > .member-avatar {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+}
+.profile-banner .member-avatar {
+  width: 86px;
+  height: 86px;
+  padding: 0;
+}
+.avatar-picker {
+  text-align: center;
+}
+.avatar-picker h2 {
+  margin-block: 8px;
+}
+.avatar-carousel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  margin: 30px auto 12px;
+}
+.avatar-carousel .member-avatar {
+  width: 142px;
+  height: 142px;
+  box-shadow:
+    0 0 0 6px #e2d6b9,
+    0 18px 30px #25271e25;
+}
+.avatar-carousel .icon-button {
+  border: 1px solid #ac874c60;
+  background: #f3eee2;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 23px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.avatar-carousel .icon-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 16px #25271e20;
+}
+.avatar-counter {
+  font-size: 13px;
+  color: var(--muted, #73776b);
+}
+.avatar-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 13px;
+  max-width: 600px;
+  margin: 22px auto 28px;
+}
+.avatar-options button {
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+.avatar-options button[aria-pressed="true"] {
+  border-color: #94713b;
+  transform: scale(1.1);
+}
+.avatar-options button:hover {
+  transform: translateY(-3px);
+}
+.avatar-options .member-avatar {
+  width: 46px;
+  height: 46px;
+  box-shadow: none;
+}
+.avatar-storage-note {
+  color: var(--muted, #73776b);
+  font-size: 12px;
+  margin-top: 16px;
+}
+.auction-member {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid #ac874c40;
+}
+.auction-member strong,
+.auction-member small {
+  display: block;
+}
+.auction-member small {
+  font-size: 12px;
+  margin-top: 5px;
+  color: var(--muted, #73776b);
+}
 /* تم التعديل من عبير: صور نوشن تضيف حياه باطارات مختلفه وحركه خفيفه بدون تعطيل الازرار. */
-.brand-scene { position:relative; display:grid; grid-template-columns:1fr 1.1fr; gap:65px; align-items:center; margin-block:65px 100px; padding:34px; border:1px solid #a57e4335; border-radius:38px; background:#e9e6d9; isolation:isolate; }
-.brand-scene-photo { height:330px; border-radius:110px 26px 26px 26px; overflow:hidden; box-shadow:0 15px 28px #29302420; }
-.brand-scene-photo img { width:100%; height:100%; object-fit:cover; transition:transform 1s ease; }
-.brand-scene:hover .brand-scene-photo img { transform:scale(1.035); }
-.brand-scene-copy { padding:20px 10px 75px; position:relative; z-index:1; }
-.brand-scene-copy h2 { font-family:AmiriUI,serif; font-size:clamp(30px,3vw,45px); line-height:1.5; margin:12px 0; }
-.brand-scene-copy p { max-width:32ch; line-height:1.9; }
-.brand-scene-cutout { position:absolute; width:160px; height:145px; object-fit:contain; left:35%; bottom:-30px; filter:drop-shadow(0 14px 12px #25271e26); pointer-events:none; animation:portrait-drift 7s ease-in-out infinite; z-index:2; }
-.brand-scene-home .brand-scene-cutout { width:190px; top:-38px; bottom:auto; left:44%; height:140px; }
-.brand-scene-guide .brand-scene-photo { border-radius:130px 130px 25px 25px; }
-.brand-scene-profile .brand-scene-cutout,.brand-scene-help .brand-scene-cutout { height:185px; width:145px; }
-.brand-scene-listings .brand-scene-photo { border-radius:26px 120px 26px 26px; }
-@media(max-width:1100px) {
- .category-layout { padding-left:34%; grid-template-columns:1fr; gap:20px; }
- .category-portrait-wrap { width:29%; height:440px; }
- .category-links a { padding-block:15px; }
- .category-layout h2 br { display:none; }
- .brand-scene { gap:30px; }
+.brand-scene {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 65px;
+  align-items: center;
+  margin-block: 65px 100px;
+  padding: 34px;
+  border: 1px solid #a57e4335;
+  border-radius: 38px;
+  background: #e9e6d9;
+  isolation: isolate;
 }
-@media(max-width:700px) {
- .category-section { padding:48px 0 445px; min-height:0; }
- .category-layout { padding-left:24px; grid-template-columns:1fr; }
- .category-layout h2 br { display:initial; }
- .category-portrait-wrap { top:auto; bottom:30px; left:0; width:84%; height:365px; transform:none; }
- .category-portrait-wrap .category-portrait { border-radius:0 190px 190px 0; }
- .category-portrait-wrap figcaption { left:7%; bottom:22px; padding:12px 16px; width:70%; }
- .portrait-symbols > span { width:45px; height:45px; }
- .portrait-symbols svg { width:24px; height:24px; }
- .portrait-symbols > span:nth-child(2) { right:-9%; }
- .brand-scene { grid-template-columns:1fr; gap:12px; padding:20px; margin-block:38px 65px; border-radius:28px; }
- .brand-scene-photo { height:270px; border-radius:80px 22px 22px; }
- .brand-scene-copy { padding:12px 4px 65px; }
- .brand-scene-cutout { left:15px; width:130px; height:120px; bottom:-20px; }
- .brand-scene-home .brand-scene-cutout { top:195px; left:0; width:140px; }
- .brand-scene-profile .brand-scene-cutout,.brand-scene-help .brand-scene-cutout { height:140px; width:110px; }
- .avatar-options { gap:9px; }
- .avatar-options .member-avatar { width:40px; height:40px; }
- .avatar-carousel { gap:20px; }
- .avatar-carousel .member-avatar { width:120px; height:120px; }
+.brand-scene-photo {
+  height: 330px;
+  border-radius: 110px 26px 26px 26px;
+  overflow: hidden;
+  box-shadow: 0 15px 28px #29302420;
 }
-@media(prefers-reduced-motion:reduce) { .portrait-symbols > span,.brand-scene-cutout { animation:none; } .brand-scene-photo img,.avatar-options button,.avatar-carousel .icon-button { transition:none; } }
+.brand-scene-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1s ease;
+}
+.brand-scene:hover .brand-scene-photo img {
+  transform: scale(1.035);
+}
+.brand-scene-copy {
+  padding: 20px 10px 75px;
+  position: relative;
+  z-index: 1;
+}
+.brand-scene-copy h2 {
+  font-family: AmiriUI, serif;
+  font-size: clamp(30px, 3vw, 45px);
+  line-height: 1.5;
+  margin: 12px 0;
+}
+.brand-scene-copy p {
+  max-width: 32ch;
+  line-height: 1.9;
+}
+.brand-scene-cutout {
+  position: absolute;
+  width: 160px;
+  height: 145px;
+  object-fit: contain;
+  left: 35%;
+  bottom: -30px;
+  filter: drop-shadow(0 14px 12px #25271e26);
+  pointer-events: none;
+  animation: portrait-drift 7s ease-in-out infinite;
+  z-index: 2;
+}
+.brand-scene-home .brand-scene-cutout {
+  width: 190px;
+  top: -38px;
+  bottom: auto;
+  left: 44%;
+  height: 140px;
+}
+.brand-scene-guide .brand-scene-photo {
+  border-radius: 130px 130px 25px 25px;
+}
+.brand-scene-profile .brand-scene-cutout,
+.brand-scene-help .brand-scene-cutout {
+  height: 185px;
+  width: 145px;
+}
+.brand-scene-listings .brand-scene-photo {
+  border-radius: 26px 120px 26px 26px;
+}
+@media (max-width: 1100px) {
+  .category-layout {
+    padding-left: 34%;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .category-portrait-wrap {
+    width: 29%;
+    height: 440px;
+  }
+  .category-links a {
+    padding-block: 15px;
+  }
+  .category-layout h2 br {
+    display: none;
+  }
+  .brand-scene {
+    gap: 30px;
+  }
+}
+@media (max-width: 700px) {
+  .category-section {
+    padding: 48px 0 445px;
+    min-height: 0;
+  }
+  .category-layout {
+    padding-left: 24px;
+    grid-template-columns: 1fr;
+  }
+  .category-layout h2 br {
+    display: initial;
+  }
+  .category-portrait-wrap {
+    top: auto;
+    bottom: 30px;
+    left: 0;
+    width: 84%;
+    height: 365px;
+    transform: none;
+  }
+  .category-portrait-wrap .category-portrait {
+    border-radius: 0 190px 190px 0;
+  }
+  .category-portrait-wrap figcaption {
+    left: 7%;
+    bottom: 22px;
+    padding: 12px 16px;
+    width: 70%;
+  }
+  .portrait-symbols > span {
+    width: 45px;
+    height: 45px;
+  }
+  .portrait-symbols svg {
+    width: 24px;
+    height: 24px;
+  }
+  .portrait-symbols > span:nth-child(2) {
+    right: -9%;
+  }
+  .brand-scene {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 20px;
+    margin-block: 38px 65px;
+    border-radius: 28px;
+  }
+  .brand-scene-photo {
+    height: 270px;
+    border-radius: 80px 22px 22px;
+  }
+  .brand-scene-copy {
+    padding: 12px 4px 65px;
+  }
+  .brand-scene-cutout {
+    left: 15px;
+    width: 130px;
+    height: 120px;
+    bottom: -20px;
+  }
+  .brand-scene-home .brand-scene-cutout {
+    top: 195px;
+    left: 0;
+    width: 140px;
+  }
+  .brand-scene-profile .brand-scene-cutout,
+  .brand-scene-help .brand-scene-cutout {
+    height: 140px;
+    width: 110px;
+  }
+  .avatar-options {
+    gap: 9px;
+  }
+  .avatar-options .member-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  .avatar-carousel {
+    gap: 20px;
+  }
+  .avatar-carousel .member-avatar {
+    width: 120px;
+    height: 120px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portrait-symbols > span,
+  .brand-scene-cutout {
+    animation: none;
+  }
+  .brand-scene-photo img,
+  .avatar-options button,
+  .avatar-carousel .icon-button {
+    transition: none;
+  }
+}
 /* تم التعديل من عبير: نمنع تنسيق القائمه القديم من اخفاء صوره الحساب. */
-.account-sidebar .member-mark > .member-avatar { background-image:url('/images/notion/avatars.webp'); background-size:500% 500%; background-repeat:no-repeat; }
-.category-portrait-wrap figcaption small { font-size:14px; }
+.account-sidebar .member-mark > .member-avatar {
+  background-image: url("/images/notion/avatars.webp");
+  background-size: 500% 500%;
+  background-repeat: no-repeat;
+}
+.category-portrait-wrap figcaption small {
+  font-size: 14px;
+}
+
+/* تم التعديل من عبير: نشيل نقاط الزينه من رساله البراند والتذييل ونبقي مؤشرات حاله المزاد. */
+.brand-bar > span > i,
+.footer-bottom > span > i {
+  display: none;
+}

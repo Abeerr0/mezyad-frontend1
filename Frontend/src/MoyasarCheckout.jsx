@@ -3,7 +3,6 @@ import { useAutoRefresh } from "./useAutoRefresh";
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./components";
 import { request } from "./api";
-
 let sdkPromise;
 // تم التعديل من عبير: بيانات البطاقه تروح لميسر مباشره وما تمر على الباك او تخزين الموقع.
 function loadMoyasar() {
@@ -21,19 +20,19 @@ function loadMoyasar() {
       const timer = setTimeout(() => {
         script.remove();
         sdkPromise = null;
-        reject(new Error("تعذّر تحميل خدمة الدفع. حاول مرة ثانية."));
+        reject(new Error("تعذّر تحميل خدمة الدفع حاول مرة ثانية"));
       }, 15000);
       script.onload = () => {
         clearTimeout(timer);
         window.Moyasar
           ? resolve(window.Moyasar)
-          : reject(new Error("تعذّر تحميل خدمة الدفع."));
+          : reject(new Error("تعذّر تحميل خدمة الدفع"));
       };
       script.onerror = () => {
         clearTimeout(timer);
         script.remove();
         sdkPromise = null;
-        reject(new Error("تعذّر تحميل خدمة الدفع. حاول مرة ثانية."));
+        reject(new Error("تعذّر تحميل خدمة الدفع حاول مرة ثانية"));
       };
       document.head.append(script);
     });
@@ -46,6 +45,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
     [success, setSuccess] = useState(false),
     [resumeUrl, setResumeUrl] = useState("");
   const [summary, setSummary] = useState(null);
+  const [holdAmount, setHoldAmount] = useState("");
   const [auctionTitle, setAuctionTitle] = useState("");
   const [loading, setLoading] = useState(true);
   const [accepted, setAccepted] = useState(false);
@@ -65,7 +65,8 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         if (!controller.signal.aborted) {
           setAuctionTitle(auction.title);
           setSummary(row);
-          if (row?.paymentId) currentPayment.current = row.paymentId;
+          if (row?.sandbox_reference)
+            currentPayment.current = row.sandbox_reference;
           setResumeUrl(row?.resumeUrl || "");
           if (row?.status === "SUCCESS") setSuccess(true);
         }
@@ -92,20 +93,16 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
   const path = "/auctions/" + encodeURIComponent(id || "") + "/commitment";
   async function verify(value) {
     currentPayment.current = value;
-    const result = await request(path + "/verify", {
-      method: "POST",
-      token: market.token,
-      body: { paymentId: value },
-    });
+    const result = await market.commit(id, value);
     setSummary(result);
     setSuccess(result.status === "SUCCESS");
     setResumeUrl(result.resumeUrl || "");
     setMessage(
       result.status === "SUCCESS"
-        ? "تم تأكيد الالتزام. تقدر ترجع للمزايدة."
+        ? "تم تأكيد الالتزام تقدر ترجع للمزايدة"
         : result.status === "FAILED"
-          ? "ما اكتمل التفويض. ارجع للالتزام وحاول ببطاقة ثانية."
-          : "طلبك بانتظار التحقق. بنحدّث حالته تلقائيًا بعد إكمال التحقق من البطاقة.",
+          ? "ما اكتمل التفويض ارجع للالتزام وحاول ببطاقة ثانية"
+          : "طلبك بانتظار التحقق بنحدّث حالته تلقائيًا بعد إكمال التحقق من البطاقة",
     );
     return result;
   }
@@ -133,7 +130,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
     event.preventDefault();
     if (sending.current || !accepted) return;
     if (!id || !market.token || market.demo) {
-      setMessage("افتح طلب الالتزام من صفحة المزاد بعد تسجيل الدخول.");
+      setMessage("افتح طلب الالتزام من صفحة المزاد بعد تسجيل الدخول");
       return;
     }
     sending.current = true;
@@ -144,19 +141,36 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         await verify(paymentId);
         return;
       }
-      const result = await market.commit(id);
-      setSummary(result);
-      if (result.status === "SUCCESS") {
-        setSuccess(true);
-        setMessage("التزامك مؤكد لهذا المزاد.");
-        return;
-      }
-      if (result.paymentId) {
-        await verify(result.paymentId);
-        return;
-      }
-      if (!result.checkout?.publishableKey?.startsWith("pk_test_"))
-        throw new Error("خدمة الدفع غير متاحة حاليًا.");
+      const key = import.meta.env.VITE_MOYASAR_PUBLISHABLE_KEY || "";
+      if (!key.startsWith("pk_test_"))
+        throw new Error("تعذر تجهيز الدفع حاول لاحقا");
+      const auction = await market.getAuction(id);
+      if (auction.seller_id === market.userId)
+        throw new Error("ما تقدر تشارك في مزادك");
+      const selected = Math.round(Number(holdAmount) * 100);
+      const bids = await market.getBids(id, 0);
+      const minimum = bids.length
+        ? Math.round(Number(auction.current_price) * 100) +
+          Math.round(Number(auction.minimum_increment) * 100)
+        : Math.round(Number(auction.starting_price) * 100);
+      if (
+        !Number.isSafeInteger(selected) ||
+        selected < minimum ||
+        selected > 99999999999999
+      )
+        throw new Error(
+          "راجع مبلغ التأمين لازم يغطي عرضك ويكون ضمن حد بوابة الدفع",
+        );
+      const result = {
+        checkout: {
+          amount: selected,
+          publishableKey: key,
+          metadata: {
+            auction_id: id,
+            user_id: market.userId,
+          },
+        },
+      };
       const sdk = await loadMoyasar();
       setCheckout(result.checkout);
       const callback = new URL(location.pathname, location.origin);
@@ -172,7 +186,9 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         callback_url: callback.href,
         methods: ["creditcard"],
         supported_networks: ["visa", "mastercard", "mada"],
-        credit_card: { manual: true },
+        credit_card: {
+          manual: true,
+        },
         metadata: result.checkout.metadata,
         on_completed: async (payment) => {
           try {
@@ -189,9 +205,15 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
       setBusy(false);
     }
   }
-  const amount = checkout?.amount ?? summary?.amountMinor;
+  const amount =
+    checkout?.amount ??
+    (summary?.max_amount
+      ? Math.round(Number(summary.max_amount) * 100)
+      : undefined);
   const amountText = Number.isSafeInteger(amount)
-    ? (amount / 100).toLocaleString("ar-SA", { minimumFractionDigits: 2 })
+    ? (amount / 100).toLocaleString("ar-SA", {
+        minimumFractionDigits: 2,
+      })
     : "—";
   return (
     <section className="container payment-page">
@@ -203,7 +225,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         <div>
           <p className="eyebrow">كل خطوة بثقة</p>
           <h1>محفظة المشاركة</h1>
-          <p>راجع مبلغك، وأكمل تأمين مشاركتك في المزاد.</p>
+          <p>راجع مبلغك، وأكمل تأمين مشاركتك في المزاد</p>
         </div>
         <span className="payment-safe">
           <Icon name="shield" /> اتصال آمن
@@ -225,7 +247,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
           <div className="wallet-balance">
             <p>{success ? "مبلغ مشاركتك المؤكد" : "مبلغ تأمين المشاركة"}</p>
             <strong>
-              {amountText} <small>ر.س</small>
+              {amountText} <small>ريال</small>
             </strong>
             <span
               className={success ? "wallet-status confirmed" : "wallet-status"}
@@ -240,7 +262,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
           </div>
           <p className="wallet-caption">
             المبلغ مرتبط بهذا المزاد، وما يُعتبر رصيدًا عامًا أو دفعة لقيمة
-            الأصل.
+            الأصل
           </p>
           <div className="wallet-assurances">
             <p>
@@ -256,17 +278,17 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
         </aside>
         <section
           className="payment-sheet paper-card"
-          aria-label="تفاصيل العملية"
+          aria-label={"تفاصيل العملية"}
         >
           <div className="payment-section-title">
             <div>
               <p className="eyebrow">تفاصيل العملية</p>
-              <h2>{success ? "مشاركتك جاهزة." : "خطوتك للمنافسة."}</h2>
+              <h2>{success ? "مشاركتك جاهزة" : "خطوتك للمنافسة"}</h2>
             </div>
             <Icon name={success ? "check" : "lock"} size={26} />
           </div>
           <p className="payment-auction">
-            {auctionTitle || "اختر مزادك لعرض تفاصيل التأمين."}
+            {auctionTitle || "اختر مزادك لعرض تفاصيل التأمين"}
           </p>
           <dl className="payment-summary">
             <div>
@@ -275,20 +297,20 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
             </div>
             <div>
               <dt>مبلغ التأمين</dt>
-              <dd>{amountText} ر.س</dd>
+              <dd>{amountText} ريال</dd>
             </div>
             <div>
               <dt>وسيلة الدفع</dt>
               <dd>
                 بطاقة بنكية{" "}
                 <span className="card-networks" dir="ltr">
-                  mada · VISA · Mastercard
+                  mada VISA Mastercard
                 </span>
               </dd>
             </div>
             <div className="payment-total">
               <dt>{success ? "المبلغ المؤكد" : "إجمالي التأمين"}</dt>
-              <dd>{amountText} ر.س</dd>
+              <dd>{amountText} ريال</dd>
             </div>
           </dl>
           {!market.userId ? (
@@ -308,6 +330,22 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
           ) : (
             <>
               {!success && !paymentId && !checkout && (
+                <label className="field">
+                  <span>مبلغ تأمين المشاركة بالريال</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="999999999999.99"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={holdAmount}
+                    onChange={(event) => setHoldAmount(event.target.value)}
+                    placeholder={"اكتب الحد اللي يناسب عروضك"}
+                  />
+                  <small>احجز مبلغ يغطي أعلى عرض ناوي تقدمه</small>
+                </label>
+              )}
+              {!success && !paymentId && !checkout && (
                 <label className="checkbox-label payment-consent">
                   <input
                     type="checkbox"
@@ -315,7 +353,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
                     onChange={(event) => setAccepted(event.target.checked)}
                   />
                   راجعت تفاصيل العملية، وأفهم أن المبلغ تأمين للمشاركة في هذا
-                  المزاد.
+                  المزاد
                 </label>
               )}
               <div ref={mount} className="secure-payment-form" />
@@ -327,7 +365,7 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
                 >
                   {busy ? (
                     <>
-                      <span className="ui-loader" /> جاري تجهيز الدفع…
+                      <span className="ui-loader" /> جاري تجهيز الدفع
                     </>
                   ) : (
                     <>
@@ -357,8 +395,8 @@ export default function MoyasarCheckout({ market, id, paymentId }) {
             </p>
           )}
           <p className="payment-footnote">
-            <Icon name="shield" size={15} /> نؤكد مشاركتك بعد التحقق من العملية.{" "}
-            <span>بيئة اختبار · لا تستخدم بطاقة حقيقية.</span>
+            <Icon name="shield" size={15} /> نؤكد مشاركتك بعد التحقق من العملية{" "}
+            <span>بيئة اختبار لا تستخدم بطاقة حقيقية</span>
           </p>
           <a
             className="text-link"
