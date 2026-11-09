@@ -1,0 +1,242 @@
+/* تم التعديل من عبير: تنسيق هالجزء فقط والعناصر المشابهه تستخدم التنسيق المشترك */
+/* تم التعديل من عبير: المحفظه فوق ملخصها والدفع بكرت مستقل وبلون هويه مزياد. */
+.container.payment-page {
+  text-align: start;
+  max-width: 1160px;
+  padding-block: 36px 90px;
+}
+.payment-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 34px;
+}
+.payment-page .payment-heading h1 {
+  font-family: ReemKufiUI, Cairo, sans-serif;
+  font-size: clamp(30px, 4vw, 48px);
+  margin: 12px 0;
+}
+.payment-heading p {
+  color: var(--muted);
+}
+.payment-safe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #506044;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.wallet-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+  gap: 28px;
+  align-items: start;
+}
+.wallet-overview {
+  background: #eeece1;
+  border: 1px solid #d9d3c0;
+  border-radius: 30px;
+  padding: 30px 24px;
+  box-shadow: 0 16px 40px #3034220c;
+}
+.payment-page .brand-wallet {
+  margin: 20px auto 45px;
+  transform: scale(1.08);
+}
+.wallet-balance {
+  text-align: center;
+  display: grid;
+  gap: 14px;
+}
+.wallet-balance > p {
+  margin: 0;
+  color: #656952;
+  font-size: 13px;
+}
+.wallet-balance strong {
+  font-size: 36px;
+  font-weight: 600;
+  color: #2b3328;
+  font-variant-numeric: tabular-nums;
+}
+.wallet-balance strong small {
+  font-size: 15px;
+}
+.wallet-status {
+  display: inline-flex;
+  justify-self: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 30px;
+  background: #e5ddc5;
+  color: #745d2f;
+  padding: 7px 14px;
+  font-size: 11px;
+}
+.wallet-status i {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.wallet-status.confirmed {
+  background: #dce8d1;
+  color: #33552a;
+}
+.wallet-caption {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #757962;
+  text-align: center;
+  max-width: 310px;
+  margin: 22px auto;
+}
+.wallet-assurances {
+  padding-top: 18px;
+  border-top: 1px solid #d7d1bf;
+}
+.wallet-assurances p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #656953;
+}
+.wallet-assurances svg {
+  color: #9c793d;
+  width: 18px;
+}
+.payment-page .payment-sheet {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  border-radius: 30px;
+  padding: 32px;
+  background: #fffdf7;
+  box-shadow: 0 16px 40px #3034220b;
+}
+.payment-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.payment-section-title h2 {
+  font-family: AmiriUI, serif;
+  font-size: 33px;
+  margin: 7px 0 12px;
+}
+.payment-section-title > svg {
+  color: #a18449;
+}
+.payment-auction {
+  font-size: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f0eee3;
+}
+.payment-page .payment-summary {
+  margin: 15px 0 22px;
+}
+.payment-page .payment-summary div {
+  padding-block: 16px;
+  gap: 18px;
+}
+.payment-summary dt {
+  color: #747763;
+  font-size: 12px;
+}
+.payment-summary dd {
+  font-size: 13px;
+  text-align: end;
+}
+.card-networks {
+  display: block;
+  color: #8b7246;
+  font-size: 10px;
+  margin-top: 5px;
+}
+.payment-summary .payment-total {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  padding-top: 22px;
+}
+.payment-total dd {
+  font-size: 22px;
+  font-weight: 700;
+}
+.payment-consent {
+  font-size: 12px;
+  line-height: 1.9;
+  margin: 18px 0;
+}
+.payment-submit {
+  min-height: 54px;
+}
+.payment-footnote {
+  font-size: 11px;
+  color: #747763;
+  line-height: 2;
+  margin: 20px 0;
+}
+.payment-footnote svg {
+  vertical-align: middle;
+  color: #99804f;
+}
+.payment-footnote span {
+  display: block;
+  font-size: 10px;
+}
+.secure-payment-form:empty {
+  display: none;
+}
+@media (max-width: 760px) {
+  .wallet-layout {
+    grid-template-columns: 1fr;
+  }
+  .payment-heading {
+    align-items: start;
+  }
+  .payment-safe {
+    font-size: 10px;
+  }
+  .payment-page .payment-sheet {
+    padding: 24px 18px;
+  }
+  .wallet-overview {
+    padding: 24px 20px;
+  }
+  .payment-page .payment-heading h1 {
+    font-size: 29px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .payment-page .brand-wallet,
+  .payment-page .wallet-card {
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .payment-page .payment-heading {
+    display: block;
+    margin-bottom: 24px;
+  }
+  .payment-page .payment-safe {
+    margin-top: 16px;
+  }
+  .payment-page .payment-heading h1 {
+    font-size: 29px;
+    line-height: 1.5;
+  }
+}
+
+/* تم التعديل من عبير: نوسع حروف عنوان المحفظه عشان العربي يطلع واضح بالجوال. */
+.payment-page .payment-heading h1 {
+  font-family: Cairo, Noto, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.6;
+}

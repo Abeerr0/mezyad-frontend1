@@ -1,0 +1,36 @@
+/* تم التعديل من عبير: تنسيق هالجزء فقط والعناصر المشابهه تستخدم التنسيق المشترك */
+/* تم التعديل من عبير: نخلي البحث والحالات فوق والاعلان بحدود ناعمه ومسافه مريحه. */
+.account-page-listings .listing-toolbar {
+  gap: 14px;
+  padding: 18px;
+  background: #eeece1;
+  border-radius: 21px;
+  margin-bottom: 22px;
+}
+.account-page-listings .listing-toolbar .search-field {
+  background: #fffdf8;
+  border-radius: 14px;
+  flex: 1;
+}
+.account-page-listings .listing-card {
+  border-radius: 25px;
+  overflow: hidden;
+  border-color: #ded9c8;
+  box-shadow: 0 7px 20px #2930240c;
+}
+.account-page-listings .listing-card h3 {
+  font-family: AmiriUI, serif;
+  font-size: 29px;
+}
+.account-page-listings .listing-photo {
+  border-radius: 18px;
+}
+@media (max-width: 600px) {
+  .account-page-listings .listing-toolbar {
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+  .account-page-listings .listing-toolbar .search-field {
+    flex-basis: 100%;
+  }
+}
