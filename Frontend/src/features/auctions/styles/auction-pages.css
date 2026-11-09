@@ -11,7 +11,6 @@
   margin: 35px 0;
 }
 .auction-heading h1 {
-  font-family: "El Messiri", serif;
   font-size: clamp(32px, 4.5vw, 56px);
   margin: 12px 0;
 }
@@ -226,7 +225,6 @@
   color: #cbb888;
 }
 .private-art h2 {
-  font-family: "El Messiri", serif;
   font-size: 38px;
   line-height: 1.6;
 }
@@ -445,7 +443,6 @@
   height: auto;
 }
 .result-paper h2 {
-  font-family: "El Messiri", serif;
   font-size: clamp(28px, 4vw, 43px);
   margin: 10px 0 25px;
 }

@@ -26,7 +26,6 @@
   pointer-events: none;
 }
 .account-page-activity .activity-welcome h2 {
-  font-family: AmiriUI, serif;
   font-size: 42px;
   line-height: 1.4;
   margin: 12px 0;
@@ -67,9 +66,7 @@
 }
 .account-page-activity .stat-card strong {
   font:
-    500 36px/1.4 ReemKufiUI,
-    Cairo,
-    sans-serif;
+    500 36px/1.4 var(--font-site);
 }
 .account-page-activity .stat-card svg {
   color: #a58447;

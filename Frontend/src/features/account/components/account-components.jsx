@@ -166,13 +166,10 @@ export function AuthLayout({ register, children }) {
             <em>ومكانك بينها</em>
           </h2>
           <p>
-            حساب واحد تبيع فيه، وتزايد منه
-            <br />
-            كل خطوة واضحة، وكل قرار لك
+            حساب واحد للبيع والمزايدة
           </p>
         </div>
         <div className="auth-art-bottom">
-          <span>مزياد للقيمة عنوان</span>
           <span>للقيمة أهلها</span>
         </div>
       </aside>

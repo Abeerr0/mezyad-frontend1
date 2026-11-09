@@ -17,7 +17,7 @@
 }
 .otp-input {
   text-align: center;
-  font: 28px monospace;
+  font: 28px var(--font-site);
   letter-spacing: 0.45em;
 }
 .ui-wait {
@@ -108,7 +108,7 @@
 }
 .ticket-stub input {
   width: 100%;
-  font: 14px monospace;
+  font: 14px var(--font-site);
   text-align: center;
 }
 .payment-page {

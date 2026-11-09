@@ -1,0 +1,21 @@
+/* تم التعديل من عبير: خط واحد لكل الموقع ونفرق بين العنوان والنص بالحجم والوزن */
+@font-face {
+  font-family: "Mezyad Sans";
+  src: url("/fonts/NotoSansArabic.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-site: "Mezyad Sans", sans-serif;
+  font-family: var(--font-site);
+}
+
+/* تم التعديل من عبير: الحقول والازرار تاخذ نفس خط الصفحه بدون تعريف مكرر */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}

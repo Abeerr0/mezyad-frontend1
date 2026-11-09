@@ -150,9 +150,6 @@ export default function Activity({ workspace, onOpen }) {
               ))}
             </div>
           )}
-          <p className="field-hint">
-            افتح أي مزاد لمتابعة تفاصيله، وراجع النتيجة بعد الإغلاق
-          </p>
         </section>
         <section className="paper-card activity-recent">
           <div className="section-heading">
@@ -187,7 +184,6 @@ export default function Activity({ workspace, onOpen }) {
                 )}
                 <span className="activity-listing-title">
                   {item.title}
-                  <small>شوف التفاصيل وتابع حالة إعلانك</small>
                 </span>
                 <span className={"status-tag " + item.status.toLowerCase()}>
                   {listingLabels[item.status]}

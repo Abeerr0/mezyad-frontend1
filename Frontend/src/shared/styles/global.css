@@ -1,18 +1,7 @@
 /* تم التعديل من عبير: تنسيق الهويه والعناصر العامه ينقرا مره وحده لكل الموقع */
-@font-face {
-  font-family: Noto;
-  src: url("/fonts/NotoSansArabic.ttf") format("truetype");
-  font-display: swap;
-}
-@font-face {
-  font-family: Messiri;
-  src: url("/fonts/ElMessiri.ttf") format("truetype");
-  font-display: swap;
-}
 
 /* تم التعديل من عبير: نوحد الالوان والخطوط عشان الصفحات تطلع من نفس الهويه. */
 :root {
-  font-family: Noto, sans-serif;
   color: #292b23;
   background: #faf9f5;
   font-synthesis: none;
@@ -99,7 +88,6 @@ p {
 h1,
 h2,
 h3 {
-  font-family: Messiri, Noto, sans-serif;
   font-weight: 500;
 }
 h1 {
@@ -131,7 +119,6 @@ em {
   padding-block: 92px;
 }
 .eyebrow {
-  font-family: Noto, sans-serif;
   color: var(--gold);
   font-size: 12px;
   font-weight: 600;
@@ -439,7 +426,6 @@ em {
   display: flex;
   gap: 18px;
   align-items: center;
-  font-family: Messiri;
   font-size: 20px;
   line-height: 1.7;
 }
@@ -450,7 +436,6 @@ em {
 }
 .vertical-label {
   writing-mode: vertical-rl;
-  font-family: sans-serif;
   font-size: 9px;
   letter-spacing: 3px;
   margin-right: 25px;
@@ -676,7 +661,6 @@ em {
   transition:
     background 0.2s,
     padding 0.2s;
-  font-family: Messiri;
   font-size: 25px;
 }
 .category-links a:first-child {
@@ -687,7 +671,7 @@ em {
   padding-inline: 12px;
 }
 .category-links .category-number {
-  font: 10px sans-serif;
+  font: 10px var(--font-site);
   color: var(--gold);
 }
 .category-links svg {
@@ -739,7 +723,6 @@ em {
   background: var(--ink);
   color: #f7f1df;
   transform: rotate(5deg);
-  font-family: Messiri;
   font-size: 20px;
 }
 .journey-copy > p:not(.eyebrow) {
@@ -762,7 +745,7 @@ em {
 }
 .mini-steps span {
   color: var(--gold);
-  font: 10px sans-serif;
+  font: 10px var(--font-site);
 }
 .private-invite {
   border: 1px solid #c8c7b9;
@@ -924,7 +907,6 @@ em {
   gap: 8px;
 }
 .filter-heading h2 {
-  font-family: Noto;
   font-size: 13px;
   font-weight: 600;
   margin: 0;
@@ -1035,7 +1017,6 @@ em {
   left: 4px;
   padding: 14px 22px;
   background: #e8ddc6;
-  font-family: Messiri;
   font-size: 20px;
   transform: rotate(-5deg);
 }
@@ -1081,7 +1062,7 @@ em {
   top: 31px;
   left: 0;
   color: var(--gold);
-  font: 12px sans-serif;
+  font: 12px var(--font-site);
 }
 .step-icon {
   margin: 0 0 26px;
@@ -1407,14 +1388,13 @@ em {
   mix-blend-mode: multiply;
 }
 .footer-brand p {
-  font-family: Messiri;
   font-size: 22px;
   color: #6c6c5c;
   margin: 14px 0 0;
   line-height: 1.6;
 }
 .footer-top h2 {
-  font: 600 12px Noto;
+  font: 600 12px var(--font-site);
   margin: 12px 0 20px;
 }
 .footer-top a,
@@ -1444,11 +1424,11 @@ em {
   transform: rotate(-14deg);
 }
 .footer-signature span {
-  font: 23px Messiri;
+  font: 23px var(--font-site);
   color: var(--ink);
 }
 .footer-signature small {
-  font: 8px sans-serif;
+  font: 8px var(--font-site);
   letter-spacing: 2px;
 }
 .footer-bottom {
@@ -2409,7 +2389,6 @@ button:disabled {
   color: #735c35;
   display: grid;
   place-items: center;
-  font-family: Messiri;
   font-size: 23px;
   flex-shrink: 0;
 }
@@ -2527,7 +2506,7 @@ button:disabled {
   margin: 0;
 }
 .section-heading h3 small {
-  font: 10px Noto;
+  font: 10px var(--font-site);
   color: var(--muted);
 }
 .section-number {
@@ -2552,7 +2531,6 @@ button:disabled {
   place-items: center;
   border-radius: 50%;
   background: #f7f2e4;
-  font-family: Messiri;
   font-size: 42px;
   color: #8b6b36;
 }
@@ -2630,7 +2608,6 @@ button:disabled {
 }
 .stat-card strong {
   grid-row: 1;
-  font-family: Messiri;
   font-size: 32px;
   font-weight: 500;
 }
@@ -3296,7 +3273,6 @@ button:disabled {
   width: 100%;
   border: 1px solid var(--line);
   background: #fffef9;
-  font-family: monospace;
   font-size: 17px;
   text-align: center;
   padding: 16px 10px;
@@ -3865,11 +3841,6 @@ button:disabled {
     transform: scale(1.06);
   }
 }
-@font-face {
-  font-family: Cairo;
-  src: url("/fonts/Cairo-SemiBold.ttf") format("truetype");
-  font-display: swap;
-}
 /* تم التعديل من عبير: نوحد انحناء العناصر ونضيف خط للعناوين والتوقيع بدون تغيير الوان الهويه. */
 .site-header {
   width: min(1320px, calc(100% - 40px));
@@ -3910,39 +3881,11 @@ button:disabled {
 .account-title h1,
 .auction-heading h1,
 .payment-page h1 {
-  font-family: Cairo, Noto, sans-serif;
   font-weight: 750;
   letter-spacing: -0.035em;
 }
 .eyebrow {
-  font-family: Cairo, Noto, sans-serif;
   letter-spacing: 0.015em;
-}
-.abeer-signature {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--ink);
-}
-.abeer-signature > b {
-  font:
-    italic 40px Georgia,
-    serif;
-  position: relative;
-}
-.abeer-signature > b > span {
-  font-size: 15px;
-  color: var(--gold);
-  position: absolute;
-  top: 2px;
-  right: -8px;
-}
-.abeer-signature small {
-  display: block;
-  letter-spacing: 0.25em;
-  font:
-    8px Cairo,
-    sans-serif;
 }
 .reset-link {
   margin: 20px 0;
@@ -3991,10 +3934,6 @@ button:disabled {
   .private-invite .invite-icon {
     animation: invite-glow 5s ease-in-out infinite;
   }
-  .abeer-signature:hover > b > span {
-    transform: rotate(90deg);
-    transition: transform 0.5s;
-  }
   .main-nav a:after {
     transition: width 0.25s;
   }
@@ -4041,7 +3980,6 @@ button:disabled {
   border-radius: 22px;
 }
 .brand-editorial h2 {
-  font-family: Messiri, serif;
   font-size: clamp(32px, 4vw, 60px);
 }
 @media (max-width: 700px) {
@@ -4135,7 +4073,6 @@ button:disabled {
 }
 h1 em,
 h2 em {
-  font-family: Messiri, serif;
   font-style: normal;
   position: relative;
   text-shadow: 0 3px 18px #b18a4b22;
@@ -4177,8 +4114,7 @@ h2 em {
 }
 .google-mark {
   font:
-    bold 23px Arial,
-    sans-serif;
+    bold 23px var(--font-site);
   color: #4285f4;
 }
 .signup-verify {
@@ -4262,17 +4198,6 @@ h2 em {
     padding-top: 110px;
   }
 }
-@font-face {
-  font-family: AmiriUI;
-  src: url("/fonts/Amiri-UI.ttf") format("truetype");
-  font-display: swap;
-}
-@font-face {
-  font-family: ReemKufiUI;
-  src: url("/fonts/ReemKufi-UI.ttf") format("truetype");
-  font-display: swap;
-  font-weight: 600;
-}
 /* تم التعديل من عبير: الهيدر خارج تدفق الصفحه عشان الصوره تبدا من فوق بدون فراغ ابيض. */
 .site-header {
   position: absolute;
@@ -4326,13 +4251,11 @@ h2 em {
   align-items: center;
 }
 .category-layout h2 {
-  font-family: ReemKufiUI, Cairo, sans-serif;
   font-size: clamp(40px, 4vw, 62px);
   line-height: 1.65;
   font-weight: 600;
 }
 .category-layout h2 em {
-  font-family: AmiriUI, serif;
   font-size: 1.5em;
   line-height: 0.9;
   display: inline-block;
@@ -4342,11 +4265,9 @@ h2 em {
   animation: none;
 }
 .category-layout .eyebrow {
-  font-family: Cairo, sans-serif;
   letter-spacing: 0;
 }
 .category-layout p:not(.eyebrow) {
-  font-family: AmiriUI, serif;
   font-size: 22px;
   line-height: 1.7;
   color: #5b5e50;
@@ -4363,7 +4284,6 @@ h2 em {
   border-top: 1px solid #d7d4c5;
 }
 .category-links a > span:not(.category-number) {
-  font-family: Cairo, Noto, sans-serif;
   font-size: 14px;
 }
 .category-ornaments {
@@ -4407,12 +4327,10 @@ h2 em {
   text-align: right;
 }
 .category-portrait figcaption > span {
-  font-family: AmiriUI, serif;
   font-size: 50px;
 }
 .category-portrait small {
   display: block;
-  font-family: Cairo, sans-serif;
   font-size: 10px;
 }
 .portrait-orbit {
@@ -4425,16 +4343,13 @@ h2 em {
 }
 .auth-form-panel h1 em,
 .browse-page h1 em {
-  font-family: AmiriUI, serif;
   font-size: 1.35em;
   font-style: normal;
   letter-spacing: -0.025em;
 }
 .comparison-grid h3 {
-  font-family: ReemKufiUI, Cairo, sans-serif;
 }
 .speech-bubble {
-  font-family: AmiriUI, serif;
   font-size: 22px;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -4580,8 +4495,7 @@ h2 em {
 }
 .category-portrait-wrap figcaption span {
   font:
-    400 38px/1.3 AmiriUI,
-    serif;
+    400 38px/1.3 var(--font-site);
 }
 .category-portrait-wrap figcaption small {
   display: block;
@@ -4636,10 +4550,8 @@ h2 em {
 .comparison-grid article:after,
 .private-invite:before {
   content: "𓃗";
-  font-family: serif;
 }
 .art-star {
-  font-family: serif;
 }
 /* تم التعديل من عبير: الافتار دائري من نفس لوحه الشخصيات ويحافظ على حجمه بكل الصفحات. */
 .member-avatar {
@@ -4797,7 +4709,6 @@ h2 em {
   z-index: 1;
 }
 .brand-scene-copy h2 {
-  font-family: AmiriUI, serif;
   font-size: clamp(30px, 3vw, 45px);
   line-height: 1.5;
   margin: 12px 0;

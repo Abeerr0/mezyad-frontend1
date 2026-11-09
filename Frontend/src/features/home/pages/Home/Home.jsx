@@ -40,9 +40,7 @@ export default function Home({
               ومنافسة <em>تليق بها</em>
             </h1>
             <p className="hero-description">
-              من سيارة لها حكاية، إلى أصل يحمل قيمة
-              <br />
-              اكتشف المزادات، واقرأ التفاصيل، وخذ قرارك بثقة
+              اكتشف المزادات واختر اللي يناسبك
             </p>
             <div className="hero-actions">
               <a className="button gold" href="#/auctions">
@@ -51,10 +49,6 @@ export default function Home({
               <button className="hero-sell" onClick={() => onFeature("sell")}>
                 عندك أصل مميز؟ <span>اعرضه هنا</span>
               </button>
-            </div>
-            <div className="hero-note">
-              <span>MEZYAD</span>
-              <span>للأصول التي لا تتكرر</span>
             </div>
           </div>
           <div className="hero-caption">
@@ -129,7 +123,7 @@ export default function Home({
       </section>
 
       <section className="category-section">
-        {/* تم التعديل من عبير: صوره الرياض بقصه منحنيه مع عنوان بخط عربي مستقل. */}
+        {/* تم التعديل من عبير: صوره الرياض بقصه منحنيه مع عنوان واضح. */}
         {/* تم التعديل من عبير: الاطار اكبر والنص بمكان مستقل والرموز موزعه حول المنحنى. */}
         <div className="category-portrait-wrap">
           <figure className="category-portrait">
@@ -164,9 +158,7 @@ export default function Home({
               <em>نظرك؟</em>
             </h2>
             <p>
-              اختر عالمك، وخلّي
-              <br />
-              التفاصيل تكمل الحكاية
+              اختر الفئة اللي تهمك
             </p>
           </div>
           <div className="category-links">
@@ -199,8 +191,7 @@ export default function Home({
             وكل قرار <em>لك</em>
           </h2>
           <p>
-            تصفح الأصل، افهم شروط المزاد، وراجع عرضك قبل تأكيده والباقي تتابعه
-            من مكان واحد
+            راجع تفاصيل الأصل وشروط المزاد قبل تقديم عرضك
           </p>
           <ol className="mini-steps">
             <li>

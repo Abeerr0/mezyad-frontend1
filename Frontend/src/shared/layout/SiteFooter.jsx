@@ -30,18 +30,9 @@ export default function SiteFooter({ onFeature }) {
           <div className="footer-signature">
             <Icon name="gavel" size={38} />
             <span>القيمة في التفاصيل</span>
-            <small>THE MEZYAD WAY</small>
           </div>
         </div>
         <div className="footer-bottom">
-          <span className="abeer-signature" aria-label={"تصميم وتطوير عبير"}>
-            <b>
-              A<span>✦</span>
-            </b>
-            <span>
-              عبير <small>CRAFTED BY ABEER</small>
-            </span>
-          </span>
           <span>
             <i />
             المملكة العربية السعودية

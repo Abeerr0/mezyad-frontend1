@@ -13,7 +13,6 @@
   margin-bottom: 34px;
 }
 .payment-page .payment-heading h1 {
-  font-family: ReemKufiUI, Cairo, sans-serif;
   font-size: clamp(30px, 4vw, 48px);
   margin: 12px 0;
 }
@@ -124,7 +123,6 @@
   gap: 20px;
 }
 .payment-section-title h2 {
-  font-family: AmiriUI, serif;
   font-size: 33px;
   margin: 7px 0 12px;
 }
@@ -235,7 +233,6 @@
 
 /* تم التعديل من عبير: نوسع حروف عنوان المحفظه عشان العربي يطلع واضح بالجوال. */
 .payment-page .payment-heading h1 {
-  font-family: Cairo, Noto, sans-serif;
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.6;
