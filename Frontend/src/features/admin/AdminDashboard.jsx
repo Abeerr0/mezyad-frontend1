@@ -1,6 +1,6 @@
 import React from "react";
-import { AccountLayout } from "../../account-components";
-import { API } from "../../api";
+import { AccountLayout } from "../account/components/account-components.jsx";
+import { API } from "../../shared/api/client.js";
 import AdminReview from "./review/AdminReview";
 import { isAdminRole } from "./admin-access";
 import { ADMIN_PAGE } from "./admin-navigation";
