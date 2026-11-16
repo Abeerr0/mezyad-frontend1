@@ -1,4 +1,9 @@
-import AdminDashboardAseel from "./pages/AdminDashboard-Aseel";
+import AdminDashboard from "./features/admin/AdminDashboard";
+import {
+  isAdminPageBlocked,
+  isAdminRole,
+  canShowMarketplaceActions,
+} from "./features/admin/admin-access";
 import { useAutoRefresh } from "./useAutoRefresh";
 import { Avatar } from "./Avatar";
 import BrandScene from "./BrandScene";
