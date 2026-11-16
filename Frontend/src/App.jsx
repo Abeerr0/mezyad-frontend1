@@ -348,9 +348,9 @@ export default function App() {
           key={route.page + "-" + demo + "-" + (route.params.get("id") || "")}
         >
           {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
-          {route.page === "admin" && (
-            <AdminDashboardAseel workspace={workspace} />
-          )}
+         {route.page === "admin" && (
+  <AdminDashboard workspace={workspace} />
+)}
           {route.page === "payment" && (
             <PaymentPage
               market={market}
