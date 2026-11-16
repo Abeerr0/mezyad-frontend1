@@ -2,6 +2,12 @@
 import React from "react";
 import { Avatar } from "../../features/profile/components/Avatar.jsx";
 import { Icon } from "../ui/index.jsx";
+import {
+  accountDestination,
+} from "../../features/admin/admin-navigation.js";
+import {
+  canShowMarketplaceActions,
+} from "../../features/admin/admin-access.js";
 export default function SiteHeader({
   menu,
   route,
@@ -35,10 +41,19 @@ export default function SiteHeader({
           ))}
         </nav>
         <div className="header-actions">
-          <button
-            className="account-button"
-            onClick={() => onFeature("account")}
-          >
+         <button
+  className="account-button"
+  onClick={() => {
+    if (workspace.user) {
+      location.hash = accountDestination(
+        workspace.user.role,
+        "/activity",
+      );
+    } else {
+      onFeature("account");
+    }
+  }}
+>
             {workspace.user ? (
               <Avatar value={workspace.avatar} name={workspace.user.name} />
             ) : (
@@ -46,12 +61,13 @@ export default function SiteHeader({
             )}
             <span>{workspace.user ? "مزاداتي" : "تسجيل الدخول"}</span>
           </button>
-          {![
-            "listings",
-            "create-listing",
-            "edit-listing",
-            "create-auction",
-          ].includes(route.page) && (
+{canShowMarketplaceActions(workspace.user?.role) &&
+  ![
+    "listings",
+    "create-listing",
+    "edit-listing",
+    "create-auction",
+  ].includes(route.page) && (
             <button
               className="button small dark sell-button"
               onClick={() => onFeature("sell")}
