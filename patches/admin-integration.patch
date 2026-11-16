@@ -1,0 +1,509 @@
+diff --git a/Frontend/src/App.jsx b/Frontend/src/App.jsx
+index bc0fe9f..7e5d193 100644
+--- a/Frontend/src/App.jsx
++++ b/Frontend/src/App.jsx
+@@ -1,4 +1,6 @@
+-import AdminDashboardAseel from "./pages/AdminDashboard-Aseel";
++import AdminDashboard from "./features/admin/AdminDashboard";
++import { canShowMarketplaceActions, isAdminPageBlocked, isAdminRole } from "./features/admin/admin-access";
++import { ADMIN_HREF, ADMIN_PAGE, accountDestination } from "./features/admin/admin-navigation";
+ import { useAutoRefresh } from "./useAutoRefresh";
+ import { Avatar } from "./Avatar";
+ import BrandScene from "./BrandScene";
+@@ -32,7 +34,7 @@ import { API, imageUrl, request } from "./api";
+ import { Icon } from "./components";
+ import { categoryLabels, demoAuctions, demoCategories } from "./data";
+ const pageTitles = {
+-  admin: "لوحة الإدارة",
++  [ADMIN_PAGE]: "لوحة الإدارة",
+   payment: "مراجعة الدفع",
+   auction: "تفاصيل المزاد",
+   "private-access": "المزاد الخاص",
+@@ -81,8 +83,9 @@ export default function App() {
+   // تم التعديل من عبير: الموقع يفتح ببياناته الحقيقيه؛ ملف PREVIEW وحده مخصص للتجربه.
+   const demo = location.pathname.endsWith("/PREVIEW.html");
+   const workspace = useWorkspace(demo);
+-  const isAdmin = workspace.user?.role === "ADMIN";
+-  const adminBlocked = isAdmin && ["create-listing", "edit-listing", "create-auction", "listings", "bid", "commitment", "payment"].includes(route.page);
++  const role = workspace.user?.role;
++  const canUseMarketplaceActions = canShowMarketplaceActions(role);
++  const adminBlocked = isAdminPageBlocked(role, route.page);
+   const market = useMarket(workspace);
+   const [catalog, setCatalog] = useState({
+     auctions: [],
+@@ -207,7 +210,7 @@ export default function App() {
+       return;
+     }
+     if (type === "sell") {
+-      if (isAdmin) return;
++      if (!canUseMarketplaceActions) return;
+       location.hash = workspace.user
+         ? "/create-listing"
+         : "/login?next=%2Fcreate-listing";
+@@ -215,9 +218,7 @@ export default function App() {
+     }
+     if (type === "account") {
+       location.hash = workspace.user
+-        ? workspace.user.role === "ADMIN"
+-          ? "/admin"
+-          : "/activity"
++        ? accountDestination(role, "/activity")
+         : "/login";
+       return;
+     }
+@@ -236,7 +237,7 @@ export default function App() {
+       }
+     : workspace;
+   const common = {
+-    isAdmin,
++    canUseMarketplaceActions,
+     ...catalog,
+     auctions: demo
+       ? catalog.auctions.map((a) => ({
+@@ -311,13 +312,13 @@ export default function App() {
+               )}
+               <span>
+                 {workspace.user
+-                  ? workspace.user.role === "ADMIN"
++                  ? isAdminRole(role)
+                     ? "الإدارة"
+                     : "مزاداتي"
+                   : "تسجيل الدخول"}
+               </span>
+             </button>
+-            {!isAdmin && ![
++            {canUseMarketplaceActions && ![
+               "listings",
+               "create-listing",
+               "edit-listing",
+@@ -349,12 +350,12 @@ export default function App() {
+           {adminBlocked ? (
+             <section className="container state-panel">
+               <p role="alert">حساب الإدارة مخصص للتصفح والمراجعة، ولا يمكنه إنشاء إعلان أو مزاد أو تقديم مزايدة.</p>
+-              <a className="button dark" href="#/admin">لوحة الإدارة</a>
++              <a className="button dark" href={ADMIN_HREF}>لوحة الإدارة</a>
+             </section>
+           ) : <>
+           {/* تم التعديل من عبير: نربط صفحات المنافسه والمتابعه بنفس حساب المستخدم. */}
+-          {route.page === "admin" && (
+-            <AdminDashboardAseel workspace={workspace} />
++          {route.page === ADMIN_PAGE && (
++            <AdminDashboard workspace={workspace} />
+           )}
+           {route.page === "payment" && (
+             <PaymentPage
+@@ -409,7 +410,7 @@ export default function App() {
+         {route.page === "auctions" && (
+           <Browse {...common} category={category} status={status} />
+         )}
+-        {route.page === "guide" && <Guide onFeature={onFeature} isAdmin={isAdmin} />}
++        {route.page === "guide" && <Guide onFeature={onFeature} canUseMarketplaceActions={canUseMarketplaceActions} />}
+         {route.page === "help" && (
+           <Help topic={route.params.get("topic") || ""} />
+         )}
+@@ -422,7 +423,7 @@ export default function App() {
+             </a>
+           </div>
+         )}
+-        {!["admin", "activity", "listings", "profile", "my-auctions"].includes(
++        {![ADMIN_PAGE, "activity", "listings", "profile", "my-auctions"].includes(
+           route.page,
+         ) && <BrandScene page={route.page} />}
+       </main>
+diff --git a/Frontend/src/account-components.jsx b/Frontend/src/account-components.jsx
+index f2b56cb..8a19d66 100644
+--- a/Frontend/src/account-components.jsx
++++ b/Frontend/src/account-components.jsx
+@@ -1,4 +1,6 @@
+ import "./account-components.css";
++import { isAdminRole } from "./features/admin/admin-access";
++import { ADMIN_ACCOUNT_LINKS, accountBreadcrumbHref } from "./features/admin/admin-navigation";
+ import { Avatar } from "./Avatar";
+ import React, { useState } from "react";
+ import { Auctioneer, Icon } from "./components";
+@@ -63,11 +65,8 @@ export function AccountLayout({
+           </div>
+         </div>
+         <nav aria-label={"صفحات حسابي"}>
+-          {(workspace.user.role === "ADMIN"
+-            ? [
+-                ["admin", "لوحة الإدارة", "shield"],
+-                ["profile", "الملف الشخصي", "user"],
+-              ]
++          {(isAdminRole(workspace.user.role)
++            ? ADMIN_ACCOUNT_LINKS
+             : [
+                 ["activity", "نشاطي", "gavel"],
+                 // تم التعديل من عبير: نضيف رابط المتابعه للمجموعه الخامسه بدون تغيير صفحات الحساب.
+@@ -110,7 +109,7 @@ export function AccountLayout({
+         <p className="breadcrumb">
+           <a href="#/">الرئيسية</a>
+           <span>/</span>
+-          <a href={workspace.user.role === "ADMIN" ? "#/profile" : "#/activity"}>حسابي</a>
++          <a href={accountBreadcrumbHref(workspace.user.role)}>حسابي</a>
+           <span>/</span>
+           {title}
+         </p>
+diff --git a/Frontend/src/auction-components.jsx b/Frontend/src/auction-components.jsx
+index 9163820..45c5a10 100644
+--- a/Frontend/src/auction-components.jsx
++++ b/Frontend/src/auction-components.jsx
+@@ -1,3 +1,4 @@
++import { canShowAuctionNavPage } from "./features/admin/admin-access";
+ import React from "react";
+ import { Icon, Auctioneer, money, dateText } from "./components";
+ import { auctionLink, statusLabels, displayStatus } from "./market";
+@@ -87,7 +88,7 @@ export function AuctionNav({ id, current, role }) {
+         ["bid", "قدّم عرضك"],
+         ["bid-history", "سجل العروض"],
+         ["auction-result", "النتيجة"],
+-      ].filter(([page]) => role !== "ADMIN" || !["commitment", "bid"].includes(page)).map(([page, label]) => (
++      ].filter(([page]) => canShowAuctionNavPage(role, page)).map(([page, label]) => (
+         <a
+           key={page}
+           href={auctionLink(page, id)}
+diff --git a/Frontend/src/pages/AdminDashboard-Aseel.jsx b/Frontend/src/features/admin/AdminDashboard.jsx
+similarity index 65%
+rename from Frontend/src/pages/AdminDashboard-Aseel.jsx
+rename to Frontend/src/features/admin/AdminDashboard.jsx
+index 568def5..14469b1 100644
+--- a/Frontend/src/pages/AdminDashboard-Aseel.jsx
++++ b/Frontend/src/features/admin/AdminDashboard.jsx
+@@ -1,19 +1,21 @@
+ import React from "react";
+-import { AccountLayout } from "../account-components";
+-import { API } from "../api";
+-import AdminReview from "../AdminReview-Aseel";
++import { AccountLayout } from "../../account-components";
++import { API } from "../../api";
++import AdminReview from "./review/AdminReview";
++import { isAdminRole } from "./admin-access";
++import { ADMIN_PAGE } from "./admin-navigation";
++import "./admin.css";
+ 
+-// تم التعديل من عبير: نربط لوحه اسيل بصلاحيات الادمن ونحافظ على منطق المراجعه الاصلي.
+-export default function AdminDashboardAseel({ workspace }) {
++export default function AdminDashboard({ workspace }) {
+   return (
+     <AccountLayout
+       workspace={workspace}
+-      active="admin"
++      active={ADMIN_PAGE}
+       title={"لوحة الإدارة"}
+       eyebrow={"متابعة وقرار"}
+       description={"راجع الإعلانات وتابع المزادات من مكان واحد"}
+     >
+-      {workspace.user?.role === "ADMIN" ? (
++      {isAdminRole(workspace.user?.role) ? (
+         <AdminReview
+           api={new URL(API, location.origin).href}
+           token={workspace.session.token}
+diff --git a/Frontend/src/features/admin/admin-access.js b/Frontend/src/features/admin/admin-access.js
+new file mode 100644
+index 0000000..ab959ae
+--- /dev/null
++++ b/Frontend/src/features/admin/admin-access.js
+@@ -0,0 +1,29 @@
++const blockedPages = new Set([
++  "create-listing",
++  "edit-listing",
++  "create-auction",
++  "listings",
++  "bid",
++  "commitment",
++  "payment",
++]);
++
++export function isAdminRole(role) {
++  return role === "ADMIN";
++}
++
++export function isAdminPageBlocked(role, page) {
++  return isAdminRole(role) && blockedPages.has(page);
++}
++
++export function canShowMarketplaceActions(role) {
++  return !isAdminRole(role);
++}
++
++export function canShowAuctionNavPage(role, page) {
++  return !isAdminRole(role) || (page !== "commitment" && page !== "bid");
++}
++
++export function canShowAccountSettings(role) {
++  return !isAdminRole(role);
++}
+diff --git a/Frontend/src/features/admin/admin-navigation.js b/Frontend/src/features/admin/admin-navigation.js
+new file mode 100644
+index 0000000..43489d3
+--- /dev/null
++++ b/Frontend/src/features/admin/admin-navigation.js
+@@ -0,0 +1,18 @@
++import { isAdminRole } from "./admin-access.js";
++
++export const ADMIN_PAGE = "admin";
++export const ADMIN_PATH = "/" + ADMIN_PAGE;
++export const ADMIN_HREF = "#" + ADMIN_PATH;
++
++export const ADMIN_ACCOUNT_LINKS = [
++  [ADMIN_PAGE, "لوحة الإدارة", "shield"],
++  ["profile", "الملف الشخصي", "user"],
++];
++
++export function accountDestination(role, fallback) {
++  return isAdminRole(role) ? ADMIN_PATH : fallback;
++}
++
++export function accountBreadcrumbHref(role) {
++  return isAdminRole(role) ? "#/profile" : "#/activity";
++}
+diff --git a/Frontend/src/features/admin/admin.css b/Frontend/src/features/admin/admin.css
+new file mode 100644
+index 0000000..229366d
+--- /dev/null
++++ b/Frontend/src/features/admin/admin.css
+@@ -0,0 +1,21 @@
++.account-page-admin .account-main > .account-title {
++  position: absolute;
++  width: 1px;
++  height: 1px;
++  overflow: hidden;
++  clip-path: inset(50%);
++  white-space: nowrap;
++}
++
++.account-layout.account-page-admin {
++  padding-top: 165px;
++  padding-bottom: 48px;
++}
++
++
++@media (max-width: 700px) {
++  .account-layout.account-page-admin {
++    padding-top: 140px;
++    padding-bottom: 32px;
++  }
++}
+diff --git a/Frontend/src/AdminReview-Aseel.jsx b/Frontend/src/features/admin/review/AdminReview.jsx
+similarity index 99%
+rename from Frontend/src/AdminReview-Aseel.jsx
+rename to Frontend/src/features/admin/review/AdminReview.jsx
+index bd13b1c..a8813c0 100644
+--- a/Frontend/src/AdminReview-Aseel.jsx
++++ b/Frontend/src/features/admin/review/AdminReview.jsx
+@@ -1,4 +1,4 @@
+-import "./AdminReview-Aseel.css";
++import "./admin-review.css";
+ import React, { useEffect, useState } from "react";
+ export default function AdminReview({ api, token, onUnauthorized }) {
+   const itemsApi =
+diff --git a/Frontend/src/AdminReview-Aseel.css b/Frontend/src/features/admin/review/admin-review.css
+similarity index 87%
+rename from Frontend/src/AdminReview-Aseel.css
+rename to Frontend/src/features/admin/review/admin-review.css
+index fce9e0c..1508740 100644
+--- a/Frontend/src/AdminReview-Aseel.css
++++ b/Frontend/src/features/admin/review/admin-review.css
+@@ -1,4 +1,3 @@
+-/* تم التعديل من عبير: نوحد شكل لوحه اسيل مع هويه الموقع بدون تغيير قرارات المراجعه او طلبات API. */
+ .admin-review-aseel {
+   position: relative;
+   min-width: 0;
+@@ -237,26 +236,3 @@
+     transition: none;
+   }
+ }
+-
+-/* تم التعديل من عبير: نخلي عنوان الاداره مره وحده ونبقي عنوان الصفحه للقارئ الصوتي. */
+-.account-page-admin .account-main > .account-title {
+-  position: absolute;
+-  width: 1px;
+-  height: 1px;
+-  overflow: hidden;
+-  clip-path: inset(50%);
+-  white-space: nowrap;
+-}
+-
+-.account-layout.account-page-admin {
+-  padding-top: 165px;
+-  padding-bottom: 48px;
+-}
+-
+-
+-@media (max-width: 700px) {
+-  .account-layout.account-page-admin {
+-    padding-top: 140px;
+-    padding-bottom: 32px;
+-  }
+-}
+diff --git a/Frontend/src/pages/AuctionDetails.jsx b/Frontend/src/pages/AuctionDetails.jsx
+index 4d88372..43d2d8c 100644
+--- a/Frontend/src/pages/AuctionDetails.jsx
++++ b/Frontend/src/pages/AuctionDetails.jsx
+@@ -1,3 +1,4 @@
++import { canShowMarketplaceActions } from "../features/admin/admin-access";
+ import { Avatar } from "../Avatar";
+ import React, { useState } from "react";
+ import { Icon, money, dateText } from "../components";
+@@ -127,7 +128,7 @@ export default function AuctionDetails({ market, id }) {
+                   >
+                     شوف النتيجة <Icon />
+                   </a>
+-                ) : market.workspace.user?.role === "ADMIN" ? null : owner ? (
++                ) : !canShowMarketplaceActions(market.workspace.user?.role) ? null : owner ? (
+                   <p className="inline-notice">
+                     هذا مزادك تابع العروض؛ المالك ما يزايد على أصله
+                   </p>
+diff --git a/Frontend/src/pages/BankStatus.jsx b/Frontend/src/pages/BankStatus.jsx
+index 30a7268..9800e36 100644
+--- a/Frontend/src/pages/BankStatus.jsx
++++ b/Frontend/src/pages/BankStatus.jsx
+@@ -1,4 +1,5 @@
+ import React from "react";
++import { isAdminPageBlocked } from "../features/admin/admin-access";
+ import { Icon, dateText } from "../components";
+ import { commitmentLabel, auctionLink, useAuction } from "../market";
+ import {
+@@ -14,6 +15,8 @@ export default function BankStatus({ market, id }) {
+     commitment: true,
+   });
+   const bank = state.commitment;
++  const actionPage = bank?.status === "SUCCESS" ? "bid" : "commitment";
++  const showAction = !isAdminPageBlocked(market.workspace.user?.role, actionPage);
+   return (
+     <AuctionLayout
+       market={market}
+@@ -58,19 +61,18 @@ export default function BankStatus({ market, id }) {
+                 </div>
+               </dl>
+             )}
+-            <div className="form-actions">
+-              {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
+-              <a
+-                className="button dark"
+-                href={auctionLink(
+-                  bank?.status === "SUCCESS" ? "bid" : "commitment",
+-                  id,
+-                )}
+-              >
+-                {bank?.status === "SUCCESS" ? "للمزايدة" : "ارجع للالتزام"}{" "}
+-                <Icon />
+-              </a>
+-            </div>
++            {showAction && (
++              <div className="form-actions">
++                {/* تم التعديل من عبير: تحديث البيانات تلقائي بدون زر اضافي. */}
++                <a
++                  className="button dark"
++                  href={auctionLink(actionPage, id)}
++                >
++                  {bank?.status === "SUCCESS" ? "للمزايدة" : "ارجع للالتزام"}{" "}
++                  <Icon />
++                </a>
++              </div>
++            )}
+           </div>
+         </AuctionState>
+       </SignInGate>
+diff --git a/Frontend/src/pages/Guide.jsx b/Frontend/src/pages/Guide.jsx
+index 7d345d0..f40158a 100644
+--- a/Frontend/src/pages/Guide.jsx
++++ b/Frontend/src/pages/Guide.jsx
+@@ -3,7 +3,7 @@ import { Auctioneer, Icon } from "../components";
+ import { guideSteps } from "../data";
+ 
+ // تم التعديل من عبير: نفس الحساب يقدر يبيع ويزايد ونشرح كل رحله بتبويب مستقل.
+-export default function Guide({ onFeature, isAdmin }) {
++export default function Guide({ onFeature, canUseMarketplaceActions }) {
+   const [role, setRole] = useState("bidder");
+   return (
+     <div className="guide-page">
+@@ -144,7 +144,7 @@ export default function Guide({ onFeature, isAdmin }) {
+             <a href="#/auctions" className="button dark">
+               استكشف المزادات <Icon />
+             </a>
+-          ) : !isAdmin && (
++          ) : canUseMarketplaceActions && (
+             <button onClick={() => onFeature("sell")} className="button dark">
+               ابدأ عرض أصلك <Icon />
+             </button>
+diff --git a/Frontend/src/pages/Home.jsx b/Frontend/src/pages/Home.jsx
+index edb376b..861a545 100644
+--- a/Frontend/src/pages/Home.jsx
++++ b/Frontend/src/pages/Home.jsx
+@@ -10,7 +10,7 @@ export default function Home({
+   retry,
+   onOpen,
+   onFeature,
+-  isAdmin,
++  canUseMarketplaceActions,
+ }) {
+   const featured = auctions.filter((a) => a.status === "ACTIVE").slice(0, 3);
+   return (
+@@ -43,7 +43,7 @@ export default function Home({
+               <a className="button gold" href="#/auctions">
+                 استكشف المزادات <Icon />
+               </a>
+-              {!isAdmin && <button className="hero-sell" onClick={() => onFeature("sell")}>
++              {canUseMarketplaceActions && <button className="hero-sell" onClick={() => onFeature("sell")}>
+                 عندك أصل مميز؟ <span>اعرضه هنا</span>
+               </button>}
+             </div>
+diff --git a/Frontend/src/pages/Login.jsx b/Frontend/src/pages/Login.jsx
+index 2b78741..1c02216 100644
+--- a/Frontend/src/pages/Login.jsx
++++ b/Frontend/src/pages/Login.jsx
+@@ -1,3 +1,5 @@
++import { isAdminRole } from "../features/admin/admin-access";
++import { accountDestination } from "../features/admin/admin-navigation";
+ import { notify } from "../InteractionUI";
+ import { GoogleAccess, SignupVerification } from "../AccountVerification";
+ import React, { useState } from "react";
+@@ -29,7 +31,7 @@ export default function Login({ workspace, params }) {
+       const user = await workspace.login(email.trim().toLowerCase(), password);
+       notify("حياك في مزادك");
+       setPassword("");
+-      location.hash = user?.role === "ADMIN" ? "/admin" : destination;
++      location.hash = accountDestination(user?.role, destination);
+     } catch (err) {
+       if (err.code === "EMAIL_NOT_VERIFIED") setVerifying(true);
+       setError(err.message);
+@@ -52,7 +54,7 @@ export default function Login({ workspace, params }) {
+             );
+             setVerifying(false);
+             setPassword("");
+-            location.hash = user?.role === "ADMIN" ? "/admin" : destination;
++            location.hash = accountDestination(user?.role, destination);
+           }}
+         />
+       )}
+@@ -74,9 +76,9 @@ export default function Login({ workspace, params }) {
+           <p>{workspace.user.name}</p>
+           <a
+             className="button dark"
+-            href={workspace.user.role === "ADMIN" ? "#/admin" : "#/activity"}
++            href={"#" + accountDestination(workspace.user.role, "/activity")}
+           >
+-            {workspace.user.role === "ADMIN"
++            {isAdminRole(workspace.user.role)
+               ? "الذهاب للإدارة"
+               : "الذهاب لنشاطي"}{" "}
+             <Icon />
+diff --git a/Frontend/src/pages/Profile.jsx b/Frontend/src/pages/Profile.jsx
+index 5a46bf6..c5e12c7 100644
+--- a/Frontend/src/pages/Profile.jsx
++++ b/Frontend/src/pages/Profile.jsx
+@@ -1,3 +1,4 @@
++import { canShowAccountSettings } from "../features/admin/admin-access";
+ import "./Profile.css";
+ import { Avatar, avatarCells } from "../Avatar";
+ import React, { useState } from "react";
+@@ -194,7 +195,7 @@ export default function Profile({ workspace }) {
+             <p role="status">{avatarMessage}</p>
+           </section>
+           {/* تم التعديل من عبير: الاسم قابل للتعديل والبريد ثابت والامان بنفس كرت الحساب. */}
+-          {workspace.user.role !== "ADMIN" && <section className="paper-card profile-settings">
++          {canShowAccountSettings(workspace.user.role) && <section className="paper-card profile-settings">
+             <div className="section-heading">
+               <div>
+                 <p className="eyebrow">حسابك تحت يدك</p>
