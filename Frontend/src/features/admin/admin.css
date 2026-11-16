@@ -1,0 +1,21 @@
+.account-page-admin .account-main > .account-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.account-layout.account-page-admin {
+  padding-top: 165px;
+  padding-bottom: 48px;
+}
+
+
+@media (max-width: 700px) {
+  .account-layout.account-page-admin {
+    padding-top: 140px;
+    padding-bottom: 32px;
+  }
+}
