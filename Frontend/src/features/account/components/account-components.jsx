@@ -3,6 +3,8 @@ import "./account-components.css";
 import { Avatar } from "../../profile/components/Avatar.jsx";
 import React, { useState } from "react";
 import { Auctioneer, Icon } from "../../../shared/ui/index.jsx";
+import { ADMIN_ACCOUNT_LINKS } from "../../admin/admin-navigation.js";
+import { isAdminRole } from "../../admin/admin-access.js";
 export const listingLabels = {
   PENDING_REVIEW: "قيد المراجعة",
   APPROVED: "معتمد",
@@ -18,8 +20,17 @@ export function AccountLayout({
   description,
   children,
 }) {
-  const [exitError, setExitError] = useState("");
-  const [exiting, setExiting] = useState(false);
+const [exitError, setExitError] = useState("");
+const [exiting, setExiting] = useState(false);
+
+const accountLinks = isAdminRole(workspace.user?.role)
+  ? ADMIN_ACCOUNT_LINKS
+  : [
+      ["activity", "نشاطي", "gavel"],
+      ["my-auctions", "مزاداتي ومشاركاتي", "flag"],
+      ["listings", "إعلاناتي", "image"],
+      ["profile", "الملف الشخصي", "user"],
+    ];
   // تم التعديل من عبير: ننهي الجلسه ونوضح اذا تسجيل الخروج فشل
   async function exit() {
     if (exiting) return;
@@ -65,13 +76,7 @@ export function AccountLayout({
           </div>
         </div>
         <nav aria-label={"صفحات حسابي"}>
-          {[
-            ["activity", "نشاطي", "gavel"],
-            // تم التعديل من عبير: نضيف رابط المتابعه للمجموعه الخامسه بدون تغيير صفحات الحساب.
-            ["my-auctions", "مزاداتي ومشاركاتي", "flag"],
-            ["listings", "إعلاناتي", "image"],
-            ["profile", "الملف الشخصي", "user"],
-          ].map(([page, label, icon]) => (
+          {accountLinks.map(([page, label, icon]) => (
             <a
               key={page}
               href={"#/" + page}
