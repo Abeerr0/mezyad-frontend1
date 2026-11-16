@@ -31,6 +31,7 @@ import EditListing from "../features/listings/pages/EditListing/EditListing.jsx"
 import CreateAuction from "../features/auctions/pages/CreateAuction/CreateAuction.jsx";
 import { useWorkspace } from "../features/account/hooks/useWorkspace.js";
 import { API, imageUrl, request } from "../shared/api/client.js";
+import AdminDashboard from "../features/admin/AdminDashboard.jsx";
 import { Icon } from "../shared/ui/index.jsx";
 import {
   categoryLabels,
@@ -38,6 +39,7 @@ import {
   demoCategories,
 } from "../shared/data/site-data.js";
 const pageTitles = {
+   admin: "لوحة الإدارة",
   payment: "مراجعة الدفع",
   auction: "تفاصيل المزاد",
   "private-access": "المزاد الخاص",
@@ -332,8 +334,11 @@ export default function App() {
           {route.page === "edit-listing" && (
             <EditListing workspace={workspace} params={route.params} />
           )}
-          {route.page === "create-auction" && (
+                  {route.page === "create-auction" && (
             <CreateAuction workspace={workspace} params={route.params} />
+          )}
+          {route.page === "admin" && (
+            <AdminDashboard workspace={workspace} />
           )}
         </div>
         {route.page === "home" && <Home {...common} />}
